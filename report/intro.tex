@@ -1,0 +1,130 @@
+\section{Introduction}
+\label{sec:intro}
+
+Real-time systems are utilized in various domains such as air traffic 
+control, public transportation, and automated vehicles. Unlike non-real-time systems, 
+tasks in real-time systems must be both functionally correct and meet strict 
+(or flexible) execution time constraints, known as deadlines. Failure 
+to meet these deadlines can lead to severe consequences. The critical 
+nature of these systems necessitates designing the system 
+architecture with a focus on time and incorporating fault tolerance 
+to ensure high reliability.
+
+One example of such architecture is the time-triggered 
+architecture (TTA)\cite{kopetz2003tta}\cite{kopetz1998timetriggered}, which offers a fault-tolerant communication protocol and a precise timing system to synchronize different electronic control units. Developing and running tasks on these architectures require in-depth knowledge of the system and its architecture, which complicates code reusability and scalability when adding hardware resources or upgrading to a larger system.
+
+To address these issues, the Automotive Open System Architecture 
+(AUTOSAR\footnote{\url{https://www.autosar.org/}}) was developed. 
+AUTOSAR introduces layers of abstraction between hardware, firmware, 
+and software, enhancing software reusability and hardware 
+scalability across different systems while maintaining safety and 
+security standards. It is now the most widely used architecture among car 
+manufacturers, with notable core partners including BMW, Ford, and Toyota.
+
+Scalability, in particular, plays a crucial role in modern 
+real-time systems. Increasingly, real-time systems such as 
+autonomous cars or computer vision systems are enhancing their 
+computational resources by transitioning to multiprocessor systems. 
+This shift from uniprocessor to multiprocessor systems addresses 
+the growing complexity and computational demands of tasks executed 
+on these systems, aiming to reduce both the execution time of these 
+tasks and the required resources\cite{maiza2019survey}.
+
+Hence, an increasing number of real-time systems are 
+utilizing multi-core hardware to parallelize their tasks 
+and convert sequential programs into parallelized ones using 
+frameworks such as OpenMP
+\footnote{OpenMP (2011) OpenMP Application Program Interface v3.1. 
+\url{http://www.openmp.org/mp-documents/OpenMP3.1.pdf}}. 
+Unfortunately, in most real-life scenarios, the number of available 
+processors/cores is fewer than the number of tasks/subtasks that 
+can be executed in parallel (i.e., independent tasks). This means 
+that not all independent tasks can be executed simultaneously on 
+the system, raising the question: which task should be executed first?
+
+This question is particularly important in a real-time context 
+because having the wrong execution order, or schedule, could lead 
+to, at best, a slow system, and at worst, deadline misses, which 
+can have fatal repercussions. In the case of a self-driving car 
+system, for instance, a slight delay of 500 ms in detecting a pedestrian 
+crossing the road can, in some cases, be enough to drive over 
+the pedestrian or cause a car accident. Note that the resources of 
+real-time systems are scarce and limited, which is why using as 
+little processing power as possible while ensuring that tasks meet 
+their deadlines is of crucial importance.
+
+The extreme case of this scheduling problem arises when only one 
+processor is available to execute tasks. This is known as task 
+scheduling on a uniprocessor, and \cite{liu1973scheduling} 
+provided two major priority policies: Rate Monotonic (RM) and 
+Earliest Deadline First (EDF) for scheduling periodic tasks. 
+However, when considering multiple processors, the scheduling 
+problem becomes much more complex, and different task models must 
+be considered.
+
+A prevalent task model is the time-triggered task model, 
+which specifies tasks that execute periodically and is well-suited 
+for time-triggered systems. Another type of task is the Logical 
+Execution Time (LET) task. The LET paradigm is based on the 
+time-triggered paradigm and was originally introduced by the 
+Giotto real-time programming language\cite{henzinger2003giotto} and 
+later refined by \cite{henzinger2009distributed} into the 
+Hierarchical Timing Language (HTL). The main principle behind the 
+LET paradigm is that each task's inputs and outputs are read and 
+written in zero time, i.e., constant time.
+
+The benefits of using LET are twofold. Firstly, the zero-time 
+communication semantics greatly improve the predictability of the 
+overall system and make I/O operations (i.e., memory access) on 
+shared resources deterministic, which is crucial in real-time 
+systems due to the highly negative impact that memory access 
+contentions can have on the system\cite{nagalakshmi2016impact}. 
+Secondly, using LET in programming also provides a layer of 
+abstraction that facilitates the direct translation from modeling 
+to implementation, thus ensuring the implementation of timing 
+requirements, enhancing code maintenance, and producing a less 
+error-prone code base\cite{kirsch2012logical}.
+
+One drawback of LET is its implementation overhead, which increases 
+the execution times of tasks due to the zero-time communication 
+semantics\cite{biondi2018LETruntimeoverhead}. Despite this drawback, 
+the advantages of LET make it attractive for real-time systems\cite{gemlau2021systemLET}, 
+which is why the focus here will be on time-triggered and LET 
+task scheduling on multi-core systems. Given that the problem of 
+scheduling independent tasks is NP-hard\footnote{If a problem is 
+NP-hard, it means that it is very unlikely to find a solution in 
+polynomial time complexity, i.e., solutions are not scalable}\cite{du1989schedNPhard}, 
+no scalable optimal algorithm exists. Therefore, heuristics are 
+used to partially solve the problem.
+
+Consequently, machine learning will be considered here as it can 
+better approximate the unattainable perfect solution while being 
+scalable in terms of computing time after the training phase. In 
+other words, the research questions are:
+
+\begin{itemize}
+    \item [RQ1] What is the current state-of-the-Art in time-triggered task scheduling ?
+            \begin{itemize}
+                \item [RQ1.1] What is the current state-of-the-Art for independent task scheduling ?
+                \item [RQ1.2] What is the current state-of-the-Art for task scheduling with precedence constraints ?
+            \end{itemize}
+    \item [RQ2]  Can machine learning be a better solution to schedule time-triggered task ?
+            \begin{itemize}
+                \item [RQ2.1] Can a machine learning solution compare to state-of-the art heuristics for scheduling Directed Acyclic Graph tasks (tasks with precedence constraints)
+                \item [RQ2.2] Can a machine learning solution be comparable to ILP solutions while being more scalable ?
+            \end{itemize}    
+\end{itemize}
+
+To achieve this, the background section will introduce the various 
+technical terms, concepts, and fundamental algorithms. 
+Following this, a systematic literature review will be conducted to address R1, 
+and finally, the artifact and experimental design, results, and conclusion will 
+be presented to answer R2.
+
+
+
+These research questions which were explored using SLR (RQ1) and \textit{method from Section~\ref{sec:methodology}}.
+
+\paraheading{The solution we propose has the following features..}
+
+\paraheading{The primary contributions of this paper are:}
