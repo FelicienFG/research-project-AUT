@@ -2,47 +2,364 @@
 \section{Related Works}
 \label{sec:literature}
 
-\cite{ala} is another good paper.
-
 \subsection{Systematic Literature Review process}
 
-The SLR process~\cite{kitchenham2009systematic}.
-
 \paraheading{\textbf{Scoping}}
-The following research questions were used to conduct this SLR. 
+
+This SLR aims at tackling RQ1. More precisely, the following research questions will be answered:
+
 \begin{itemize}
-    \item RQ1
-    \item RQ2
+    \item [RQ1.1] What is the current state-of-the-Art for independent time-triggered task scheduling ?
+    \item [RQ1.2] What is the current state-of-the-Art for time-triggered task scheduling with precedence constraints ?
 \end{itemize}
-Extant literature does not sufficiently answer this question (provide a summary of current secondary studies).
+It will also be shown how the literature doesn't provide 
+a complete answer to RQ2, hence the contributions of this paper.\\
 
-\paraheading{\textbf{Planning} involved breaking down the RQs into individual search terms.} We identified the following search terms (concepts) which were combined in the following way. Some practice search runs were used to ensure that the search terms were correct and yielded correct results.
-Preliminary inclusion and exclusion criteria were ....
+From these research questions, several concepts have been isolated,
+namely, time-triggered tasks, the nature of the system (real-time multicore system),
+the scheduling of tasks, DAG tasks, and machine learning.
+The recording of the search results were done using the BibTeX LateX plugin
+combine with the google scholar "cite" feature.
 
-\paraheading{It was decided that search results would be recorded by the use of ... (provide details)}.
+Searching was conducted using the IEEE, ACM and Google Scholar databases.
+According to the concepts identified above, 
+the keyword chain used for searching was 
+"("real-time" OR "real time") AND 
+"system" AND ("time-triggered" OR "time triggered") AND "task" AND "scheduling" 
+AND ("multi-processors" OR "multi-cores" OR "multi processors" OR 
+"multi cores" OR "multi-processor" OR "multi processor" OR 
+"multi-core" OR "multi core")" when considering independent time-triggered tasks.
+Then, for DAG tasks, the keyword "DAG task" was added
+instead of ("time-triggered" OR "time triggered") AND "task".
+Finally, the keyword "machine learning" was included in 
+both DAG task and time-triggered task searches to cover RQ2.
+The searches were also confined to the last 20 years.
 
-\paraheading{\textbf{Searching}}
+The first search, about independent time-triggered tasks, yielded more than 200 results,
+some of them being duplicates,
+the list shrunk to around 100.
+Those 100 papers were than looked through using their abstract 
+and the ones not proposing an scheduling but rather talking 
+only about the response time analysis were excluded from the list.
+The papers about outdated version of scheduling algorithms (i.e.,
+more recent papers improved on them) were also excluded from the list,
+as well as papers about heterogenous multicore systems,
+leaving us with around 10 papers.
+The second search, about DAG tasks, outputed around 300 papers,
+most of which were papers found in the first search.
+By excluding those found in the previous search, 
+the list shrunk down to about 100 papers.
+Using the same exclusion criteria as before, 
+the final list was comprised of 10 articles.
 
-\paraheading{Searching was conducted on the following databases, and XYZ number of results were returned.} 
+The final search, that is, including the keyword "machine learning"
+in the two previous searches, left us with about 10 papers,
+the vast majority of which were about frameworks to conduct machine learning
+in a real-time system environment but not producing a scheduling algorithm based on it.
+Hence, we only found 3 articles using machine learning to
+schedule time-triggered tasks on multicore real-time systems.
+Out of those 3, 2 were about DAG tasks and only one was
+about independent time-triggered tasks.
 
-\paraheading{\textbf{Screening and Eligibility}}
-Prune the list to identify the final list (max 20 papers). 
+Beyond these searches, some of the references cited here
+were found through cross-referencing.
 
 \subsection{Findings of the Literature Review}
 
 \paraheading{The works reviewed were compared on the following metrics.} 
 \begin{itemize}
-    \item \textbf{Metric 1}: justification
-    \item \textbf{Metric 2}: justification
-    \item $\ldots$ (add as many as needed)
+    \item \textbf{Utilization Bound}: for independent task scheduling, useful to see which algorithm is more efficient at using the available resources.
+    \item \textbf{Acceptance Ratio}: also for independent task scheduling, it shows how optimal (see Section \ref{sec:bg}) a scheduling algorithm is.
+    \item \textbf{Makespan}: for DAG task scheduling, widely used in the literature.
+    \item \textbf{Runtime Overhead}: some scheduling algorithms can show promising results theoretically but are practically very slow because 
+    of their complexity adding runtime overhead on the scheduler, this metric will not be a number but rather an amount such as minimal, practical, non-practical.
 \end{itemize}
+Every metric used here have also been chosen for their prevalence in the literature.
 
 A comparison of the works was carried out and the overall results are illustrated in Table~\ref{tab:slrtable}.
 
-\paraheading{Provide a summary of what the results say.}
+\subsubsection{Independent tasks}
+~
 
-\paraheading{Show how your work is novel.}
+Multi-processor scheduling can be classified into two main types: 
+partitioning scheduling and global scheduling. In partitioning 
+scheduling, tasks are initially assigned to a specific processor 
+where they will remain for their entire execution, meaning task 
+migration between processors is not permitted. Subsequently, a 
+uniprocessor scheduling algorithm is utilized. Conversely, global 
+scheduling permits tasks to migrate from one processor to another 
+during runtime.
+
+The partitioning approach offers the benefit that, once tasks 
+are allocated to each processor, the problem reduces to multiple 
+uniprocessor scheduling problems. The challenge with partitioning 
+lies in determining which task to assign to which processor. 
+This issue is known as a bin-packing problem, which is 
+NP-hard\cite{bin_packing_pb}. Consequently, various partitioning 
+scheduling algorithms are based on bin-packing heuristics such 
+as First Fit (FF), Best Fit (BF), or Next Fit (NF), leading to 
+the development of the EDF-FF and RM-FF scheduling algorithms 
+for partitioned multi-processor scheduling\cite{oh1993tightRMFFBound}
+\cite{lopez2000wcUEDF}. Within the partitioning domain, 
+EDF-FF is the most effective scheduling algorithm in terms of 
+utilization bound and surpasses the RM algorithm in terms of 
+approximation ratio\cite{lopez2000wcUEDF}.
+
+For the global scheduling approach, several new algorithms have 
+emerged, but EDF has also been extended to Global-EDF, which is a 
+simple and popular global version of EDF\cite{li2015globalEDF}. 
+Unlike EDF in uniprocessor scheduling, Global-EDF is not optimal. 
+Therefore, other scheduling algorithms, such as the PFair\cite{baruah1993PFair} 
+algorithm and LLREF\cite{cho2006LLREF}, were developed to achieve 
+optimality in a multi-processor scheduling context. Both PFair and 
+LLREF utilize the concept of proportional fairness to assign 
+priority to tasks based on the amount of processor time they 
+require for execution. The PFair algorithm calculates the priority 
+of tasks at each time tick to ensure proportionate fairness for each 
+task. This makes PFair the first optimal algorithm for multi-processor 
+systems, though it incurs significant runtime overhead by invoking 
+the scheduler at every tick. LLREF aims to reduce PFair's runtime 
+overhead by introducing the time and local execution time domain 
+plane (or T-L plane), maintaining PFair's optimality while improving 
+runtime efficiency. As a result, LLREF outperforms PFair in 
+practical scenarios. Despite Global-EDF and its counterpart, 
+Global RM, not being optimal, they are much simpler to implement 
+than both PFair and LLREF and have less runtime overhead, making 
+them easier to use in most real-life applications.
+
+It has been shown that global scheduling generally leads to 
+better performance compared to partitioned scheduling\cite{srinivasan2003globalbetterthanpart}, 
+especially in soft real-time systems where critical and mixed-critical tasks, as well 
+as non-periodic tasks (i.e., sporadic tasks), are present. For 
+example, \cite{matschulat2007EREDF} introduced an early-release EDF 
+algorithm to accommodate sporadic and non-critical tasks by 
+accumulating slack time at the end of each hyperperiod
+\footnote{A hyperperiod of a taskset is the least common multiple of the tasks' periods.} 
+and using it to execute those tasks. This algorithm was further 
+improved by \cite{yip2014relaxing}, who considered the 
+base-period\footnote{The base-period is the greatest common divisor of all tasks' periods.} 
+instead of the hyperperiod for their scheduling algorithm.
+\newline
+
+Although dynamically allocating the priorities of tasks 
+allows the scheduling algorithm to achieve high schedulability, 
+these algorithms are generally more difficult and complex to 
+implement in practice. This is why popular real-time system 
+architectures, such as AUTOSAR\footnote{https://www.autosar.org/}, 
+only use fixed priority ordering\cite{panic2014autosar_static}.
+
+For global fixed priority scheduling, multiple heuristics have 
+been proposed, inspired by the uniprocessor priority assigning 
+algorithm such as deadline monotonic (DM, where a lower deadline 
+corresponds to a higher priority) and a variant called DkC, 
+where the priority score is $S=D-k*C$ (i.e., the lower the S, 
+the higher the priority), with kk being dependent on the number of 
+processors\cite{andersson2000DMDkC}. Another variant of DM is 
+DMDS\cite{andersson2008DMDS}, which uses slack time (i.e., DkC 
+with $k=1$) as a priority score. \cite{audsley2001OPA} developed 
+an optimal fixed priority assignment (OPA) algorithm, 
+which was extended to multi-processors by \cite{davis2011improvedTDA} 
+and \cite{bertogna2008RTA_test}.
+
+Recently, \cite{lee2020panda} proposed a deep learning model 
+utilizing attention and reinforcement learning to generate a 
+priority list for an input set of time-triggered tasks. They 
+compared the schedulability rate produced by the model with the 
+various fixed-priority heuristics described above, using a 
+worst-case response time upper bound from\cite{bertogna2008RTA_test}. 
+The model achieved better overall performance in terms of 
+schedulability, even surpassing the OPA algorithm.
+
+\subsubsection{DAG tasks}
+~
+
+Scheduling DAG tasks involves two steps: first, 
+computing the intra-task schedule, and second, computing 
+the inter-task schedule. For the inter-task schedule, various 
+approaches can be employed.
+
+\cite{WangGEDFDag2019}, for instance, improve the worst-case 
+makespan of GEDF under federated scheduling of multiple DAG tasks 
+with arbitrary deadlines. The federated scheduling approach, 
+similar to the partitioning approach, involves assigning clusters 
+of processors to DAG tasks with the highest utilization, leaving 
+the remainder for low-utilization tasks. This allows for 
+intra-task parallelization instead of merely sequentializing 
+the DAG task. Consequently, the paper also improves the acceptance 
+ratio for single DAG task scheduling by providing a better 
+schedulability test compared to previously used 
+schedulability tests for GEDF.
+
+Another method is the decomposition approach, which involves 
+decomposing the DAG task into several independent sequential tasks. 
+These tasks are then executed in parallel segments, with their 
+release times and deadlines aligned to match the dependency constraints 
+between the sequential tasks\cite{CaoStretchingDAGs2020}. The paper 
+\cite{CaoStretchingDAGs2020} introduces a state-of-the-art 
+stretching method for DAG task decomposition and employs the GEDF 
+dynamic priority assignment algorithm to demonstrate improvements 
+in the acceptance ratio over the previous state-of-the-art 
+decomposition algorithm.
+
+\cite{SchmidResponseDAGThreadpools2021} explores a thread pool 
+approach for parallelizing DAG tasks. Instead of assigning 
+processors to DAG tasks, thread workers from a thread pool are 
+assigned, and the number of thread workers each DAG can use is 
+limited. Their algorithm, combined with a global fixed-point 
+priority scheduling algorithm such as Rate Monotonic, is compared 
+to other approaches, including the global approach and the 
+semi-federated approach.
+
+The global approach does not assign processors to DAG tasks but 
+allows the tasks to utilize multiple processors dynamically. 
+The semi-federated approach, similar to the federated approach, 
+places as many heavy tasks (tasks with high utilization) in processor 
+clusters as possible, while the remaining tasks, along with the 
+light tasks, are allocated to the rest of the available processors.
+
+It is found that the latest approach generally outperforms 
+the method used in \cite{SchmidResponseDAGThreadpools2021}, although the 
+thread pools approach still has a better acceptance ratio compared 
+to the global approach.
+
+The previously cited articles focus on the execution of multiple 
+DAGs on a multi-processor system, utilizing existing priority 
+scheduling algorithms such as GEDF or Global RM to evaluate their 
+contributions. \cite{he2019intra} considers recurrent DAG tasks 
+and their inner graph structure to develop a priority assignment 
+algorithm that minimizes the makespan of the DAG task. This 
+algorithm is then extended to multi-DAG scheduling using a global 
+scheduling approach such as G-EDF or G-RM. This dynamic scheduling 
+approach performs best with G-RM in terms of acceptance ratio.
+
+The results in terms of acceptance ratio are superior to those in 
+\cite{SchmidResponseDAGThreadpools2021}, though in some cases they 
+are surpassed by \cite{CaoStretchingDAGs2020}. However, a 
+drawback of \cite{CaoStretchingDAGs2020} is that this type of task 
+decomposition incurs significant runtime overhead, which diminishes 
+task performance in real-life scenarios.
+
+While \cite{he2019intra} and \cite{CaoStretchingDAGs2020} allow 
+for task preemption, which especially in the case of 
+\cite{CaoStretchingDAGs2020} adds runtime overhead, 
+\cite{zhao2020dag} leverages the parallelism and dependency 
+properties of DAG tasks, along with a 'critical path first' 
+execution strategy, to develop a state-of-the-art non-preemptive 
+and priority-based scheduling algorithm that completely outperforms 
+\cite{he2019intra} in terms of makespan. Their results are utilized 
+by \cite{lee2021DAGDeeplearning} to compare with a deep 
+learning-based priority assignment algorithm for DAGs, which 
+improves the makespan of DAG task execution by 2$\sim$3\%.
+
+\cite{zhao2022dag} extends their concurrent provider and consumer 
+(CPC) model \cite{zhao2020dag} to multi-DAG scheduling by 
+minimizing inter-task DAG interference to zero and devising a 
+processor-assigning scheduling algorithm where the priority of 
+different DAG tasks is computed using the deadline-monotonic 
+algorithm. Under non-preemptive scheduling, the proposed method 
+significantly outperforms the method used in \cite{he2019intra} in 
+terms of acceptance ratio, by up to 60\%.
+
+For multi-DAG scheduling, \cite{GuanDAGfluid2021} employed the 
+fluid scheduling strategy to manage DAG tasks with implicit 
+deadlines. This fluid scheduling approach, also used in PFair and 
+LLREF scheduling algorithms \cite{baruah1993PFair}\cite{cho2006LLREF}, 
+ensures that at every point in time, each task has utilized the 
+amount of execution time dictated by its respective utilization 
+factor, thereby approximating the perfect fluid execution of the 
+task. The advantage of this approach is its exceptionally high 
+acceptance ratio, outperforming other methods such as 
+\cite{WangGEDFDag2019}, \cite{he2019intra}, and \cite{CaoStretchingDAGs2020}. 
+However, it suffers from high runtime overhead, complicating 
+practical implementation.
+\newline
+
+A more mathematical approach to the scheduling of DAGs is to model 
+the scheduling problem as an Integer Linear Programming (ILP) 
+optimization problem. In this model, precedence, deadline, and 
+processor assignment constraints are represented mathematically, 
+with the objective of minimizing the makespan. This method is 
+utilized by \cite{ChangMinWRCTBoundILP2022} and compared to 
+state-of-the-art priority assignment algorithms (\cite{he2019intra} 
+and \cite{zhao2020dag}). The ILP method demonstrates a significant 
+improvement in makespan, which is expected due to the optimality of 
+the ILP approach. However, the drawback of this method is that as 
+the number of tasks and subtasks increases, the number of 
+constraints grows, causing the computation time to increase 
+exponentially, rendering the method non-scalable.
+
+Most studies do not consider the communication time between tasks, 
+which can be significant in real-life systems. 
+\cite{ChenDAGorder2023} addresses this by scheduling DAG tasks on a 
+Network on Chip (NoC) system. The resulting schedule, DAG-Order, 
+is non-preemptive and is based on ordering the tasks according to 
+their communication delays and computation workloads.
+
+Memory access contention, which occurs when two or more tasks 
+attempt to access a shared memory location simultaneously, can 
+also be crucial in real-life scenarios. Therefore, scheduling 
+algorithms for implementations of the LET paradigm have been 
+proposed to reduce or even eliminate contention problems with LET 
+DAG tasks \cite{Yano2021ContentionFree}\cite{Igarashi2020HeuristicContFree}.
+\newline
 
 
+The machine learning community has also explored DAG scheduling. 
+For instance, \cite{yano2021work} utilized reinforcement 
+learning (RL), specifically Q-learning, to statically prioritize 
+sub-tasks within DAG tasks and applied an 
+earliest-start-first (EST) heuristic value to dispatch each 
+sub-task to different processors. Similar to \cite{ChenDAGorder2023}, 
+\cite{yano2021work} accounted for communication delays and the 
+workload of subtasks when assigning priorities.
+
+Another application of RL is demonstrated by 
+\cite{lee2021DAGDeeplearning}, who designed a deep learning model 
+based on RL that uses the spatial features of each DAG task as well 
+as their temporal features, i.e., precedence constraints. They 
+achieved this by combining a graph convolution network 
+(for spatial information) with a sequential encoder 
+(for temporal information), ultimately producing a prioritized list 
+of the DAG's subtasks. This list can then be used to compute 
+the makespan and optimize it via RL. The results in 
+\cite{lee2021DAGDeeplearning} were compared with state-of-the-art (SOTA) 
+algorithms \cite{he2019intra}\cite{zhao2020dag}, with the deep 
+reinforcement learning method surpassing the SOTA by up to 3\% 
+in terms of makespan.
 
 \input{slrtable}
+
+As you can see, although dynamic priority algorithms outperform 
+fixed-priority ones, the simplicity of implementation and low runtime 
+overhead of fixed-priority algorithms make them attractive to the 
+industry. This is especially true for the DAG task model, where 
+there has been significant focus on fixed-priority scheduling. While 
+some have attempted to produce an 'optimal' schedule using 
+ILP\cite{wei2011reliabilityILP}\cite{yip2014relaxing}\cite{ChangMinWRCTBoundILP2022}, 
+the primary issue with this method is its lack of scalability.
+
+Regarding task migrations, the NP-hard nature of the 
+bin-packing problem suggests that allowing tasks or subtasks to migrate 
+between processors can improve utilization performance.
+
+
+Also, only 3 articles used machine learning to tackle the task scheduling problem,
+from which two are from the same author.
+Furthermore, those articles only compare their results to 
+heuristic-based methods and not ILP methods.
+If we focus on DAG tasks, then only 2 papers are left,
+one focusing on communication between the cores and
+applying the model on a specific architecture\cite{yano2021work},
+and one more theoretical\cite{lee2021DAGDeeplearning}, comparing their model to SOTA 
+\cite{zhao2020dag} and \cite{he2019intra}. The latter suffers 
+from closed sourcing as their model is not open source
+which prohibits the research community to improve on their work. 
+
+Hence, there not only is a need to compare one such machine learning technique 
+to the non-scalable but leading to the mathematically minimum makespan, ILP method,
+but there also is a need to have this model open source and open access.
+Therefore, in this paper, an attempt at replicating the model described
+in \cite{lee2021DAGDeeplearning} will be done and 
+a comparison with the SOTA heuristic-based algorithms
+and ILP will be conducted using the open-source software 
+for LET task scheduling LETSyncronize\cite{yip2023letsynchronise}.

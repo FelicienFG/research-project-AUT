@@ -160,3 +160,56 @@ especially when considering independent tasks (see Section \ref{sec:literature})
 While the acceptance and approximation ratio are used 
 to measure the performance of scheduling alrogithms for independent tasks,
 the makespan is only used for DAG tasks and tasksets representing chain of events.
+
+\subsection{RM and EDF scheduling}
+~
+
+When designing a scheduling algorithm, the key decision involves 
+determining which task should execute first when two or more 
+independent tasks are ready to execute. This requires assigning each 
+task a priority. \cite{liu1973scheduling} introduced two 
+heuristics for this purpose: Rate Monotonic (RM) and Earliest 
+Deadline First (EDF).
+
+The RM algorithm is a fixed-priority scheduling algorithm, 
+meaning that the priority of each task is known before execution 
+begins. RM assigns the highest priority to tasks with the minimum 
+execution rate, i.e., $\frac{C_k}{T_k}$, and is considered optimal 
+for assigning fixed priorities to tasks. In contrast, EDF assigns 
+priorities dynamically by selecting tasks based on which one has 
+the earliest absolute deadline.
+
+Figure \ref{fig:edf_rm_examples} illustrates the difference 
+between the two algorithms by scheduling the same two tasks, 
+$\tau_1$ and $\tau_2$. $\tau_1$ has a worst-case execution time of 0.5 time units 
+and a period of 2 time units, while $\tau_2$ has a worst-case execution 
+time of 2 time units and a period of 3 time units. These are 
+examples of implicit deadline tasks, where the relative deadline 
+equals the end of their execution period. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth, height=100px]{images/schedule_rm.png}
+    a)
+    \includegraphics[width=\linewidth, height=100px]{images/schedule_edf.png}
+    b)
+    \caption{Schedules of $\tau_1$ and $\tau_2$ using Rate Monotonic (a)
+    and Earliest Deadline First (b) heuristics.}
+    \label{fig:edf_rm_examples}
+\end{figure}
+
+Although EDF calculates each priority at runtime, it is optimal 
+for uniprocessor scheduling and has a theoretical utilization bound 
+of 1, which is the maximum possible for a feasible taskset on a 
+single processor. RM, on the other hand, has a much lower 
+utilization bound than EDF. While one might argue that RM introduces 
+less runtime overhead and is therefore more practical, it has been 
+shown that RM leads to more task preemptions (interrupting the 
+execution of a task, as seen at times 2 and 4 for task $\tau_2$ in 
+Figure \ref{fig:edf_rm_examples}.a). This, combined with its lower 
+utilization bound and non-optimality, makes EDF clearly superior to 
+RM\cite{buttazzo2005RMvsEDF}.
+
+Although \cite{liu1973scheduling}'s work focused on uniprocessor 
+systems, the proposed algorithms have also been applied to 
+multi-processor scheduling.
