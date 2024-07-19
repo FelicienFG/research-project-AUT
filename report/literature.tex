@@ -49,8 +49,8 @@ exclusion : past 5 years : IEEE --> down to 1,171
 
 \paraheading{The works reviewed were compared on the following metrics.} 
 \begin{itemize}
-    \item \textbf{Utilization Bound}: for independent task scheduling, useful to see which algorithm is more efficient at using the available resources.
-    \item \textbf{Acceptance Ratio}: also for independent task scheduling, it shows how optimal (see Section \ref{sec:bg}) a scheduling algorithm is.
+    \item \textbf{Utilization Bound}: useful to see which algorithm is more efficient at using the available resources.
+    \item \textbf{Acceptance Ratio}: it shows how optimal (see Section \ref{sec:bg}) a scheduling algorithm is.
     \item \textbf{Makespan}: for DAG task scheduling, widely used in the literature.
     \item \textbf{Runtime Overhead}: some scheduling algorithms can show promising results theoretically but are practically very slow because 
     of their complexity adding runtime overhead on the scheduler, this metric will not be a number but rather an amount such as minimal, practical, non-practical.
@@ -59,97 +59,60 @@ Every metric used here have also been chosen for their prevalence in the literat
 
 A comparison of the works was carried out and the overall results are illustrated in Table~\ref{tab:slrtable}.
 
-\subsubsection{Independent tasks}
-~
 
-Multi-processor scheduling can be classified into two main types: 
-partitioning scheduling and global scheduling. In partitioning 
-scheduling, tasks are initially assigned to a specific processor 
-where they will remain for their entire execution, meaning task 
-migration between processors is not permitted. Subsequently, a 
-uniprocessor scheduling algorithm is utilized. Conversely, global 
-scheduling permits tasks to migrate from one processor to another 
-during runtime.
+\begin{table}
+    \centering
+    \begin{tabular}[]{|l|p{0.20\linewidth}|p{0.20\linewidth}|p{0.20\linewidth}|p{0.20\linewidth}|}
+        \hline
+        \textbf{Reference} & \textbf{Motivation} & \textbf{Contribution(s)} & \textbf{Limitation(s)} & \textbf{Methodology Summary}\\
+        \hline
+        \cite{guan2021DAGfluid}  & DAG tasks scheduling is getting more popular and fluid scheduling performs great theoretically & Provide a DAG-fluid scheduling algorithm
+        that performs way better in terms of acceptance ratio then previous algorithms & Fluid scheduling is unpractical and introduces a lot of overhead and task migrations, also only for implicit deadlines tasks
+        & fluid-based algorithm where it decomposes a DAG's subtasks into multiple sequential segments\\
+        \hline
+        \cite{He2019DagIntra}  & DAGs are popular but no one looked at the intra-task execution order to leverage the graph structure & proposes a priority list scheduling algorithm for a single DAG task
+        which performs better than SOTA in terms of makespan & no comparison with optimal priority assignment algorithms / optimal schedules.  & uses the length (in terms of wcets) of each paths passing through the current vertex to assign the priority to the current vertex,
+        the higher the length, the higher priority \\
+        \hline
+        \cite{Kobayashi2023FedBundledDagsched}  & & & & \\
+        \hline
+        \cite{Xiao2019}  & & & & \\
+        \hline
+        \cite{Igarashi2020HeuristicContentionFree}  & & & & \\
+        \hline
+        \cite{jiangUtilTensityBound}  & & & & \\
+        \hline
+        \cite{JiangDecompoSchedParallelTask}  & & & & \\
+        \hline
+        \cite{He2023DegreeOfParallelism}  & & & & \\
+        \hline
+        \cite{Shi2024DagExecGroups}  & & & & \\
+        \hline
+        \cite{Guan2023FederatedNew}  & & & & \\
+        \hline
+        \cite{Zhao2024GATDRLmodel}  & & & & \\
+        \hline
+        \cite{Xu2023DRLtaskSched}  & & & & \\
+        \hline
+        \cite{Zhao2022DAGsched}  & & & & \\
+        \hline
+        \cite{Lee2021GlobalDagSchedDRL}  & & & & \\
+        \hline
+        \cite{Jiang2023SchedVirtualProcs}  & & & & \\
+        \hline
+        \cite{GuanFluidDag2022}  & & & & \\
+        \hline
+        \cite{GuanFRTDS2020RL}  & & & & \\
+        \hline
+        \cite{JiangVirtuallyFederatedSched2021}  & & & & \\
+        \hline
+        \cite{Pazzaglia2021DMALETtransfer} & & & & \\
+        \hline
+    \end{tabular}
+    \caption{SLR summary table}
+    \label{tab:slt_sum_table}
+\end{table}
 
-The partitioning approach offers the benefit that, once tasks 
-are allocated to each processor, the problem reduces to multiple 
-uniprocessor scheduling problems. The challenge with partitioning 
-lies in determining which task to assign to which processor. 
-This issue is known as a bin-packing problem, which is 
-NP-hard\cite{bin_packing_pb}. Consequently, various partitioning 
-scheduling algorithms are based on bin-packing heuristics such 
-as First Fit (FF), Best Fit (BF), or Next Fit (NF), leading to 
-the development of the EDF-FF and RM-FF scheduling algorithms 
-for partitioned multi-processor scheduling\cite{oh1993tightRMFFBound}
-\cite{lopez2000wcUEDF}. Within the partitioning domain, 
-EDF-FF is the most effective scheduling algorithm in terms of 
-utilization bound and surpasses the RM algorithm in terms of 
-approximation ratio\cite{lopez2000wcUEDF}.
-
-For the global scheduling approach, several new algorithms have 
-emerged, but EDF has also been extended to Global-EDF, which is a 
-simple and popular global version of EDF\cite{li2015globalEDF}. 
-Unlike EDF in uniprocessor scheduling, Global-EDF is not optimal. 
-Therefore, other scheduling algorithms, such as the PFair\cite{baruah1993PFair} 
-algorithm and LLREF\cite{cho2006LLREF}, were developed to achieve 
-optimality in a multi-processor scheduling context. Both PFair and 
-LLREF utilize the concept of proportional fairness to assign 
-priority to tasks based on the amount of processor time they 
-require for execution. The PFair algorithm calculates the priority 
-of tasks at each time tick to ensure proportionate fairness for each 
-task. This makes PFair the first optimal algorithm for multi-processor 
-systems, though it incurs significant runtime overhead by invoking 
-the scheduler at every tick. LLREF aims to reduce PFair's runtime 
-overhead by introducing the time and local execution time domain 
-plane (or T-L plane), maintaining PFair's optimality while improving 
-runtime efficiency. As a result, LLREF outperforms PFair in 
-practical scenarios. Despite Global-EDF and its counterpart, 
-Global RM, not being optimal, they are much simpler to implement 
-than both PFair and LLREF and have less runtime overhead, making 
-them easier to use in most real-life applications.
-
-It has been shown that global scheduling generally leads to 
-better performance compared to partitioned scheduling\cite{srinivasan2003globalbetterthanpart}, 
-especially in soft real-time systems where critical and mixed-critical tasks, as well 
-as non-periodic tasks (i.e., sporadic tasks), are present. For 
-example, \cite{matschulat2007EREDF} introduced an early-release EDF 
-algorithm to accommodate sporadic and non-critical tasks by 
-accumulating slack time at the end of each hyperperiod
-\footnote{A hyperperiod of a taskset is the least common multiple of the tasks' periods.} 
-and using it to execute those tasks. This algorithm was further 
-improved by \cite{yip2014relaxing}, who considered the 
-base-period\footnote{The base-period is the greatest common divisor of all tasks' periods.} 
-instead of the hyperperiod for their scheduling algorithm.
-\newline
-
-Although dynamically allocating the priorities of tasks 
-allows the scheduling algorithm to achieve high schedulability, 
-these algorithms are generally more difficult and complex to 
-implement in practice. This is why popular real-time system 
-architectures, such as AUTOSAR\footnote{https://www.autosar.org/}, 
-only use fixed priority ordering\cite{panic2014autosar_static}.
-
-For global fixed priority scheduling, multiple heuristics have 
-been proposed, inspired by the uniprocessor priority assigning 
-algorithm such as deadline monotonic (DM, where a lower deadline 
-corresponds to a higher priority) and a variant called DkC, 
-where the priority score is $S=D-k*C$ (i.e., the lower the S, 
-the higher the priority), with kk being dependent on the number of 
-processors\cite{andersson2000DMDkC}. Another variant of DM is 
-DMDS\cite{andersson2008DMDS}, which uses slack time (i.e., DkC 
-with $k=1$) as a priority score. \cite{audsley2001OPA} developed 
-an optimal fixed priority assignment (OPA) algorithm, 
-which was extended to multi-processors by \cite{davis2011improvedTDA} 
-and \cite{bertogna2008RTA_test}.
-
-Recently, \cite{lee2020panda} proposed a deep learning model 
-utilizing attention and reinforcement learning to generate a 
-priority list for an input set of time-triggered tasks. They 
-compared the schedulability rate produced by the model with the 
-various fixed-priority heuristics described above, using a 
-worst-case response time upper bound from\cite{bertogna2008RTA_test}. 
-The model achieved better overall performance in terms of 
-schedulability, even surpassing the OPA algorithm.
 
 \subsubsection{DAG tasks}
 ~
