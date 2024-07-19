@@ -202,14 +202,6 @@ doi="10.1007/3-540-29297-7_18",
   pages={1--10},
   year={2014}
 }
-@INPROCEEDINGS{Yano2021ContentionFree,
-  author={Yano, Atsushi and Igarashi, Shingo and Azumi, Takuya},
-  booktitle={2021 IEEE/ACM 25th International Symposium on Distributed Simulation and Real Time Applications (DS-RT)}, 
-  title={Contention-Free Scheduling Algorithm Using LET Paradigm for Clustered Many-core Processor}, 
-  year={2021},
-  pages={1-4},
-  doi={10.1109/DS-RT52167.2021.9576147}
-}
 @article{davis2011improvedTDA,
   title={Improved priority assignment for global fixed priority pre-emptive scheduling in multiprocessor real-time systems},
   author={Davis, Robert I and Burns, Alan},
@@ -324,136 +316,217 @@ doi="10.1007/3-540-29297-7_18",
 }
 
 %LITERATURE REVIEW
-@article{lee2021DAGDeeplearning,
-  title={A global DAG task scheduler using deep reinforcement learning and graph convolution network},
-  author={Lee, Hyunsung and Cho, Sangwoo and Jang, Yeongjae and Lee, Jinkyu and Woo, Honguk},
-  journal={IEEE Access},
-  volume={9},
-  pages={158548--158561},
-  year={2021},
-  publisher={IEEE}
-}
-%
-@inproceedings{yano2021work,
-  title={Work-in-progress: Reinforcement learning-based DAG scheduling algorithm in clustered many-core platform},
-  author={Yano, Atsushi and Azumi, Takuya},
-  booktitle={2021 IEEE Real-Time Systems Symposium (RTSS)},
-  pages={548--551},
-  year={2021},
-  organization={IEEE}
-}
 
-%@inproceedings{delgadillo2021architecture,
-  title={An Architecture to Enable Machine-Learning-Based Task Migration for Multi-Core Real-Time Systems},
-  author={Delgadillo, Octavio and Blieninger, Bernhard and Kuhn, Juri and Baumgarten, Uwe},
-  booktitle={2021 IEEE 14th International Symposium on Embedded Multicore/Many-core Systems-on-Chip (MCSoC)},
-  pages={405--412},
-  year={2021},
-  organization={IEEE}
-}
+%IEEE 
 
-%@inproceedings{horstmann2019framework,
-  title={A framework to design and implement real-time multicore schedulers using machine learning},
-  author={Horstmann, Leonardo Passig and Hoffmann, Jos{\'e} Luis Conradi and Fr{\"o}hlich, Ant{\^o}nio Augusto},
-  booktitle={2019 24th IEEE international conference on emerging technologies and factory automation (ETFA)},
-  pages={251--258},
-  year={2019},
-  organization={IEEE}
-}
-
-%dag
-@inproceedings{zhao2020dag,
-  title={DAG scheduling and analysis on multiprocessor systems: Exploitation of parallelism and dependency},
-  author={Zhao, Shuai and Dai, Xiaotian and Bate, Iain and Burns, Alan and Chang, Wanli},
-  booktitle={2020 IEEE Real-Time Systems Symposium (RTSS)},
-  pages={128--140},
+@INPROCEEDINGS{zhangImpleSched2020,
+  author={Zhang, Xuemei and Huang, Shujuan and Li, Jinghui},
+  booktitle={2020 International Conference on Computer Network, Electronic and Automation (ICCNEA)}, 
+  title={Implementation of Real-Time Scheduling Algorithm on Multi-Core Platform}, 
   year={2020},
-  organization={IEEE}
-}
-
-@article{zhao2022dag,
-  title={DAG scheduling and analysis on multi-core systems by modelling parallelism and dependency},
-  author={Zhao, Shuai and Dai, Xiaotian and Bate, Iain},
-  journal={IEEE transactions on parallel and distributed systems},
-  volume={33},
-  number={12},
-  pages={4019--4038},
-  year={2022},
-  publisher={IEEE}
-}
-
-@INPROCEEDINGS{CaoStretchingDAGs2020,
-  author={Cao, Sheng and Bian, Jiali},
-  booktitle={2020 IEEE 11th International Conference on Software Engineering and Service Science (ICSESS)}, 
-  title={Improved DAG Tasks Stretching Algorithm Based on Multi-core Processors}, 
-  year={2020},
-  pages={18-21}
-}
-
-@inproceedings{SchmidResponseDAGThreadpools2021,
-author = {Schmid, Michael and Mottok, Juergen},
-title = {Response Time Analysis of Parallel Real-Time DAG Tasks Scheduled by Thread Pools},
-year = {2021},
-publisher = {Association for Computing Machinery},
-pages = {173–183}
-}
-
-@article{WangGEDFDag2019,
-  author = {Wang, Kankan and Jiang, Xu and Guan, Nan and Liu, Di and Liu, Weichen and Deng, Qingxu},
-  title = {Real-Time Scheduling of DAG Tasks with Arbitrary Deadlines},
-  year = {2019},
-  publisher = {Association for Computing Machinery},
-  volume = {24},
-  journal = {ACM Trans. Des. Autom. Electron. Syst.},
-}
-
-@ARTICLE{GuanDAGfluid2021,
+  volume={},
+  number={},
+  pages={66-71},
+  keywords={Task analysis;Scheduling algorithms;Real-time systems;Scheduling;Linux;Data structures;Component;LITMUSRT;Multi-Core Systems;Rate Monotic Algorithm;Real-Time Scheduling Algorithm},
+  doi={10.1109/ICCNEA50255.2020.00023}}
+@INPROCEEDINGS{Yano2021ContentionFree,
+  author={Yano, Atsushi and Igarashi, Shingo and Azumi, Takuya},
+  booktitle={2021 IEEE/ACM 25th International Symposium on Distributed Simulation and Real Time Applications (DS-RT)}, 
+  title={Contention-Free Scheduling Algorithm Using LET Paradigm for Clustered Many-core Processor}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={1-4},
+  keywords={Schedules;Directed acyclic graph;Power demand;Scheduling algorithms;Scalability;Clustering algorithms;Real-time systems;multi-rate DAG;multi-/many-core;communication contention;list-scheduling;logical execution time},
+  doi={10.1109/DS-RT52167.2021.9576147}}
+@ARTICLE{guan2021DAGfluid,
   author={Guan, Fei and Qiao, Jiaqing and Han, Yu},
   journal={IEEE Transactions on Computers}, 
   title={DAG-Fluid: A Real-Time Scheduling Algorithm for DAGs}, 
   year={2021},
   volume={70},
   number={3},
-  pages={471-482}
-}
-
-%@ARTICLE{UeterParallelPathProgDAGsched2023,
-  author={Ueter, Niklas and Günzel, Mario and Brüggen, Georg von der and Chen, Jian-Jia},
-  journal={IEEE Transactions on Computers}, 
-  title={Parallel Path Progression DAG Scheduling}, 
-  year={2023},
-  volume={72},
-  pages={3002-3016}
-}
-
-@article{he2019intra,
-  title={Intra-task priority assignment in real-time scheduling of DAG tasks on multi-cores},
-  author={He, Qingqiang and Guan, Nan and Guo, Zhishan and others},
-  journal={IEEE Transactions on Parallel and Distributed Systems},
+  pages={471-482},
+  keywords={Task analysis;Scheduling;Scheduling algorithms;Program processors;Real-time systems;Optimal scheduling;Real-time scheduling;multi-processor system;parallel task},
+  doi={10.1109/TC.2020.2990282}}
+@ARTICLE{He2019DagIntra,
+  author={He, Qingqiang and jiang, xu and Guan, Nan and Guo, Zhishan},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={Intra-Task Priority Assignment in Real-Time Scheduling of DAG Tasks on Multi-Cores}, 
+  year={2019},
   volume={30},
   number={10},
-  pages={2283--2295},
+  pages={2283-2295},
+  keywords={Task analysis;Time factors;Real-time systems;Scheduling algorithms;Runtime;Heuristic algorithms;Dynamic scheduling;Intra-task priority assignment;response time analysis;parallel real-time tasks;multi-cores},
+  doi={10.1109/TPDS.2019.2910525}}
+@INPROCEEDINGS{Kobayashi2023FedBundledDagsched,
+  author={Kobayashi, Tomoya and Azumi, Takuya},
+  booktitle={2023 IEEE Real-Time Systems Symposium (RTSS)}, 
+  title={Work-in-Progress: Federated and Bundled-Based DAG Scheduling}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={443-446},
+  keywords={Schedules;Scheduling algorithms;Multicore processing;Refining;Real-time systems;Scheduling;Task analysis},
+  doi={10.1109/RTSS59052.2023.00048}}
+@INPROCEEDINGS{Xiao2019,
+  author={Xiao, Siyu and Li, Dongguang and Wang, Shiyao},
+  booktitle={2019 IEEE International Conference on Unmanned Systems (ICUS)}, 
+  title={Periodic Task Scheduling Algorithm for Homogeneous Multi-core Parallel Processing System}, 
   year={2019},
-  publisher={IEEE}
-}
-
-
-@article{ChenDAGorder2023,
-author = {Chen, Peng and Chen, Hui and Liu, Weichen and Long, Linbo and Chang, Wanli and Guan, Nan},
-title = {DAG-Order: An Order-Based Dynamic DAG Scheduling for Real-Time Networks-on-Chip},
-year = {2023},
-volume = {21},
-journal = {ACM Trans. Archit. Code OParallel Path Progression DAG Schedulingptim.},
-}
-
-
-%ILP
-
-@ARTICLE{ChangMinWRCTBoundILP2022,
-  author={Chang, Shuangshuang and Bi, Ran and Sun, Jinghao and Liu, Weichen and Yu, Qi and Deng, Qingxu and Gu, Zonghua},
+  volume={},
+  number={},
+  pages={710-713},
+  keywords={Task analysis;Clustering algorithms;Signal processing algorithms;Heuristic algorithms;Scheduling algorithms;Job shop scheduling;periodic task;task scheduling;multi-core processor},
+  doi={10.1109/ICUS48101.2019.8995985}}
+@INPROCEEDINGS{Igarashi2020HeuristicContentionFree,
+  author={Igarashi, Shingo and Ishigooka, Tasuku and Horiguchi, Tatsuya and Koike, Ryotaro and Azumi, Takuya},
+  booktitle={2020 IEEE/ACM 24th International Symposium on Distributed Simulation and Real Time Applications (DS-RT)}, 
+  title={Heuristic Contention-Free Scheduling Algorithm for Multi-core Processor using LET Model}, 
+  year={2020},
+  volume={},
+  number={},
+  pages={1-10},
+  keywords={Task analysis;Integrated circuits;Computational modeling;Timing;Schedules;Memory management;Data models;multi-rate DAG;multi-/many-core;communication contention;list-scheduling;logical execution time},
+  doi={10.1109/DS-RT50469.2020.9213582}}
+@ARTICLE{jiangUtilTensityBound,
+  author={Jiang, Xu and Sun, Jinghao and Tang, Yue and Guan, Nan},
+  journal={IEEE Transactions on Computers}, 
+  title={Utilization-Tensity Bound for Real-Time DAG Tasks under Global EDF Scheduling}, 
+  year={2020},
+  volume={69},
+  number={1},
+  pages={39-50},
+  keywords={Task analysis;Optimal scheduling;Processor scheduling;Real-time systems;Job shop scheduling;Program processors;Multi-core;parallel tasks;DAG;real-time scheduling;global EDF;utilization},
+  doi={10.1109/TC.2019.2936477}}
+@ARTICLE{JiangDecompoSchedParallelTask,
+  author={Jiang, Xu and Guan, Nan and Long, Xiang and Wan, Han},
   journal={IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems}, 
-  title={Toward Minimum WCRT Bound for DAG Tasks Under Prioritized List Scheduling Algorithms}, 
+  title={Decomposition-Based Real-Time Scheduling of Parallel Tasks on Multicores Platforms}, 
+  year={2020},
+  volume={39},
+  number={10},
+  pages={2319-2332},
+  keywords={Task analysis;Real-time systems;Processor scheduling;Program processors;Scheduling;Measurement;Microsoft Windows;Decomposition;directed acyclic graph (DAG);global earliest deadline first (EDF);multicore;parallel tasks;real-time scheduling},
+  doi={10.1109/TCAD.2019.2937820}}
+@INPROCEEDINGS{He2023DegreeOfParallelism,
+  author={He, Qingqiang and Guan, Nan and Lv, Mingsong and Gu, Zonghua},
+  booktitle={2023 Design, Automation & Test in Europe Conference & Exhibition (DATE)}, 
+  title={On the Degree of Parallelism in Real-Time Scheduling of DAG Tasks}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Directed acyclic graph;Analytical models;Processor scheduling;Computational modeling;Parallel processing;Real-time systems;Task analysis},
+  doi={10.23919/DATE56975.2023.10137259}}
+@INPROCEEDINGS{Shi2024DagExecGroups,
+  author={Shi, Junjie and Gtinzel, Mario and Ueter, Niklas and der Bruggen, Georg von and Chen, Jian-Jia},
+  booktitle={2024 IEEE 30th Real-Time and Embedded Technology and Applications Symposium (RTAS)}, 
+  title={DAG Scheduling with Execution Groups}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={149-160},
+  keywords={Analytical models;Processor scheduling;System performance;Refining;Real-time systems;Data models;Time factors;DAG Tasks;Gang Scheduling;Cyber-Physical Systems;Real-Time Systems},
+  doi={10.1109/RTAS61025.2024.00020}}
+@ARTICLE{Guan2023FederatedNew,
+  author={Guan, Fei and Peng, Long and Qiao, Jiaqing},
+  journal={IEEE Transactions on Computers}, 
+  title={A New Federated Scheduling Algorithm for Arbitrary-Deadline DAG Tasks}, 
+  year={2023},
+  volume={72},
+  number={8},
+  pages={2264-2277},
+  keywords={Task analysis;Scheduling algorithms;Program processors;Scheduling;Clustering algorithms;Optimal scheduling;Schedules;Arbitrary-deadline;multi-processor system;parallel task;real-time scheduling},
+  doi={10.1109/TC.2023.3244632}}
+@INPROCEEDINGS{Zhao2024GATDRLmodel,
+  author={Zhao, Mingjun and Mo, Lei and Liu, Ji and Han, Jie and Niu, Dan},
+  booktitle={2024 36th Chinese Control and Decision Conference (CCDC)}, 
+  title={GAT-based Deep Reinforcement Learning Algorithm for Real-time Task Scheduling on Multicore Platform}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={5674-5679},
+  keywords={Processor scheduling;Multicore processing;System performance;Deep reinforcement learning;Feature extraction;Scheduling;Real-time systems;Deep reinforcement learning;graph attention network;multicore system;dependent real-time task;task scheduling},
+  doi={10.1109/CCDC62350.2024.10587381}}
+@INPROCEEDINGS{Xu2023DRLtaskSched,
+  author={Xu, Zijin and Zhang, Yuanhai and Zhao, Shuai and Chen, Gang and Luo, Haoyu and Huang, Kai},
+  booktitle={2023 IEEE 3rd International Conference on Intelligent Technology and Embedded Systems (ICITES)}, 
+  title={DRL-based Task Scheduling and Shared Resource Allocation for Multi-Core Real-Time Systems}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={144-150},
+  keywords={Schedules;Memory management;Fault tolerant systems;Bandwidth;Static analysis;Reinforcement learning;Real-time systems;time-triggered scheduling;deep reinforcement learning;shared resources allocation},
+  doi={10.1109/ICITES59818.2023.10356887}}
+@ARTICLE{Zhao2022DAGsched,
+  author={Zhao, Shuai and Dai, Xiaotian and Bate, Iain},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={DAG Scheduling and Analysis on Multi-Core Systems by Modelling Parallelism and Dependency}, 
   year={2022},
-  volume={41},
-  pages={3874-3885},
-}
+  volume={33},
+  number={12},
+  pages={4019-4038},
+  keywords={Task analysis;Interference;Schedules;Parallel processing;Time factors;Computational modeling;Analytical models;Multi-core systems;directed acyclic graphs;schedulability tests},
+  doi={10.1109/TPDS.2022.3177046}}
+@ARTICLE{Lee2021GlobalDagSchedDRL,
+  author={Lee, Hyunsung and Cho, Sangwoo and Jang, Yeongjae and Lee, Jinkyu and Woo, Honguk},
+  journal={IEEE Access}, 
+  title={A Global DAG Task Scheduler Using Deep Reinforcement Learning and Graph Convolution Network}, 
+  year={2021},
+  volume={9},
+  number={},
+  pages={158548-158561},
+  keywords={Task analysis;Processor scheduling;Program processors;Real-time systems;Job shop scheduling;Computational modeling;Adaptation models;Deep reinforcement learning;graph convolution network;policy gradient learning;DAG task},
+  doi={10.1109/ACCESS.2021.3130407}}
+@ARTICLE{Jiang2023SchedVirtualProcs,
+  author={Jiang, Xu and Liang, Haochun and Guan, Nan and Tang, Yue and Qiao, Lei and Wang, Yi},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={Scheduling Parallel Real-Time Tasks on Virtual Processors}, 
+  year={2023},
+  volume={34},
+  number={1},
+  pages={33-47},
+  keywords={Task analysis;Program processors;Processor scheduling;Real-time systems;Instruction sets;Computational modeling;Resource management;Real-time scheduling;vitual processors;parallel tasks;multiprocessor},
+  doi={10.1109/TPDS.2022.3213024}}
+@ARTICLE{GuanFluidDag2022,
+  author={Guan, Fei and Peng, Long and Qiao, Jiaqing},
+  journal={IEEE Transactions on Computers}, 
+  title={A Fluid Scheduling Algorithm for DAG Tasks With Constrained or Arbitrary Deadlines}, 
+  year={2022},
+  volume={71},
+  number={8},
+  pages={1860-1873},
+  keywords={Task analysis;Optimal scheduling;Job shop scheduling;Program processors;Scheduling algorithms;Schedules;Parallel processing;Real-time scheduling;multi-processor system;parallel task},
+  doi={10.1109/TC.2021.3111512}}
+@ARTICLE{GuanFRTDS2020RL,
+  author={Guan, Y. and Zhang, Bd. and Jin, Z.},
+  journal={IEEE Access}, 
+  title={An FRTDS Real-Time Simulation Optimized Task Scheduling Algorithm Based on Reinforcement Learning}, 
+  year={2020},
+  volume={8},
+  number={},
+  pages={155797-155810},
+  keywords={Task analysis;Hardware;Random access memory;Mathematical model;Computational modeling;Real-time systems;Field programmable gate arrays;DQN;FPGA;power simulation;real-time;reinforcement learning;RTDS},
+  doi={10.1109/ACCESS.2020.2997037}}
+@INPROCEEDINGS{JiangVirtuallyFederatedSched2021,
+  author={Jiang, Xu and Guan, Nan and Liang, Haochun and Tang, Yue and Qiao, Lei and Wang, Yi},
+  booktitle={2021 IEEE Real-Time Systems Symposium (RTSS)}, 
+  title={Virtually-Federated Scheduling of Parallel Real-Time Tasks}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={482-494},
+  keywords={Performance evaluation;Schedules;Program processors;Processor scheduling;Interference;Real-time systems;Resource management},
+  doi={10.1109/RTSS52674.2021.00050}}
+
+@INPROCEEDINGS{Pazzaglia2021DMALETtransfer,
+  author={Pazzaglia, Paolo and Casini, Daniel and Biondi, Alessandro and Natale, Marco Di},
+  booktitle={2021 58th ACM/IEEE Design Automation Conference (DAC)}, 
+  title={Optimal Memory Allocation and Scheduling for DMA Data Transfers under the LET Paradigm}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={1171-1176},
+  keywords={Protocols;Design automation;Multicore processing;Automotive applications;Parallel processing;Data transfer;Mixed integer linear programming},
+  doi={10.1109/DAC18074.2021.9586200}}

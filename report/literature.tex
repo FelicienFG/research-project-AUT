@@ -9,8 +9,8 @@
 This SLR aims at tackling RQ1. More precisely, the following research questions will be answered:
 
 \begin{itemize}
-    \item [RQ1.1] What is the current state-of-the-Art for independent time-triggered task scheduling ?
-    \item [RQ1.2] What is the current state-of-the-Art for time-triggered task scheduling with precedence constraints ?
+    \item [RQ1.1] What is the current state-of-the-Art for DAG task scheduling with precedence constraints ?
+    \item [RQ1.2] How has LET been used in scheduling event-chains ?
 \end{itemize}
 It will also be shown how the literature doesn't provide 
 a complete answer to RQ2, hence the contributions of this paper.\\
@@ -21,48 +21,29 @@ the scheduling of tasks, DAG tasks, and machine learning.
 The recording of the search results were done using the BibTeX LateX plugin
 combine with the google scholar "cite" feature.
 
-Searching was conducted using the IEEE, ACM and Google Scholar databases.
+Searching was conducted using the IEEE and ACM databases.
 According to the concepts identified above, 
 the keyword chain used for searching was 
 "("real-time" OR "real time") AND 
-"system" AND ("time-triggered" OR "time triggered") AND "task" AND "scheduling" 
+"system" AND ("time-triggered" OR "time triggered" OR "DAG" OR "Directed Acyclic Graph" OR "LET" OR "Logical Execution Time" OR "event chain" OR "event-chain") 
+AND "task" 
+AND ("scheduling" OR "scheduler" OR "schedule") 
 AND ("multi-processors" OR "multi-cores" OR "multi processors" OR 
 "multi cores" OR "multi-processor" OR "multi processor" OR 
-"multi-core" OR "multi core")" when considering independent time-triggered tasks.
-Then, for DAG tasks, the keyword "DAG task" was added
-instead of ("time-triggered" OR "time triggered") AND "task".
-Finally, the keyword "machine learning" was included in 
-both DAG task and time-triggered task searches to cover RQ2.
-The searches were also confined to the last 20 years.
+"multi-core" OR "multi core")".
 
-The first search, about independent time-triggered tasks, yielded more than 200 results,
-some of them being duplicates,
-the list shrunk to around 100.
-Those 100 papers were than looked through using their abstract 
-and the ones not proposing an scheduling but rather talking 
-only about the response time analysis were excluded from the list.
-The papers about outdated version of scheduling algorithms (i.e.,
-more recent papers improved on them) were also excluded from the list,
-as well as papers about heterogenous multicore systems,
-leaving us with around 10 papers.
-The second search, about DAG tasks, outputed around 300 papers,
-most of which were papers found in the first search.
-By excluding those found in the previous search, 
-the list shrunk down to about 100 papers.
-Using the same exclusion criteria as before, 
-the final list was comprised of 10 articles.
+The search produced 3,549 results on the IEEE database
 
-The final search, that is, including the keyword "machine learning"
-in the two previous searches, left us with about 10 papers,
-the vast majority of which were about frameworks to conduct machine learning
-in a real-time system environment but not producing a scheduling algorithm based on it.
-Hence, we only found 3 articles using machine learning to
-schedule time-triggered tasks on multicore real-time systems.
-Out of those 3, 2 were about DAG tasks and only one was
-about independent time-triggered tasks.
+exclusion : past 5 years : IEEE --> down to 1,171 
+            heterogeneous not in title + abstract : IEEE --> down to 999
+            mixed critical* not in title + abstract : IEEE --> down to 952
+            scheduling or scheduler or schedule in title but not "energy" :  IEEE --> down to 155 and 149 when just considering conference and journal papers (not early access)
+            
+            removing those not about real-time system,
+            not about proposing a scheduling algorithm,
+            not about DAG nor LET tasks or event-chains : IEEE --> down to 21
 
-Beyond these searches, some of the references cited here
-were found through cross-referencing.
+\paragraph{}
 
 \subsection{Findings of the Literature Review}
 
