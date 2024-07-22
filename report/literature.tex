@@ -58,7 +58,7 @@ exclusion : past 5 years : IEEE --> down to 1,171
 Every metric used here have also been chosen for their prevalence in the literature.
 
 A comparison of the works was carried out and the overall results are illustrated in Table~\ref{tab:slrtable}.
-
+ 
 
 \begin{table}
     \centering
@@ -74,17 +74,50 @@ A comparison of the works was carried out and the overall results are illustrate
         which performs better than SOTA in terms of makespan & no comparison with optimal priority assignment algorithms / optimal schedules.  & uses the length (in terms of wcets) of each paths passing through the current vertex to assign the priority to the current vertex,
         the higher the length, the higher priority \\
         \hline
-        \cite{Kobayashi2023FedBundledDagsched}  & & & & \\
+        \cite{Kobayashi2023FedBundledDagsched} & Federated scheduling for DAG tasks is has proved efficient but 
+        for tasks where the difference between the critical path and the deadline is small, it
+        can lead to over-allocating cores.  & proposed a fedrated and bundled-based scheduling algorithm to avoid this problem and enhanced the schedulability of DAG tasks using their algorithms & They only compare their method with an example of a dag task set comprised of 3 dag tasks. & Uses federated scheduling for tasks with high critical path to deadline ratio and bundled scheduling for tasks with low critical path to deadline ratio. \\
         \hline
-        \cite{Xiao2019}  & & & & \\
+        \cite{Xiao2019} & DAG task scheduling is NP-hard so one can only approximate the optimal algorithm (when considering polynomial timed algorithms)
+        and not a lot has been done on scheduling parrallel reccuring tasks & Introduces a scheduling algorithm 'MAS' that shortens the makespan of recurring DAG tasks compared to EDF & only compares EDF and MAS using one example of a DAG task for makespans and also only compares with EDF.
+        Even though MAS shortens the makespan, it is less scalable than comparable algorithms. & The MAS algorithm combines techniques from clustering scheduling and task duplication algorithm and evaluates it on an actual simulation object (the TMS320C6678) so that the measurement are close to the real-life measurement you would get on the real system.\\
         \hline
-        \cite{Igarashi2020HeuristicContentionFree}  & & & & \\
+        \cite{Igarashi2020HeuristicContentionFree}  & The use of multi-core systems can induce contentions because of shared memory / cache. This can lead to non-determinim and unpredictable behavior which
+        violates the safety requirements of real-time systems, hence using LET tasks to fix those contentions 
+        but LET also suffers from additional execution time being added because of the implementation overhead.
+        & Proposes a DAG LET tasks scheduling algorithm based that avoids contentions while reducing the running time overhead
+        due to LET implementation & They are using a multiple-clusters, multi-core architecture to evaluate their scheduling algorithm
+        but only consider one cluster. & Uses a minimum-laxity-first priority assignment for intra-tasks and Earliest Finish time (EFT) for assigning tasks to cores.
+        Considers multi-rate dags and reducing the LET interval to decrease the makespan. \\
         \hline
-        \cite{jiangUtilTensityBound}  & & & & \\
+        \cite{jiangUtilTensityBound}  & The capacity-bound is a bound used as a performance measurement 
+        but also as a schedulability test for DAG scheduling. However, 
+        it uses the same bound to bound both the normalized utilization and the tensity (critical path over the deadline) of a DAG task which 
+        can exclude DAG tasks that actually are schedulable but not according to this capacity-bound. & Introduces a new bound called the util-tensity bound
+        which proves to be a better schedulability test for GEDF with federated scheduling. & 
+        only looks at GEDF with federated scheduling and not other scheduling algorithms. & 
+        The scheduling algorithm applied uses GEDF for very low tensity tasks,
+        tasks with high utilization and relatively high tensities are scheduled using federated scheduling,
+        and low utilization tasks with relatively high tensities are scheduled by partitioned EDF\\
         \hline
-        \cite{JiangDecompoSchedParallelTask}  & & & & \\
+        \cite{JiangDecompoSchedParallelTask}  & Decomposition-based scheduling can improve schedulability
+        for DAG task scheduling but can also worsen it.
+        It is, along with global scheduling, one of the main
+        method to schedule DAG tasks. & Develop a decomposition strategy
+        as well as a metric / schedulability test 
+        and the decomposition strategy proves to be the most efficient one
+        according to the defined metric. The scheduling algorithm
+        derived from this decomposition strategy (using GEDF variants) shows promising
+        results in terms of acceptance ratios & Only looks at GEDF variants which is based on the EDF heuristics for priority assignments.& The decomposition works by first defining execution segments
+        and then assigning subtasks to those segments based on their laxity so that there are no segments overloaded with workload. \\
         \hline
-        \cite{He2023DegreeOfParallelism}  & & & & \\
+        \cite{He2023DegreeOfParallelism} & The notion of degree of parallelism has been used 
+        for DAG task scheduling but lacks a clear definition in the research community. & Proposes a new response-time bound for DAG tasks
+        as well as a new scheduling algorithm based on federated scheduling that outperforms the SOTA
+        by more than 18\% on average & They don't say which intra-task scheduling algorithm is used (just that it's work-conserving)
+        and they don't consider intra-task scheduling. & Using the defined notion of degree of parallelism,
+        they modify the federated scheduling approach by having a better way of choosing
+        the number of cores for heavy tasks, which is based on the degree of parallelism of the heavy DAG task. \\
         \hline
         \cite{Shi2024DagExecGroups}  & & & & \\
         \hline
