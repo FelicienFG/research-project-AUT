@@ -119,19 +119,109 @@ A comparison of the works was carried out and the overall results are illustrate
         they modify the federated scheduling approach by having a better way of choosing
         the number of cores for heavy tasks, which is based on the degree of parallelism of the heavy DAG task. \\
         \hline
-        \cite{Shi2024DagExecGroups}  & & & & \\
+        \cite{Shi2024DagExecGroups}  & Although several DAG intra-task scheduling algorithm have been proposed in the literature,
+        most of them ignore the communication delays, specifically the inter-core communications
+        between the subtasks of a DAG tasks. In the Robotic / automotive industry,
+        most communications can be done using the L1 cache of a processor, hence having a way to group
+        subtasks into execution groups to execute on a single processor to remove inter-core communication delays. 
+        & Extend the DAG task model to EG-DAG (execution group dag) which binds groups of subtasks to a single physical core,
+        thus reducing inter-core communication delays. They also introduce a scheduling algorithm
+        and a wcrt for the algorithm while comparing the makespan to existing methods such as federated scheduling and 
+        critical-path based sub-tasks scheduling. Their method shows comparable performance
+        while minimizing the communication overheads.
+         & The evaluation has been done using only 100 DAG tasks which 
+         is quite low to cover all different types of DAG tasks.
+         They propose a way to schedule multiple DAGs but do not offer
+         evaluation results for that. & They use list scheduling with one list per execution group 
+         and use worst-fit heuristic to map the execution groups to the processors. \\
         \hline
-        \cite{Guan2023FederatedNew}  & & & & \\
+        \cite{Guan2023FederatedNew}  & Federated scheduling has shown great potential
+        for constrained deadline tasks but for arbitrary deadline DAG tasks,
+        especially those where the WCET is longer than the period,
+        processor assignment is tricky and existing work have shown limitations
+        by letting jobs migrate between the assigned processors,
+        which produces a more pessimistic schedulability analysis. & 
+        Propose a new federated scheduling algorithm for arbitrary deadline DAG tasks
+        with WCETs longer than their periods.
+        Evaluate the proposed algorithm and comparing it to other scheduling
+        algorithms, effectively outperforming most of them in terms of acceptance ratio 
+        & Doesn't tackle the problem of resource wasting when using federated scheduling
+        or their new version of it. & The new federated algorithm is used when the deadlines are bigger than the periods,
+        and the tasks have high densities (according to the classic federated scheduling algorithm).
+        For  the high densities tasks that have a deadline lower than their period,
+        they use standard federated scheduling and for the low density tasks,
+        they use EDF-FF. \\
         \hline
-        \cite{Zhao2024GATDRLmodel}  & & & & \\
+        \cite{Zhao2024GATDRLmodel} & The NP-hard aspect of DAG multi-core scheduling
+        makes the optimal solutions (using ILP) time-consuming.
+        Hence the researchers have looked at heuristic 
+        to have scalable solutions. & Uses Deep reinforcement learning 
+        to construct a model that attempts to learn the optimal (in terms of makespan) scheduling policy
+        for DAG tasks and compares it to the mathematically optimal ILP method. & Doesn't compare the  machine learning 
+        method with SOTA heuristics, but only compares with ILP. & They use a combination of Graph neural network
+        with attention layers to better capture the structure and dependency information.
+        They use the negative value of the makespan as the reward function to be maximized.\\
         \hline
-        \cite{Xu2023DRLtaskSched}  & & & & \\
+        \cite{Xu2023DRLtaskSched} & Current methods
+        to allocate shared resources on multi-core real-time systems
+        use either static analysis of tasks or heuristics
+        which cannot represent all possible system usage scenarios,
+        thus potentially producing higher WCETs and worse system schedulability. & 
+        They use Deep Reinforcement learning to propose a holistic scheduling and allocation
+        framework and their model shows better schedulability than 
+        existing methods. & Only considers independent periodic tasks
+        and also only considers even-EDF and even-RM when comparing schedulability performance. &
+        The plaform model is a LLC architecture with a shared memory bus 
+        and the DRL model uses a dense network with the proximal policy optimization
+        algorithm for training. The DRL model produces a time-triggered 
+        schedule table for each tasks' execution and each tasks' memory allocation.\\
         \hline
-        \cite{Zhao2022DAGsched}  & & & & \\
+        \cite{Zhao2022DAGsched} & A previous paper \cite{zhao2020DAGsched} introduced a fixed-priority scheduling 
+        algorithm for DAG intra-task scheduling which performed better 
+        than SOTA but didn't extend the method to multi-DAG scheduling. & 
+        Extends the Concurrent Producer and Consumer (CPC) model from \cite{zhao2020DAGsched} to multi-DAG task scheduling
+        by proposing a new multi-DAG scheduling algorithm 
+        based on a Parallelism-aware workload distribution model
+        which outperforms existing methods in terms of system schedulability. & 
+        Only considers constrained deadlines DAG tasks. & Uses a critical path first execution model by assigning 
+        the highest priorities to the node in the critical path
+        and treating them as providers of parallel execution time
+        for the 'consumers' which basically are the parrallelizable subtasks
+        for each section of the critical path.
+        For multi-DAG scheduling, they use 
+        a method similar to federated scheduling but 
+        instead of heavy and light tasks,
+        they look at what they call the degree of parallelism of the DAG tasks.  \\
         \hline
-        \cite{Lee2021GlobalDagSchedDRL}  & & & & \\
+        \cite{Lee2021GlobalDagSchedDRL} & Several heuristics for DAG intra-task scheduling
+        have been used but no scalable optimal scheduling algorithm exists. &
+        Propose a Deep Reinforcement Learning based machine learning model 
+        that computes an intra-task priority list
+        for single DAG task scheduling which outperforms SOTA by up to 3\%
+        in terms of makespan & No comparison is made with ILP methods
+        that lead to the mathematically minimum makespan.
+        Also, it doesn't show the scalability 
+        of the GoSu DRL model when increasing the amount of 
+        cores in the system. & The network 
+        is comprised of a Graph Convolutional network to encode 
+        the graph information as well as a sequential decoder
+        based on the attention-mechanism to produce a priority list.
+        The model is trained using REINFORCE with the negative makespan as a reward function.  \\
         \hline
-        \cite{Jiang2023SchedVirtualProcs}  & & & & \\
+        \cite{Jiang2023SchedVirtualProcs} & 
+        Virtual scheduling, using threads as virtual processors, 
+        has been considered in the past but never for DAG task scheduling.
+        The similar federaded scheduling method 
+        suffers from resource wasting. & Use the concept of virtual processors
+        to provide a virtually-federated scheduling algorithm
+        which significantly outperforms other federated scheduling methods
+        in terms of acceptance ratio. & Only considers implicit and constrained deadline DAG tasks
+        and doesn't consider the running time overhead that the proposed method induces. 
+        & Introduce the concept of an active Virtual processor 
+        and a passive virtual processor (VP) and assign one of each on each physical core.
+        The active VP execute the high priority (equivalent of high density in federated scheduling) tasks and the unused processing
+        time of the active VP is treated as a passive VP on which low priority
+         (equivalent of low density in fedrated scheduling) task can execute.\\
         \hline
         \cite{GuanFluidDag2022}  & & & & \\
         \hline
