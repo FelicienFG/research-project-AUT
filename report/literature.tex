@@ -11,6 +11,7 @@ This SLR aims at tackling RQ1. More precisely, the following research questions 
 \begin{itemize}
     \item [RQ1.1] What is the current state-of-the-Art for DAG task scheduling with precedence constraints ?
     \item [RQ1.2] How has LET been used in scheduling event-chains ?
+    \item [RQ1.3] What machine learning techniques have been used for scheduling tasks on real-time systems ?
 \end{itemize}
 It will also be shown how the literature doesn't provide 
 a complete answer to RQ2, hence the contributions of this paper.\\
@@ -62,174 +63,50 @@ A comparison of the works was carried out and the overall results are illustrate
 
 \begin{table}
     \centering
-    \begin{tabular}[]{|l|p{0.20\linewidth}|p{0.20\linewidth}|p{0.20\linewidth}|p{0.20\linewidth}|}
+    \begin{tabular}[]{|l|p{0.20\linewidth}|p{0.20\linewidth}|p{0.20\linewidth}|}
         \hline
-        \textbf{Reference} & \textbf{Motivation} & \textbf{Contribution(s)} & \textbf{Limitation(s)} & \textbf{Methodology Summary}\\
+        \textbf{Reference} & \textbf{Scheduling technique} & \textbf{Task type} & \textbf{Scope (intra/inter/both)}\\
         \hline
-        \cite{guan2021DAGfluid}  & DAG tasks scheduling is getting more popular and fluid scheduling performs great theoretically & Provide a DAG-fluid scheduling algorithm
-        that performs way better in terms of acceptance ratio then previous algorithms & Fluid scheduling is unpractical and introduces a lot of overhead and task migrations, also only for implicit deadlines tasks
-        & fluid-based algorithm where it decomposes a DAG's subtasks into multiple sequential segments\\
+        \cite{guan2021DAGfluid} & fluid & implicit deadline & inter\\
         \hline
-        \cite{He2019DagIntra}  & DAGs are popular but no one looked at the intra-task execution order to leverage the graph structure & proposes a priority list scheduling algorithm for a single DAG task
-        which performs better than SOTA in terms of makespan & no comparison with optimal priority assignment algorithms / optimal schedules.  & uses the length (in terms of wcets) of each paths passing through the current vertex to assign the priority to the current vertex,
-        the higher the length, the higher priority \\
+        \cite{He2019DagIntra} & priority-list & constrained deadline & intra \\
         \hline
-        \cite{Kobayashi2023FedBundledDagsched} & Federated scheduling for DAG tasks is has proved efficient but 
-        for tasks where the difference between the critical path and the deadline is small, it
-        can lead to over-allocating cores.  & proposed a fedrated and bundled-based scheduling algorithm to avoid this problem and enhanced the schedulability of DAG tasks using their algorithms & They only compare their method with an example of a dag task set comprised of 3 dag tasks. & Uses federated scheduling for tasks with high critical path to deadline ratio and bundled scheduling for tasks with low critical path to deadline ratio. \\
+        \cite{Kobayashi2023FedBundledDagsched} & federated and bundled-based & constrained deadline & inter\\
         \hline
-        \cite{Xiao2019} & DAG task scheduling is NP-hard so one can only approximate the optimal algorithm (when considering polynomial timed algorithms)
-        and not a lot has been done on scheduling parrallel reccuring tasks & Introduces a scheduling algorithm 'MAS' that shortens the makespan of recurring DAG tasks compared to EDF & only compares EDF and MAS using one example of a DAG task for makespans and also only compares with EDF.
-        Even though MAS shortens the makespan, it is less scalable than comparable algorithms. & The MAS algorithm combines techniques from clustering scheduling and task duplication algorithm and evaluates it on an actual simulation object (the TMS320C6678) so that the measurement are close to the real-life measurement you would get on the real system.\\
+        \cite{Xiao2019}  & clustering & constrained deadline & intra\\ 
         \hline
-        \cite{Igarashi2020HeuristicContentionFree}  & The use of multi-core systems can induce contentions because of shared memory / cache. This can lead to non-determinim and unpredictable behavior which
-        violates the safety requirements of real-time systems, hence using LET tasks to fix those contentions 
-        but LET also suffers from additional execution time being added because of the implementation overhead.
-        & Proposes a DAG LET tasks scheduling algorithm based that avoids contentions while reducing the running time overhead
-        due to LET implementation & They are using a multiple-clusters, multi-core architecture to evaluate their scheduling algorithm
-        but only consider one cluster. & Uses a minimum-laxity-first priority assignment for intra-tasks and Earliest Finish time (EFT) for assigning tasks to cores.
-        Considers multi-rate dags and reducing the LET interval to decrease the makespan. \\
+        \cite{Igarashi2020HeuristicContentionFree}  & priority-list & LET constrained deadline & both \\
         \hline
-        \cite{jiangUtilTensityBound}  & The capacity-bound is a bound used as a performance measurement 
-        but also as a schedulability test for DAG scheduling. However, 
-        it uses the same bound to bound both the normalized utilization and the tensity (critical path over the deadline) of a DAG task which 
-        can exclude DAG tasks that actually are schedulable but not according to this capacity-bound. & Introduces a new bound called the util-tensity bound
-        which proves to be a better schedulability test for GEDF with federated scheduling. & 
-        only looks at GEDF with federated scheduling and not other scheduling algorithms. & 
-        The scheduling algorithm applied uses GEDF for very low tensity tasks,
-        tasks with high utilization and relatively high tensities are scheduled using federated scheduling,
-        and low utilization tasks with relatively high tensities are scheduled by partitioned EDF\\
+        \cite{jiangUtilTensityBound}  & federated and GEDF and PEDF & implicit deadline & inter\\
         \hline
-        \cite{JiangDecompoSchedParallelTask}  & Decomposition-based scheduling can improve schedulability
-        for DAG task scheduling but can also worsen it.
-        It is, along with global scheduling, one of the main
-        method to schedule DAG tasks. & Develop a decomposition strategy
-        as well as a metric / schedulability test 
-        and the decomposition strategy proves to be the most efficient one
-        according to the defined metric. The scheduling algorithm
-        derived from this decomposition strategy (using GEDF variants) shows promising
-        results in terms of acceptance ratios & Only looks at GEDF variants which is based on the EDF heuristics for priority assignments.& The decomposition works by first defining execution segments
-        and then assigning subtasks to those segments based on their laxity so that there are no segments overloaded with workload. \\
+        \cite{JiangDecompoSchedParallelTask} & Decomposition-based & implicit deadline & inter \\
         \hline
-        \cite{He2023DegreeOfParallelism} & The notion of degree of parallelism has been used 
-        for DAG task scheduling but lacks a clear definition in the research community. & Proposes a new response-time bound for DAG tasks
-        as well as a new scheduling algorithm based on federated scheduling that outperforms the SOTA
-        by more than 18\% on average & They don't say which intra-task scheduling algorithm is used (just that it's work-conserving)
-        and they don't consider intra-task scheduling. & Using the defined notion of degree of parallelism,
-        they modify the federated scheduling approach by having a better way of choosing
-        the number of cores for heavy tasks, which is based on the degree of parallelism of the heavy DAG task. \\
+        \cite{He2023DegreeOfParallelism} & federated-based & constrained deadlines & inter \\
         \hline
-        \cite{Shi2024DagExecGroups}  & Although several DAG intra-task scheduling algorithm have been proposed in the literature,
-        most of them ignore the communication delays, specifically the inter-core communications
-        between the subtasks of a DAG tasks. In the Robotic / automotive industry,
-        most communications can be done using the L1 cache of a processor, hence having a way to group
-        subtasks into execution groups to execute on a single processor to remove inter-core communication delays. 
-        & Extend the DAG task model to EG-DAG (execution group dag) which binds groups of subtasks to a single physical core,
-        thus reducing inter-core communication delays. They also introduce a scheduling algorithm
-        and a wcrt for the algorithm while comparing the makespan to existing methods such as federated scheduling and 
-        critical-path based sub-tasks scheduling. Their method shows comparable performance
-        while minimizing the communication overheads.
-         & The evaluation has been done using only 100 DAG tasks which 
-         is quite low to cover all different types of DAG tasks.
-         They propose a way to schedule multiple DAGs but do not offer
-         evaluation results for that. & They use list scheduling with one list per execution group 
-         and use worst-fit heuristic to map the execution groups to the processors. \\
+        \cite{Shi2024DagExecGroups}  & partitioned / clustering & constrained deadlines & intra\\
         \hline
-        \cite{Guan2023FederatedNew}  & Federated scheduling has shown great potential
-        for constrained deadline tasks but for arbitrary deadline DAG tasks,
-        especially those where the WCET is longer than the period,
-        processor assignment is tricky and existing work have shown limitations
-        by letting jobs migrate between the assigned processors,
-        which produces a more pessimistic schedulability analysis. & 
-        Propose a new federated scheduling algorithm for arbitrary deadline DAG tasks
-        with WCETs longer than their periods.
-        Evaluate the proposed algorithm and comparing it to other scheduling
-        algorithms, effectively outperforming most of them in terms of acceptance ratio 
-        & Doesn't tackle the problem of resource wasting when using federated scheduling
-        or their new version of it. & The new federated algorithm is used when the deadlines are bigger than the periods,
-        and the tasks have high densities (according to the classic federated scheduling algorithm).
-        For  the high densities tasks that have a deadline lower than their period,
-        they use standard federated scheduling and for the low density tasks,
-        they use EDF-FF. \\
+        \cite{Guan2023FederatedNew}  & federated & arbitrary deadline & inter\\
         \hline
-        \cite{Zhao2024GATDRLmodel} & The NP-hard aspect of DAG multi-core scheduling
-        makes the optimal solutions (using ILP) time-consuming.
-        Hence the researchers have looked at heuristic 
-        to have scalable solutions. & Uses Deep reinforcement learning 
-        to construct a model that attempts to learn the optimal (in terms of makespan) scheduling policy
-        for DAG tasks and compares it to the mathematically optimal ILP method. & Doesn't compare the  machine learning 
-        method with SOTA heuristics, but only compares with ILP. & They use a combination of Graph neural network
-        with attention layers to better capture the structure and dependency information.
-        They use the negative value of the makespan as the reward function to be maximized.\\
+        \cite{Zhao2024GATDRLmodel} & DRL & constrained deadline & intra\\
         \hline
-        \cite{Xu2023DRLtaskSched} & Current methods
-        to allocate shared resources on multi-core real-time systems
-        use either static analysis of tasks or heuristics
-        which cannot represent all possible system usage scenarios,
-        thus potentially producing higher WCETs and worse system schedulability. & 
-        They use Deep Reinforcement learning to propose a holistic scheduling and allocation
-        framework and their model shows better schedulability than 
-        existing methods. & Only considers independent periodic tasks
-        and also only considers even-EDF and even-RM when comparing schedulability performance. &
-        The plaform model is a LLC architecture with a shared memory bus 
-        and the DRL model uses a dense network with the proximal policy optimization
-        algorithm for training. The DRL model produces a time-triggered 
-        schedule table for each tasks' execution and each tasks' memory allocation.\\
+        \cite{Xu2023DRLtaskSched} & DRL & non-DAG implicit deadline & inter\\
         \hline
-        \cite{Zhao2022DAGsched} & A previous paper \cite{zhao2020DAGsched} introduced a fixed-priority scheduling 
-        algorithm for DAG intra-task scheduling which performed better 
-        than SOTA but didn't extend the method to multi-DAG scheduling. & 
-        Extends the Concurrent Producer and Consumer (CPC) model from \cite{zhao2020DAGsched} to multi-DAG task scheduling
-        by proposing a new multi-DAG scheduling algorithm 
-        based on a Parallelism-aware workload distribution model
-        which outperforms existing methods in terms of system schedulability. & 
-        Only considers constrained deadlines DAG tasks. & Uses a critical path first execution model by assigning 
-        the highest priorities to the node in the critical path
-        and treating them as providers of parallel execution time
-        for the 'consumers' which basically are the parrallelizable subtasks
-        for each section of the critical path.
-        For multi-DAG scheduling, they use 
-        a method similar to federated scheduling but 
-        instead of heavy and light tasks,
-        they look at what they call the degree of parallelism of the DAG tasks.  \\
+        \cite{Zhao2022DAGsched} & priority-list and federated & constrained deadline & both \\
         \hline
-        \cite{Lee2021GlobalDagSchedDRL} & Several heuristics for DAG intra-task scheduling
-        have been used but no scalable optimal scheduling algorithm exists. &
-        Propose a Deep Reinforcement Learning based machine learning model 
-        that computes an intra-task priority list
-        for single DAG task scheduling which outperforms SOTA by up to 3\%
-        in terms of makespan & No comparison is made with ILP methods
-        that lead to the mathematically minimum makespan.
-        Also, it doesn't show the scalability 
-        of the GoSu DRL model when increasing the amount of 
-        cores in the system. & The network 
-        is comprised of a Graph Convolutional network to encode 
-        the graph information as well as a sequential decoder
-        based on the attention-mechanism to produce a priority list.
-        The model is trained using REINFORCE with the negative makespan as a reward function.  \\
+        \cite{Lee2021GlobalDagSchedDRL} & DRL & constrained deadline & intra\\
         \hline
-        \cite{Jiang2023SchedVirtualProcs} & 
-        Virtual scheduling, using threads as virtual processors, 
-        has been considered in the past but never for DAG task scheduling.
-        The similar federaded scheduling method 
-        suffers from resource wasting. & Use the concept of virtual processors
-        to provide a virtually-federated scheduling algorithm
-        which significantly outperforms other federated scheduling methods
-        in terms of acceptance ratio. & Only considers implicit and constrained deadline DAG tasks
-        and doesn't consider the running time overhead that the proposed method induces. 
-        & Introduce the concept of an active Virtual processor 
-        and a passive virtual processor (VP) and assign one of each on each physical core.
-        The active VP execute the high priority (equivalent of high density in federated scheduling) tasks and the unused processing
-        time of the active VP is treated as a passive VP on which low priority
-         (equivalent of low density in fedrated scheduling) task can execute.\\
+        \cite{Jiang2023SchedVirtualProcs} & federated-based & constrained deadline & inter\\
         \hline
-        \cite{GuanFluidDag2022}  & & & & \\
+        \cite{GuanFluidDag2022} & fluid & constrained/arbitrary deadline & inter\\
         \hline
-        \cite{GuanFRTDS2020RL}  & & & & \\
+        \cite{GuanFRTDS2020RL} & DRL & constrained deadline & intra \\
         \hline
-        \cite{JiangVirtuallyFederatedSched2021}  & & & & \\
+        \cite{JiangVirtuallyFederatedSched2021} & federated-based & constrained deadline & inter\\
         \hline
-        \cite{Pazzaglia2021DMALETtransfer} & & & & \\
+        \cite{Pazzaglia2021DMALETtransfer} & Mixed ILP & LET, constrained deadline & inter\\
+        \hline
+        \textbf{Total: 19} & \textbf{DRL: 4, Federated: 7, Fluid: 2, ILP: 1, Priority-List(intra): 3, Clustering: 2, Decomposition: 1}
+        & \textbf{implicit: 4, constrained: 13, arbitrary: 2} & \textbf{inter: 11, intra: 6, both: 2} \\
         \hline
     \end{tabular}
     \caption{SLR summary table}
