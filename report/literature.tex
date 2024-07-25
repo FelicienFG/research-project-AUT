@@ -61,6 +61,91 @@ Every metric used here have also been chosen for their prevalence in the literat
 
 A comparison of the works was carried out and the overall results are illustrated in Table~\ref{tab:slrtable}.
  
+In \cite{guan2021DAGfluid}, authors 
+use fluid scheduling to schedule multiple DAG tasks
+on a multicore system. 
+Fluid scheduling has been used in previous work for independent
+time-triggered task scheduling\cite{baruah1993PFair}\cite{cho2006LLREF} 
+but very few consider DAG tasks. Fluid-scheduling is known for producing optimal scheduling algorithms.
+Their method decomposes a DAG task into several sequential segments
+in which the subtasks will execute according to the fluid scheduling 
+model. Although their algorithm significantly outperforms
+existing algorithms, the main limitation that is common to all fluid-based
+scheduling algorithm is the runtime overhead induced by the fluid-scheduling model.
+Although authors in \cite{guan2021DAGfluid} briefly explain how 
+to transform their scheduling algorithm to a non-fluid one for practical implementation,
+they do not evaluate the overhead caused by the frequent task migrations
+and preemptions. Also, their algorithm only considers DAG task with implicit deadlines
+(D = T) which makes the response-time analysis simpler but to the cost
+of generalizability.
+
+As a follow up, authors in \cite{GuanFluidDag2022} 
+extend the fluid scheduling algorithm in \cite{guan2021DAGfluid}
+to constrained and arbitrary deadline tasks,
+especially focusing on DAG tasks with a deadline greater than their period.
+Their main contributions are their new scheduling algorithm that 
+performs better than existing methods in terms of acceptance ratio,
+and producing the first theoretical capacity bound for DAG tasks
+with deadlines greater than their periods.
+However, the authors still don't provide any evaluation 
+on the amount of runtime overhead their scheduling algorithm implementation
+produces which generally lowers the actual acceptance ratio
+of the algorithm. 
+
+Instead of considering fluid-scheduling,
+a popular scheduling method is federated scheduling.
+Federated scheduling is based on the idea
+of assigning heavy tasks ($U > 1$) to multiple cores
+for the whole duration of the tasks' executions,
+and assigning light tasks ($U \le 1$) to execute on
+cores that have not been assigned a heavy task.
+Although it is popular, it suffers from a resource wasting problem,
+especially when the difference between the critical path's length 
+and the deadline is small,
+which many papers aim at solving
+\cite{Guan2023FederatedNew}
+\cite{jiangUtilTensityBound}
+\cite{JiangVirtuallyFederatedSched2021}
+\cite{Jiang2023SchedVirtualProcs}
+\cite{Kobayashi2023FedBundledDagsched}
+\cite{Shi2024DagExecGroups}
+\cite{He2023DegreeOfParallelism}.
+
+\cite{jiangUtilTensityBound}, for instance, 
+consider federated scheduling and GEDF
+and introduces a better metric called the util-tensity bound
+that extends the concept of capacity bound
+to have a better schedulability test.
+Based on this newly derived bound, the authors 
+propose an extension to the classic federated algorithm,
+with very low tensity tasks being scheduled with GEDF, 
+tasks with high-utilization and relatively high tensities are scheduled
+using the classic federated scheduling and low utilization
+tasks with relatively high tensities are scheduled using partitioned-EDF.
+Their algorithm, based on their newly derived bound, effectively improves
+the system schedulability of DAG tasks and reduces the resource wasting 
+problem of federated scheduling. The main limitation
+of this paper is that they only consider GEDF 
+for their util-tensity bound and also only consider implicit deadline DAG tasks.
+
+This problem of resource wasting in federated scheduling
+is also tackled in \cite{Kobayashi2023FedBundledDagsched}
+where the authors propose a federated and bundled-based scheduling
+algorithm which enhances the schedulability of DAG tasks
+compared to existing federated scheduling algorithms.
+Their method consists of using federated scheduling for
+tasks with high critical path to deadline ratio and bundled
+scheduling for tasks with low critical path to deadline ratio.
+Unfortunately, this paper only looks at 3 DAG tasks to evaluate
+their algorithm which is a really small amount and is not 
+representative of the different DAG tasks that can exist.
+
+Authors in \cite{JiangVirtuallyFederatedSched2021}
+take another approach by proposingg a virtually-federated 
+scheduling algorithm that leverages the advantages
+of federated scheduling while improving the acceptance 
+ratio for DAG tasks, outperforming existing algorithms.
+
 
 \begin{table}
     \centering
@@ -115,196 +200,4 @@ A comparison of the works was carried out and the overall results are illustrate
 \end{table}
 
 
-\subsubsection{DAG tasks}
-~
 
-Scheduling DAG tasks involves two steps: first, 
-computing the intra-task schedule, and second, computing 
-the inter-task schedule. For the inter-task schedule, various 
-approaches can be employed.
-
-\cite{WangGEDFDag2019}, for instance, improve the worst-case 
-makespan of GEDF under federated scheduling of multiple DAG tasks 
-with arbitrary deadlines. The federated scheduling approach, 
-similar to the partitioning approach, involves assigning clusters 
-of processors to DAG tasks with the highest utilization, leaving 
-the remainder for low-utilization tasks. This allows for 
-intra-task parallelization instead of merely sequentializing 
-the DAG task. Consequently, the paper also improves the acceptance 
-ratio for single DAG task scheduling by providing a better 
-schedulability test compared to previously used 
-schedulability tests for GEDF.
-
-Another method is the decomposition approach, which involves 
-decomposing the DAG task into several independent sequential tasks. 
-These tasks are then executed in parallel segments, with their 
-release times and deadlines aligned to match the dependency constraints 
-between the sequential tasks\cite{CaoStretchingDAGs2020}. The paper 
-\cite{CaoStretchingDAGs2020} introduces a state-of-the-art 
-stretching method for DAG task decomposition and employs the GEDF 
-dynamic priority assignment algorithm to demonstrate improvements 
-in the acceptance ratio over the previous state-of-the-art 
-decomposition algorithm.
-
-\cite{SchmidResponseDAGThreadpools2021} explores a thread pool 
-approach for parallelizing DAG tasks. Instead of assigning 
-processors to DAG tasks, thread workers from a thread pool are 
-assigned, and the number of thread workers each DAG can use is 
-limited. Their algorithm, combined with a global fixed-point 
-priority scheduling algorithm such as Rate Monotonic, is compared 
-to other approaches, including the global approach and the 
-semi-federated approach.
-
-The global approach does not assign processors to DAG tasks but 
-allows the tasks to utilize multiple processors dynamically. 
-The semi-federated approach, similar to the federated approach, 
-places as many heavy tasks (tasks with high utilization) in processor 
-clusters as possible, while the remaining tasks, along with the 
-light tasks, are allocated to the rest of the available processors.
-
-It is found that the latest approach generally outperforms 
-the method used in \cite{SchmidResponseDAGThreadpools2021}, although the 
-thread pools approach still has a better acceptance ratio compared 
-to the global approach.
-
-The previously cited articles focus on the execution of multiple 
-DAGs on a multi-processor system, utilizing existing priority 
-scheduling algorithms such as GEDF or Global RM to evaluate their 
-contributions. \cite{he2019intra} considers recurrent DAG tasks 
-and their inner graph structure to develop a priority assignment 
-algorithm that minimizes the makespan of the DAG task. This 
-algorithm is then extended to multi-DAG scheduling using a global 
-scheduling approach such as G-EDF or G-RM. This dynamic scheduling 
-approach performs best with G-RM in terms of acceptance ratio.
-
-The results in terms of acceptance ratio are superior to those in 
-\cite{SchmidResponseDAGThreadpools2021}, though in some cases they 
-are surpassed by \cite{CaoStretchingDAGs2020}. However, a 
-drawback of \cite{CaoStretchingDAGs2020} is that this type of task 
-decomposition incurs significant runtime overhead, which diminishes 
-task performance in real-life scenarios.
-
-While \cite{he2019intra} and \cite{CaoStretchingDAGs2020} allow 
-for task preemption, which especially in the case of 
-\cite{CaoStretchingDAGs2020} adds runtime overhead, 
-\cite{zhao2020dag} leverages the parallelism and dependency 
-properties of DAG tasks, along with a 'critical path first' 
-execution strategy, to develop a state-of-the-art non-preemptive 
-and priority-based scheduling algorithm that completely outperforms 
-\cite{he2019intra} in terms of makespan. Their results are utilized 
-by \cite{lee2021DAGDeeplearning} to compare with a deep 
-learning-based priority assignment algorithm for DAGs, which 
-improves the makespan of DAG task execution by 2$\sim$3\%.
-
-\cite{zhao2022dag} extends their concurrent provider and consumer 
-(CPC) model \cite{zhao2020dag} to multi-DAG scheduling by 
-minimizing inter-task DAG interference to zero and devising a 
-processor-assigning scheduling algorithm where the priority of 
-different DAG tasks is computed using the deadline-monotonic 
-algorithm. Under non-preemptive scheduling, the proposed method 
-significantly outperforms the method used in \cite{he2019intra} in 
-terms of acceptance ratio, by up to 60\%.
-
-For multi-DAG scheduling, \cite{GuanDAGfluid2021} employed the 
-fluid scheduling strategy to manage DAG tasks with implicit 
-deadlines. This fluid scheduling approach, also used in PFair and 
-LLREF scheduling algorithms \cite{baruah1993PFair}\cite{cho2006LLREF}, 
-ensures that at every point in time, each task has utilized the 
-amount of execution time dictated by its respective utilization 
-factor, thereby approximating the perfect fluid execution of the 
-task. The advantage of this approach is its exceptionally high 
-acceptance ratio, outperforming other methods such as 
-\cite{WangGEDFDag2019}, \cite{he2019intra}, and \cite{CaoStretchingDAGs2020}. 
-However, it suffers from high runtime overhead, complicating 
-practical implementation.
-\newline
-
-A more mathematical approach to the scheduling of DAGs is to model 
-the scheduling problem as an Integer Linear Programming (ILP) 
-optimization problem. In this model, precedence, deadline, and 
-processor assignment constraints are represented mathematically, 
-with the objective of minimizing the makespan. This method is 
-utilized by \cite{ChangMinWRCTBoundILP2022} and compared to 
-state-of-the-art priority assignment algorithms (\cite{he2019intra} 
-and \cite{zhao2020dag}). The ILP method demonstrates a significant 
-improvement in makespan, which is expected due to the optimality of 
-the ILP approach. However, the drawback of this method is that as 
-the number of tasks and subtasks increases, the number of 
-constraints grows, causing the computation time to increase 
-exponentially, rendering the method non-scalable.
-
-Most studies do not consider the communication time between tasks, 
-which can be significant in real-life systems. 
-\cite{ChenDAGorder2023} addresses this by scheduling DAG tasks on a 
-Network on Chip (NoC) system. The resulting schedule, DAG-Order, 
-is non-preemptive and is based on ordering the tasks according to 
-their communication delays and computation workloads.
-
-Memory access contention, which occurs when two or more tasks 
-attempt to access a shared memory location simultaneously, can 
-also be crucial in real-life scenarios. Therefore, scheduling 
-algorithms for implementations of the LET paradigm have been 
-proposed to reduce or even eliminate contention problems with LET 
-DAG tasks \cite{Yano2021ContentionFree}\cite{Igarashi2020HeuristicContFree}.
-\newline
-
-
-The machine learning community has also explored DAG scheduling. 
-For instance, \cite{yano2021work} utilized reinforcement 
-learning (RL), specifically Q-learning, to statically prioritize 
-sub-tasks within DAG tasks and applied an 
-earliest-start-first (EST) heuristic value to dispatch each 
-sub-task to different processors. Similar to \cite{ChenDAGorder2023}, 
-\cite{yano2021work} accounted for communication delays and the 
-workload of subtasks when assigning priorities.
-
-Another application of RL is demonstrated by 
-\cite{lee2021DAGDeeplearning}, who designed a deep learning model 
-based on RL that uses the spatial features of each DAG task as well 
-as their temporal features, i.e., precedence constraints. They 
-achieved this by combining a graph convolution network 
-(for spatial information) with a sequential encoder 
-(for temporal information), ultimately producing a prioritized list 
-of the DAG's subtasks. This list can then be used to compute 
-the makespan and optimize it via RL. The results in 
-\cite{lee2021DAGDeeplearning} were compared with state-of-the-art (SOTA) 
-algorithms \cite{he2019intra}\cite{zhao2020dag}, with the deep 
-reinforcement learning method surpassing the SOTA by up to 3\% 
-in terms of makespan.
-
-\input{slrtable}
-
-As you can see, although dynamic priority algorithms outperform 
-fixed-priority ones, the simplicity of implementation and low runtime 
-overhead of fixed-priority algorithms make them attractive to the 
-industry. This is especially true for the DAG task model, where 
-there has been significant focus on fixed-priority scheduling. While 
-some have attempted to produce an 'optimal' schedule using 
-ILP\cite{wei2011reliabilityILP}\cite{yip2014relaxing}\cite{ChangMinWRCTBoundILP2022}, 
-the primary issue with this method is its lack of scalability.
-
-Regarding task migrations, the NP-hard nature of the 
-bin-packing problem suggests that allowing tasks or subtasks to migrate 
-between processors can improve utilization performance.
-
-
-Also, only 3 articles used machine learning to tackle the task scheduling problem,
-from which two are from the same author.
-Furthermore, those articles only compare their results to 
-heuristic-based methods and not ILP methods.
-If we focus on DAG tasks, then only 2 papers are left,
-one focusing on communication between the cores and
-applying the model on a specific architecture\cite{yano2021work},
-and one more theoretical\cite{lee2021DAGDeeplearning}, comparing their model to SOTA 
-\cite{zhao2020dag} and \cite{he2019intra}. The latter suffers 
-from closed sourcing as their model is not open source
-which prohibits the research community to improve on their work. 
-
-Hence, there not only is a need to compare one such machine learning technique 
-to the non-scalable but leading to the mathematically minimum makespan, ILP method,
-but there also is a need to have this model open source and open access.
-Therefore, in this paper, an attempt at replicating the model described
-in \cite{lee2021DAGDeeplearning} will be done and 
-a comparison with the SOTA heuristic-based algorithms
-and ILP will be conducted using the open-source software 
-for LET task scheduling LETSyncronize\cite{yip2023letsynchronise}.
