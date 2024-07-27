@@ -29,7 +29,7 @@
         \cite{Igarashi2020HeuristicContentionFree}  & The use of multi-core systems can induce contentions because of shared memory / cache. This can lead to non-determinim and unpredictable behavior which
         violates the safety requirements of real-time systems, hence using LET tasks to fix those contentions 
         but LET also suffers from additional execution time being added because of the implementation overhead.
-        & Proposes a DAG LET tasks scheduling algorithm based that avoids contentions while reducing the running time overhead
+        & Proposes a DAG LET tasks scheduling algorithm that avoids contentions while reducing the running time overhead
         due to LET implementation & They are using a multiple-clusters, multi-core architecture to evaluate their scheduling algorithm
         but only consider one cluster. & Uses a minimum-laxity-first priority assignment for intra-tasks and Earliest Finish time (EFT) for assigning tasks to cores.
         Considers multi-rate dags and reducing the LET interval to decrease the makespan. \\
@@ -127,7 +127,8 @@
         by proposing a new multi-DAG scheduling algorithm 
         based on a Parallelism-aware workload distribution model
         which outperforms existing methods in terms of system schedulability. & 
-        Only considers constrained deadlines DAG tasks. & Uses a critical path first execution model by assigning 
+        Considers constrained deadlines DAG tasks for the analysis
+        but only consider implicit deadlines DAG tasks for the experiment evaluation. & Uses a critical path first execution model by assigning 
         the highest priorities to the node in the critical path
         and treating them as providers of parallel execution time
         for the 'consumers' which basically are the parrallelizable subtasks
@@ -146,7 +147,7 @@
         that lead to the mathematically minimum makespan.
         Also, it doesn't show the scalability 
         of the GoSu DRL model when increasing the amount of 
-        cores in the system. & The network 
+        cores/subtasks in the system/DAG task. & The network 
         is comprised of a Graph Convolutional network to encode 
         the graph information as well as a sequential decoder
         based on the attention-mechanism to produce a priority list.
