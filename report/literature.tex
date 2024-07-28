@@ -59,7 +59,6 @@ exclusion : past 5 years : IEEE --> down to 1,171
 \end{itemize}
 Every metric used here have also been chosen for their prevalence in the literature.
 
-A comparison of the works was carried out and the overall results are illustrated in Table~\ref{tab:slrtable}.
  
 In \cite{guan2021DAGfluid}, authors 
 use fluid scheduling to schedule multiple DAG tasks
@@ -212,7 +211,7 @@ derived from it shows promising results in terms of
 acceptance ratio.
 Their decomposition strategy basically works by first 
 definin execution segments and then then assigning subtasks 
-to those segments using the laxity of those subtasks so that 
+to those segments using the laxity\footnote{Laxity is the gap between the total execution time of a task (potentially comprising the I/O delays) and its deadline.} of those subtasks so that 
 no segments are overloaded with workload.
 The main limitation of this work is that 
 they only look at GEDF variants for priority assignment 
@@ -419,7 +418,7 @@ per DAG tasks, of their method and they do not provide any
 evaluation of their method applied to existing DAG scheduling algorithms
 to see how their LET protocol impacts the acceptance ratio of those scheduling algorithms.
 
-
+Table \ref{tab:slt_sum_table} gives a summary of the findings.
 
 \begin{table}
     \centering
@@ -465,13 +464,37 @@ to see how their LET protocol impacts the acceptance ratio of those scheduling a
         \hline
         \cite{Pazzaglia2021DMALETtransfer} & Mixed ILP & LET, constrained deadline & inter\\
         \hline
-        \textbf{Total: 19} & \textbf{DRL: 4, Federated: 7, Fluid: 2, ILP: 1, Priority-List(intra): 3, Clustering: 2, Decomposition: 1}
-        & \textbf{implicit: 4, constrained: 13, arbitrary: 2} & \textbf{inter: 11, intra: 6, both: 2} \\
-        \hline
+%        \textbf{Total: 19} & \textbf{DRL: 4, Federated: 7, Fluid: 2, ILP: 1, Priority-List(intra): 3, Clustering: 2, Decomposition: 1}
+%        & \textbf{implicit: 4, constrained: 13, arbitrary: 2} & \textbf{inter: 11, intra: 6, both: 2} \\
+%        \hline
     \end{tabular}
     \caption{SLR summary table}
     \label{tab:slt_sum_table}
 \end{table}
 
+According to these findings,
+the current state-of-the-Art for DAG task scheduling (RQ1.1)
+seems to be a federated-based scheduling approach for inter-task 
+scheduling and a global priority-list approach for intra-task scheduling
+\cite{He2023DegreeOfParallelism}\cite{Zhao2022DAGsched}.
+Although those papers don't consider communication overheads
+which is where LET (RQ1.2) is moslty used when looking at scheduling 
+LET tasks, to reduce the amount of overhead 
+so that the LET interval of a task can be as close to 
+its wcet as possible while respecting the advantageous LET semantics.
 
+In terms of machine learning techniques (RQ1.3), every article found uses 
+deep reinforcement learning for scheduling DAG tasks.
+More specifically, the model proposed is often a combination
+of a kind of graph neural network and attention layers 
+to produce a priority-list of the subtasks of the DAG task.
 
+Multiple limitations were found for each 
+paper. Notably, the type of task that is 
+considered which mostly is constrained or implicit deadline tasks
+and arbitrary is rarely considered due to the complexity it adds
+to the scheduling analysis.
+Also, there hasn't been any use of supervise machine learning 
+for real-time task scheduling
+and only one paper looked at comparing a machine learning solution
+to the optimal schedule provided by the ILP methodology.
