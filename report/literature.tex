@@ -4,8 +4,6 @@
 
 \subsection{Systematic Literature Review process}
 
-\paraheading{\textbf{Scoping}}
-
 This SLR aims at tackling RQ1. More precisely, the following research questions will be answered:
 
 \begin{itemize}
@@ -34,31 +32,40 @@ AND ("multi-processors" OR "multi-cores" OR "multi processors" OR
 "multi-core" OR "multi core")".
 
 The search produced 3,549 results on the IEEE database
+which was reduced tp 1,171 papers when considering only 
+articles published in the past 5 years.
 
-exclusion : past 5 years : IEEE --> down to 1,171 
-            heterogeneous not in title + abstract : IEEE --> down to 999
-            mixed critical* not in title + abstract : IEEE --> down to 952
-            scheduling or scheduler or schedule in title but not "energy" :  IEEE --> down to 155 and 149 when just considering conference and journal papers (not early access)
-            
-            removing those not about real-time system,
-            not about proposing a scheduling algorithm,
-            not about DAG nor LET tasks or event-chains : IEEE --> down to 21
-            After reading the complete articles --> 19.
+Then the following exclusion criterias were used to filter out 
+the rest of the articles, bringing the number of papers down to 19
+(see Figure \ref{fig:slr_process}).
 
-\paragraph{}
+\begin{itemize}{}{}
+    \item [EC1] Not focusing on homogeneous multicores and hard RTS
+    \begin{list}{}{}
+        \item "Heterogeneous" not in the title nor the abstract.
+        \item "mixed critical*" not in the title nor the abstract
+    \end{list}
+    
+    \item [EC2] Not focusing on scheduling
+    \begin{list}{}{}        
+        \item "scheduling" or "scheduler" or "schedule" in the title 
+        \item "energy" not in the title
+        \item Focus on conference and journal papers
+    \end{list}
+
+    \item [EC3] Not focusing on real-time systems, not proposing a scheduling algorithm, not using DAG, LET or event-chain tasks.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{images/slr_process.drawio.png}
+    \caption{SLR process diagram. EC stands for Exclusion Criteria,
+    which are listed above.}
+    \label{fig:slr_process}
+\end{figure}
+
 
 \subsection{Findings of the Literature Review}
-
-\paraheading{The works reviewed were compared on the following metrics.} 
-\begin{itemize}
-    \item \textbf{Utilization Bound}: useful to see which algorithm is more efficient at using the available resources.
-    \item \textbf{Acceptance Ratio}: it shows how optimal (see Section \ref{sec:bg}) a scheduling algorithm is.
-    \item \textbf{Makespan}: for DAG task scheduling, widely used in the literature.
-    \item \textbf{Runtime Overhead}: some scheduling algorithms can show promising results theoretically but are practically very slow because 
-    of their complexity adding runtime overhead on the scheduler, this metric will not be a number but rather an amount such as minimal, practical, non-practical.
-\end{itemize}
-Every metric used here have also been chosen for their prevalence in the literature.
-
  
 In \cite{guan2021DAGfluid}, authors 
 use fluid scheduling to schedule multiple DAG tasks
