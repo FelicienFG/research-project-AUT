@@ -201,6 +201,26 @@ when their motivation came from the notion
 of degree of parallelism being used
 but wrongly defined in previous intra-task scheduling work\cite{Zhao2022DAGsched}\cite{zhao2020DAGsched}.\\
 
+Federated scheduling isn't the only method used,
+\cite{JiangDecompoSchedParallelTask},
+for instance, propose a decomposition-based 
+approach to schedule multi-DAG tasks as well as 
+a metric for testing the schedulability of tasks.
+Their decomposition strategy proves to be the most efficient 
+, according to the defined metric, and the scheduling algorithm
+derived from it shows promising results in terms of
+acceptance ratio.
+Their decomposition strategy basically works by first 
+definin execution segments and then then assigning subtasks 
+to those segments using the laxity of those subtasks so that 
+no segments are overloaded with workload.
+The main limitation of this work is that 
+they only look at GEDF variants for priority assignment 
+and do not evaluate their decomposition method
+using other scheduling heuristics for multi-DAGs.
+Most of the articles presented up to now 
+tackle inter-task scheduling, not considering
+the intra-task execution schedule.
 
 Indeed, intra-task scheduling\cite{He2019DagIntra}\cite{Xiao2019}
 \cite{Shi2024DagExecGroups}\cite{Zhao2024GATDRLmodel}\cite{Lee2021GlobalDagSchedDRL}
@@ -348,13 +368,57 @@ which violates the safety rules of hard real-time systems.
 As a consequence, the Logical Execution Time has been 
 introduced in the early 2000s\cite{henzinger2003giotto}.
 Unfortunately, LET implementations can suffer from contention problem
-as well as implementation overheads
+as well as overheads
 which increases the WCET of regular DAG tasks when executed on the system.
 
 As such, \cite{Igarashi2020HeuristicContentionFree}
 propose a LET DAG task scheduling algorithm that
 avoids contentions using a heuristic, while reducing the runtime
 overhead caused by the LET semantics implementation.
+Their approach is based on a minimum laxity-first priority
+assignment algorithm for scheduling the subtasks of the DAG task
+and multi-DAG scheduling is done using each task's job's earliest start time (EST)
+and earliest finish time (EFT) to avoid communication contentions between jobs.
+Their method considerably reduces the makespan 
+compared to LET tasks being scheduled without 
+avoiding contentions and the deadline-miss ratio when 
+scheduling multiple jobs is also 
+significantly lowered.
+Although they use a multiple-cluster, multicore architecture to 
+perform the experiment, they only consider one cluster
+and don't extend their approach to scheduling tasks 
+on multiple-cluster.
+
+Another approach at minimizing the inter-core communication delays
+is using the Direct Memory Access (DMA) protocol
+which transfer data from one core to another, without using local buffers.
+Indeed, typical implementations of LET use 
+local buffers in every core of the system
+which read/write data from/to a global memory.
+This mechanism can be coslty when dealing 
+with huge amounts of sensor data, such as in
+autonomous driving systems.
+Hence, \cite{Pazzaglia2021DMALETtransfer}
+propose a DMA-based protocol to handle LET communications semantics
+on multi-core systems that minimizes the read/write latency of each task.
+They do so by having an LET task on each core being responsible for 
+programming the DMA engine so that the LET communications
+can happen.
+They also introduce a scheduling algorithm 
+for the communication tasks, based on mixed-ILP (MILP)
+problem formulation, minimizing either the
+number of DMA data communications or 
+the maximum communication delay to period ratio
+of each task.
+Their MILP method produces an optimal schedule
+and improves by up to 98\% the communication delays
+compared to the classic Giotto approach of LET\cite{henzinger2003giotto}.
+Unfortunately, 
+they do not consider the scalability, in terms of the number of subtasks
+per DAG tasks, of their method and they do not provide any 
+evaluation of their method applied to existing DAG scheduling algorithms
+to see how their LET protocol impacts the acceptance ratio of those scheduling algorithms.
+
 
 
 \begin{table}
