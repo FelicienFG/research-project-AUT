@@ -82,7 +82,8 @@ resources are often limited and expensive, making it crucial to
 maximize their usage.
 
 This concept is also used either as a measurement
-when comparing two scheduling algorithms (see Section \ref{sec:literature}),
+when comparing two scheduling algorithms 
+and considering their utilization bound(see Section \ref{sec:literature}),
 or used as a parameter to generate tasksets or DAG tasks with 
 a fixed utilization (see Section \ref{sec:methodology}).
 
@@ -113,21 +114,24 @@ and it will be the main efficacy criteria when comparing
 the machine learning model with state-of-the-art heuristics and ILP
 (see Section \ref{sec:methodology}).
 
-\subsection{Acceptance ratio}
+\subsection{Capacity augmentation bound}
 
-When dealing with several independent DAG tasks
-or tasksets, 
-the acceptance ratio is often used to measure the 
-performance of a scheduling algorithm (see Section \ref{sec:literature}).
-It consists of looking at a number of generated tasksets (or DAG tasks)
-and calculating the amount of schedulable (i.e., 
-the schedule produced doesn't lead to a deadline miss) tasksets compared to 
-the total amount of taskets.
-The resulting percentage is the acceptance ratio 
-and the closer it gets to 100\% for a scheduling algorithm, the better the scheduling algorithm.
-
-This concept is also used as a measurement, to assert the efficiency
-of scheduling algorithms when considering independent tasks (see Section \ref{sec:literature}).
+Another measurement used when scheduling event-chains, or DAG, tasks  
+is the capacity bounds, or capacity augmentation bound,
+which compares resource use to an theoretically optimal scheduling algorithm.
+It can also be used as a simple schedulability test.
+The matehmatical definition for a scheduling algorithm $S$ of its capacity
+augmentation bound $\beta$ is that, for any chain of events represented by a DAG $G$
+satisfying the following condition :
+\begin{align}
+    \beta \times U \leq m \wedge  \beta \times len(G) \leq D,
+\end{align}
+the associated DAG is schedulable by $S$.
+Here, $len(G)$ is the length of the longest path, in terms of WCETs,
+in the graph $G$, $D$ is the DAG task's deadline, $m$ the number of processors and $U$
+is the utilization factor of the DAG task (with the WCET of the DAG being the sum of all tasks' WCET).
+As you can see, the lower $\beta$ is, the better the scheduling algorithm.\\
+This metric is used for DAG tasks or event-chains of tasks.
 
 %\cite{tiryaki2006sunit} is really good with MAS but really bad with something else.
 \subsection{Optimality}
@@ -144,22 +148,27 @@ all the tasks in the taskset will finish executing before their deadlines.
 This concept is used in the literature, mainly for independent tasks scheduling
 (see Section \ref{sec:literature}).
 
-\subsection{Approximation ratio}
+\subsection{Acceptance ratio}
 
-The approximation ratio is the comparison between 
-the average number of processors required by a scheduling algorithm 
-to make a random taskset feasible and the average number of 
-processors needed by the theoretically optimal scheduling algorithm 
-for the same taskset.
+When dealing with several independent DAG tasks
+or tasksets, 
+the acceptance ratio is often used to measure the 
+performance of a scheduling algorithm (see Section \ref{sec:literature}).
+It consists of looking at a number of generated tasksets (or DAG tasks)
+and calculating the amount of schedulable (i.e., 
+the schedule produced doesn't lead to a deadline miss) tasksets compared to 
+the total amount of taskets.
+The resulting percentage is the acceptance ratio 
+and the closer it gets to 100\% for a scheduling algorithm, the better the scheduling algorithm.
 
-It is a way of measuring scheduling algorithms,
-especially when considering independent tasks (see Section \ref{sec:literature}).
+This concept is also used as a metric, to assert the efficiency
+of scheduling algorithms when considering independent tasks (see Section \ref{sec:literature}).
 \\
 
 
-While the acceptance and approximation ratio are used 
+While the acceptance ratio, also called system schedulability, is used 
 to measure the performance of scheduling alrogithms for independent tasks,
-the makespan is only used for DAG tasks and tasksets representing chain of events.
+the makespan and the capacity bound are only used for DAG tasks and tasksets representing chain of events.
 
 \subsection{RM and EDF scheduling}
 ~
@@ -207,9 +216,13 @@ less runtime overhead and is therefore more practical, it has been
 shown that RM leads to more task preemptions (interrupting the 
 execution of a task, as seen at times 2 and 4 for task $\tau_2$ in 
 Figure \ref{fig:edf_rm_examples}.a). This, combined with its lower 
-utilization bound and non-optimality, makes EDF clearly superior to 
+utilization bound and non-optimality, makes EDF perform better than 
 RM\cite{buttazzo2005RMvsEDF}.
 
 Although \cite{liu1973scheduling}'s work focused on uniprocessor 
 systems, the proposed algorithms have also been applied to 
 multi-processor scheduling.
+For example, Global EDF (GEDF)
+can be used on multi-core systems when allowing task migrations
+and Partitioned EDF (PEDF) is used when forbidding task migrations
+(The RM equivalents also exist).
