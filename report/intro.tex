@@ -94,8 +94,15 @@ task scheduling on multi-core systems. Given that the problem of
 scheduling independent tasks is NP-hard\footnote{If a problem is 
 NP-hard, it means that it is very unlikely to find a solution in 
 polynomial time complexity, i.e., solutions are not scalable}\cite{du1989schedNPhard}, 
-no scalable optimal algorithm exists. Therefore, heuristics are 
-used to partially solve the problem.
+no scalable optimal algorithm exists. Therefore, either heuristics are 
+used to partially solve the problem,
+or the optimal but not scalable Integer Linear Programming
+(ILP) method is used.
+
+Another prevalent task model use to 
+model the dependencies between tasks
+in an event-chain is the Directed Acyclic Graph (DAG) task model
+which is described in the next section (Section \ref{sec:bg}).
 
 Consequently, machine learning will be considered here as it can 
 better approximate the unattainable perfect solution while being 
