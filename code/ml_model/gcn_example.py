@@ -1,6 +1,11 @@
 #!/usr/env python3
 
 import torch
+import makespan_solver
+
+make = makespan_solver.MakespanSolver()
+
+print(make.computeMakespan([], []))
 
 
 class myGCNmodule(torch.nn.Module):
@@ -58,3 +63,7 @@ if __name__ == "__main__":
     output = gcn_layer(X)
 
     print(output)
+
+    
+
+    
