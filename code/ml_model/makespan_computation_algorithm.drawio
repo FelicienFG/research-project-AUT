@@ -1,0 +1,153 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0" version="24.7.6">
+  <diagram name="Page-1" id="O1DJKOfM3pfdQOUyjbKf">
+    <mxGraphModel dx="1299" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="GAcEJit3W1IuJde5-rXI-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-1" target="GAcEJit3W1IuJde5-rXI-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-1" target="GAcEJit3W1IuJde5-rXI-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-1" value="waiting list and ready-queue no empty" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="190" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-2" target="GAcEJit3W1IuJde5-rXI-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-2" value="&lt;div&gt;waiting list&lt;/div&gt;&lt;div&gt;ready priority-queue&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;perimeterSpacing=0;" vertex="1" parent="1">
+          <mxGeometry x="330" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-4" value="list of processors" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-12" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="500" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-9" value="try to assign highest priority subtask to processor " style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-13" target="GAcEJit3W1IuJde5-rXI-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-13" target="GAcEJit3W1IuJde5-rXI-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-13" value="can assign ?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="500" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-15" value="&lt;div&gt;increment timer&lt;/div&gt;&lt;div&gt;to next sched point&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-17" value="timer" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="70" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-18" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-15" target="GAcEJit3W1IuJde5-rXI-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="380" as="sourcePoint" />
+            <mxPoint x="440" y="330" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="570" y="390" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-19" value="NO" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="420" y="518" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-20" value="YES" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="385" y="588" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-21" value="assign subtask" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="330" y="700" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-23" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-21" target="GAcEJit3W1IuJde5-rXI-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="668" as="sourcePoint" />
+            <mxPoint x="200" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="290" y="730" />
+              <mxPoint x="290" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-24" value="return timer + current max workload" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-28" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-26" target="GAcEJit3W1IuJde5-rXI-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-26" value="try to assign highest priority subtask to processor " style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="890" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-30" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-33" target="GAcEJit3W1IuJde5-rXI-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-27" value="look at all executing subtasks and update waiting list / ready queue" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="1030" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-29" value="&lt;div&gt;assign on the first available proc&lt;/div&gt;&lt;div&gt;and return YES&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="1290" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-27" target="GAcEJit3W1IuJde5-rXI-33">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="1090" as="sourcePoint" />
+            <mxPoint x="340" y="1210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-38" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-33">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="470" y="1205" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-33" value="&lt;div&gt;can&amp;nbsp;&lt;/div&gt;&lt;div&gt;assign ready queue&#39;s&amp;nbsp;&lt;/div&gt;&lt;div&gt;top&amp;nbsp;&lt;/div&gt;&lt;div&gt;subtask ?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="285" y="1150" width="110" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-36" value="YES" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="335" y="1250" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-39" value="NO" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="385" y="1205" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-42" target="GAcEJit3W1IuJde5-rXI-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-49" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-42" target="GAcEJit3W1IuJde5-rXI-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-42" value="&lt;div&gt;can preempt&amp;nbsp;&lt;/div&gt;&lt;div&gt;lower-priority&amp;nbsp;&lt;/div&gt;&lt;div&gt;subtask to assign the ready-queue&#39;s&amp;nbsp;&lt;/div&gt;&lt;div&gt;top subtask ?&lt;/div&gt;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="1132.5" width="145" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-44" value="&lt;div&gt;preempt and then assign&lt;/div&gt;&lt;div&gt;and returnYES&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="482.5" y="1310" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-46" value="YES" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="545" y="1258" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-47" value="NO" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1218" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-48" value="return NO" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1175" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-50" target="GAcEJit3W1IuJde5-rXI-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-50" value="&lt;div&gt;increment timer&lt;/div&gt;&lt;div&gt;to next sched point&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="450" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-54" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GAcEJit3W1IuJde5-rXI-51" target="GAcEJit3W1IuJde5-rXI-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-51" value="compute minimum core workload " style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="548" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GAcEJit3W1IuJde5-rXI-53" value="increment timer by the minimum workload" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="640" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
