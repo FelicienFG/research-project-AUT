@@ -2809,7 +2809,7 @@ namespace swig {
 
 
 #define SWIG_FILE_WITH_INIT
-#include "./cpp/makespan_solver.h"
+#include "../cpp/makespan_solver.h"
 
 
 #include <iostream>

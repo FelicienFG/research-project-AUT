@@ -2,7 +2,7 @@
 
 %{
 #define SWIG_FILE_WITH_INIT
-#include "./cpp/makespan_solver.h"
+#include "../cpp/makespan_solver.h"
 %}
 
 %include "std_vector.i"
@@ -11,4 +11,4 @@ namespace std {
    %template(IntVector) vector<int>;
 }
 
-%include "./cpp/makespan_solver.h"
+%include "../cpp/makespan_solver.h"

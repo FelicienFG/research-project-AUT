@@ -1,9 +1,9 @@
 #!/usr/env python3
 
 import torch
-import makespan_solver
+import makespan_solver as ms
 
-make = makespan_solver.MakespanSolver()
+make = ms.MakespanSolver()
 
 print(make.computeMakespan([], []))
 
