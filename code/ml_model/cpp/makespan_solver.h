@@ -2,17 +2,19 @@
 #define MAKESPAN_SOLVER_H
 #include <vector>
 #include <map>
+#include <list>
 
 struct DagSubtask
 {
     DagSubtask()
-        :id(0),wcet(0),priority(0),dependencies(){}
-    DagSubtask(int _id, int _wcet, const std::vector<int>& _dependencies)
-        :id(_id), wcet(_wcet), priority(0), dependencies(_dependencies){}
+        :id(0),wcet(0),priority(0), inDependencies(), outDependencies(){}
+    DagSubtask(int _id, int _wcet, const std::list<int>& _inDependencies, const std::list<int>& _outDependencies)
+        :id(_id), wcet(_wcet), priority(0), inDependencies(_inDependencies), outDependencies(_outDependencies){}
     int id;
     int wcet;
     int priority;
-    std::vector<int> dependencies;
+    std::list<int> inDependencies;
+    std::list<int> outDependencies;
 };
 
 class MakespanSolver

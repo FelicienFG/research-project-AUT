@@ -12,14 +12,15 @@ public:
     DagSubtask* getExecutingTask() const;
 
     //returns nullptr or the task that was assigned to this core before 
-    DagSubtask* assignTask(DagSubtask* newTask);
+    DagSubtask* assignTask(DagSubtask* newTask, int timer);
 
     //returns 0 if no task is assigned, wcet of task otherwise.
-    int getWorkload() const;
+    int getWorkload(int timer) const;
 
 private:
 
     DagSubtask* taskExecuting;
+    int taskExecuteStartTime;
 };
 
 

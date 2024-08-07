@@ -2,10 +2,7 @@
 
 import torch
 import makespan_solver as ms
-
-make = ms.MakespanSolver()
-
-print(make.computeMakespan([], []))
+import data_loader as dl
 
 
 class myGCNmodule(torch.nn.Module):
@@ -45,7 +42,7 @@ class myGCNmodule(torch.nn.Module):
         return H
     
 
-if __name__ == "__main__":
+def gcn_test():
 
     input_dim = 3
     output_dim = 2
@@ -64,6 +61,36 @@ if __name__ == "__main__":
 
     print(output)
 
-    
+def getDagTask(graph, wcets):
+    """
+    get the list of DagSubtasks from the graph
+    """
+    dagTask = ms.DagSubtaskVector()
+    for vertex_key in wcets:
+        dagSubtask = ms.DagSubtask()
+        dagSubtask.id = vertex_key - 1 
+        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
+        for i in range(dagSubtask.inDependencies.size()):
+            dagSubtask.inDependencies[i] -= 1
+        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
+        for i in range(dagSubtask.outDependencies.size()):
+            dagSubtask.outDependencies[i] -= 1
+        dagSubtask.wcet = wcets[vertex_key]
 
+        dagTask.append(dagSubtask)
+
+    return dagTask
+
+
+if __name__ == "__main__":
+
+    makespanSolver = ms.MakespanSolver()
+    dataLoader = dl.DataLoader("../dag_generator/data/")
+    task = 1
+    dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
     
+    priorities = ms.IntVector([0, 1, 1, 1, 2, 3])
+    
+    makespan = makespanSolver.computeMakespan(priorities, dagTask)
+
+    print(makespan)

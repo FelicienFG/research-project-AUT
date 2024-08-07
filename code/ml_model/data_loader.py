@@ -34,9 +34,13 @@ class DataLoader:
         max_key = 0
         for u, v, weight in G.edges(data='label'):
             if u not in G_dict:
-                G_dict[u] = [v]
+                G_dict[u] = {"in": [], "out": [v]}
             else:
-                G_dict[u].append(v)
+                G_dict[u]["out"].append(v)
+            if v not in G_dict:
+                G_dict[v] = {"in": [u], "out": []}
+            else:
+                G_dict[v]["in"].append(u)
 
             if v > max_key:
                 max_key = v
@@ -49,7 +53,6 @@ class DataLoader:
             C_dict[u] = weight
 
         C_dict[max_key] = G.nodes[max_key]['C']
-        G_dict[max_key] = []
 
         # formulate the c list (c[0] is c for v1!!)
         C_array = []
@@ -64,5 +67,5 @@ class DataLoader:
 
 if __name__ == "__main__":
 
-    data = DataLoader("data/")
+    data = DataLoader("../dag_generator/data/")
     print(data.tasks)

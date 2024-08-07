@@ -228,15 +228,246 @@ class IntVector(object):
 # Register IntVector in _makespan_solver:
 _makespan_solver.IntVector_swigregister(IntVector)
 
+class DagSubtaskVector(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        return _makespan_solver.DagSubtaskVector_iterator(self)
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        return _makespan_solver.DagSubtaskVector___nonzero__(self)
+
+    def __bool__(self):
+        return _makespan_solver.DagSubtaskVector___bool__(self)
+
+    def __len__(self):
+        return _makespan_solver.DagSubtaskVector___len__(self)
+
+    def __getslice__(self, i, j):
+        return _makespan_solver.DagSubtaskVector___getslice__(self, i, j)
+
+    def __setslice__(self, *args):
+        return _makespan_solver.DagSubtaskVector___setslice__(self, *args)
+
+    def __delslice__(self, i, j):
+        return _makespan_solver.DagSubtaskVector___delslice__(self, i, j)
+
+    def __delitem__(self, *args):
+        return _makespan_solver.DagSubtaskVector___delitem__(self, *args)
+
+    def __getitem__(self, *args):
+        return _makespan_solver.DagSubtaskVector___getitem__(self, *args)
+
+    def __setitem__(self, *args):
+        return _makespan_solver.DagSubtaskVector___setitem__(self, *args)
+
+    def pop(self):
+        return _makespan_solver.DagSubtaskVector_pop(self)
+
+    def append(self, x):
+        return _makespan_solver.DagSubtaskVector_append(self, x)
+
+    def empty(self):
+        return _makespan_solver.DagSubtaskVector_empty(self)
+
+    def size(self):
+        return _makespan_solver.DagSubtaskVector_size(self)
+
+    def swap(self, v):
+        return _makespan_solver.DagSubtaskVector_swap(self, v)
+
+    def begin(self):
+        return _makespan_solver.DagSubtaskVector_begin(self)
+
+    def end(self):
+        return _makespan_solver.DagSubtaskVector_end(self)
+
+    def rbegin(self):
+        return _makespan_solver.DagSubtaskVector_rbegin(self)
+
+    def rend(self):
+        return _makespan_solver.DagSubtaskVector_rend(self)
+
+    def clear(self):
+        return _makespan_solver.DagSubtaskVector_clear(self)
+
+    def get_allocator(self):
+        return _makespan_solver.DagSubtaskVector_get_allocator(self)
+
+    def pop_back(self):
+        return _makespan_solver.DagSubtaskVector_pop_back(self)
+
+    def erase(self, *args):
+        return _makespan_solver.DagSubtaskVector_erase(self, *args)
+
+    def __init__(self, *args):
+        _makespan_solver.DagSubtaskVector_swiginit(self, _makespan_solver.new_DagSubtaskVector(*args))
+
+    def push_back(self, x):
+        return _makespan_solver.DagSubtaskVector_push_back(self, x)
+
+    def front(self):
+        return _makespan_solver.DagSubtaskVector_front(self)
+
+    def back(self):
+        return _makespan_solver.DagSubtaskVector_back(self)
+
+    def assign(self, n, x):
+        return _makespan_solver.DagSubtaskVector_assign(self, n, x)
+
+    def resize(self, *args):
+        return _makespan_solver.DagSubtaskVector_resize(self, *args)
+
+    def insert(self, *args):
+        return _makespan_solver.DagSubtaskVector_insert(self, *args)
+
+    def reserve(self, n):
+        return _makespan_solver.DagSubtaskVector_reserve(self, n)
+
+    def capacity(self):
+        return _makespan_solver.DagSubtaskVector_capacity(self)
+    __swig_destroy__ = _makespan_solver.delete_DagSubtaskVector
+
+# Register DagSubtaskVector in _makespan_solver:
+_makespan_solver.DagSubtaskVector_swigregister(DagSubtaskVector)
+
+class IntList(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def iterator(self):
+        return _makespan_solver.IntList_iterator(self)
+    def __iter__(self):
+        return self.iterator()
+
+    def __nonzero__(self):
+        return _makespan_solver.IntList___nonzero__(self)
+
+    def __bool__(self):
+        return _makespan_solver.IntList___bool__(self)
+
+    def __len__(self):
+        return _makespan_solver.IntList___len__(self)
+
+    def __getslice__(self, i, j):
+        return _makespan_solver.IntList___getslice__(self, i, j)
+
+    def __setslice__(self, *args):
+        return _makespan_solver.IntList___setslice__(self, *args)
+
+    def __delslice__(self, i, j):
+        return _makespan_solver.IntList___delslice__(self, i, j)
+
+    def __delitem__(self, *args):
+        return _makespan_solver.IntList___delitem__(self, *args)
+
+    def __getitem__(self, *args):
+        return _makespan_solver.IntList___getitem__(self, *args)
+
+    def __setitem__(self, *args):
+        return _makespan_solver.IntList___setitem__(self, *args)
+
+    def pop(self):
+        return _makespan_solver.IntList_pop(self)
+
+    def append(self, x):
+        return _makespan_solver.IntList_append(self, x)
+
+    def empty(self):
+        return _makespan_solver.IntList_empty(self)
+
+    def size(self):
+        return _makespan_solver.IntList_size(self)
+
+    def swap(self, v):
+        return _makespan_solver.IntList_swap(self, v)
+
+    def begin(self):
+        return _makespan_solver.IntList_begin(self)
+
+    def end(self):
+        return _makespan_solver.IntList_end(self)
+
+    def rbegin(self):
+        return _makespan_solver.IntList_rbegin(self)
+
+    def rend(self):
+        return _makespan_solver.IntList_rend(self)
+
+    def clear(self):
+        return _makespan_solver.IntList_clear(self)
+
+    def get_allocator(self):
+        return _makespan_solver.IntList_get_allocator(self)
+
+    def pop_back(self):
+        return _makespan_solver.IntList_pop_back(self)
+
+    def erase(self, *args):
+        return _makespan_solver.IntList_erase(self, *args)
+
+    def __init__(self, *args):
+        _makespan_solver.IntList_swiginit(self, _makespan_solver.new_IntList(*args))
+
+    def push_back(self, x):
+        return _makespan_solver.IntList_push_back(self, x)
+
+    def front(self):
+        return _makespan_solver.IntList_front(self)
+
+    def back(self):
+        return _makespan_solver.IntList_back(self)
+
+    def assign(self, n, x):
+        return _makespan_solver.IntList_assign(self, n, x)
+
+    def resize(self, *args):
+        return _makespan_solver.IntList_resize(self, *args)
+
+    def insert(self, *args):
+        return _makespan_solver.IntList_insert(self, *args)
+
+    def pop_front(self):
+        return _makespan_solver.IntList_pop_front(self)
+
+    def push_front(self, x):
+        return _makespan_solver.IntList_push_front(self, x)
+
+    def reverse(self):
+        return _makespan_solver.IntList_reverse(self)
+    __swig_destroy__ = _makespan_solver.delete_IntList
+
+# Register IntList in _makespan_solver:
+_makespan_solver.IntList_swigregister(IntList)
+
+class DagSubtask(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _makespan_solver.DagSubtask_swiginit(self, _makespan_solver.new_DagSubtask(*args))
+    id = property(_makespan_solver.DagSubtask_id_get, _makespan_solver.DagSubtask_id_set)
+    wcet = property(_makespan_solver.DagSubtask_wcet_get, _makespan_solver.DagSubtask_wcet_set)
+    priority = property(_makespan_solver.DagSubtask_priority_get, _makespan_solver.DagSubtask_priority_set)
+    inDependencies = property(_makespan_solver.DagSubtask_inDependencies_get, _makespan_solver.DagSubtask_inDependencies_set)
+    outDependencies = property(_makespan_solver.DagSubtask_outDependencies_get, _makespan_solver.DagSubtask_outDependencies_set)
+    __swig_destroy__ = _makespan_solver.delete_DagSubtask
+
+# Register DagSubtask in _makespan_solver:
+_makespan_solver.DagSubtask_swigregister(DagSubtask)
+
 class MakespanSolver(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
 
-    def computeMakespan(self, priorityList, wcets):
-        return _makespan_solver.MakespanSolver_computeMakespan(self, priorityList, wcets)
+    def __init__(self, numberOfCores=4):
+        _makespan_solver.MakespanSolver_swiginit(self, _makespan_solver.new_MakespanSolver(numberOfCores))
 
-    def __init__(self):
-        _makespan_solver.MakespanSolver_swiginit(self, _makespan_solver.new_MakespanSolver())
+    def computeMakespan(self, priorityList, dagTask):
+        return _makespan_solver.MakespanSolver_computeMakespan(self, priorityList, dagTask)
     __swig_destroy__ = _makespan_solver.delete_MakespanSolver
 
 # Register MakespanSolver in _makespan_solver:
