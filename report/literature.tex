@@ -4,15 +4,14 @@
 
 \subsection{Systematic Literature Review process}
 
-This SLR aims at tackling RQ1. More precisely, the following research questions will be answered:
+This SLR aims at tackling RQ1 and RQ2. More precisely, the following research questions will be answered:
 
 \begin{itemize}
-    \item [RQ1.1] What is the current state-of-the-Art for DAG task scheduling with precedence constraints ?
-    \item [RQ1.2] How has LET been used in scheduling event-chains ?
-    \item [RQ1.3] What machine learning techniques have been used for scheduling tasks on real-time systems ?
+    \item [RQ1] What is the current state-of-the-Art for DAG tasks scheduling ?        
+    \item [RQ2] What machine learning  techniques are used for DAG task scheduling ?
 \end{itemize}
 It will also be shown how the literature doesn't provide 
-a complete answer to RQ2, hence the contributions of this paper.\\
+a complete answer to RQ3, hence the contributions of this paper.\\
 
 From these research questions, several concepts have been isolated,
 namely, time-triggered tasks, the nature of the system (real-time multicore system),
@@ -24,15 +23,16 @@ Searching was conducted using the IEEE and ACM databases.
 According to the concepts identified above, 
 the keyword chain used for searching was 
 "("real-time" OR "real time") AND 
-"system" AND ("time-triggered" OR "time triggered" OR "DAG" OR "Directed Acyclic Graph" OR "LET" OR "Logical Execution Time" OR "event chain" OR "event-chain") 
+"system" AND ("time-triggered" OR "time triggered" OR "DAG" OR "Directed Acyclic Graph" OR "event chain" OR "event-chain") 
 AND "task" 
 AND ("scheduling" OR "scheduler" OR "schedule") 
 AND ("multi-processors" OR "multi-cores" OR "multi processors" OR 
 "multi cores" OR "multi-processor" OR "multi processor" OR 
 "multi-core" OR "multi core")".
-
-The search produced 3,549 results on the IEEE database
-which was reduced tp 1,171 papers when considering only 
+             EC1    EC2    EC3
+1,259 -> 515 -> 403 -> 101 -> 19 --> 17
+The search produced 1,259 results on the IEEE database
+which was reduced tp 515 papers when considering only 
 articles published in the past 5 years.
 
 Then the following exclusion criterias were used to filter out 
@@ -53,12 +53,12 @@ the rest of the articles, bringing the number of papers down to 19
         \item Focus on conference and journal papers
     \end{list}
 
-    \item [EC3] Not focusing on real-time systems, not proposing a scheduling algorithm, not using DAG, LET or event-chain tasks.
+    \item [EC3] Not focusing on real-time systems, not proposing a scheduling algorithm, not using DAG or event-chain tasks.
 \end{itemize}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{images/slr_process.drawio.png}
+    \includegraphics[width=\linewidth]{images/slr_process.png}
     \caption{SLR process diagram. EC stands for Exclusion Criteria,
     which are listed above.}
     \label{fig:slr_process}
@@ -323,66 +323,6 @@ exposing the experiment to obersvational biases.
 Also, although they introduce a way to extend their approach to schedule
 multiple DAGs, they do not provide any evaluation of that.
 
-Other than delays, communication, especially inter-core communication,
-can lead to non-determinism when wrongly implemented,
-which violates the safety rules of hard real-time systems.
-As a consequence, the Logical Execution Time has been 
-introduced in the early 2000s\cite{henzinger2003giotto}.
-Unfortunately, LET implementations can suffer from contention problem
-as well as overheads
-which increases the WCET of regular DAG tasks when executed on the system.
-
-As such, \citet{Igarashi2020HeuristicContentionFree}
-propose a LET DAG task scheduling algorithm that
-avoids contentions using a heuristic, while reducing the runtime
-overhead caused by the LET semantics implementation.
-Their approach is based on a minimum laxity-first priority
-assignment algorithm for scheduling the subtasks of the DAG task
-and multi-DAG scheduling is done using each task's job's earliest start time (EST)
-and earliest finish time (EFT) to avoid communication contentions between jobs.
-Their method considerably reduces the makespan 
-compared to LET tasks being scheduled without 
-avoiding contentions and the deadline-miss ratio when 
-scheduling multiple jobs is also 
-significantly lowered.
-Although they use a multiple-cluster, multicore architecture to 
-perform the experiment, they only consider one cluster
-and don't extend their approach to scheduling tasks 
-on multiple-cluster.
-
-Another approach at minimizing the inter-core communication delays
-is using the Direct Memory Access (DMA) protocol
-which transfer data from one core to another, without using local buffers.
-Indeed, typical implementations of LET use 
-local buffers in every core of the system
-which read/write data from/to a global memory.
-This mechanism can be coslty when dealing 
-with huge amounts of sensor data, such as in
-autonomous driving systems.
-Hence, \citet{Pazzaglia2021DMALETtransfer}
-propose a DMA-based protocol to handle LET communications semantics
-on multi-core systems that minimizes the read/write latency of each task.
-They do so by having an LET task on each core being responsible for 
-programming the DMA engine so that the LET communications
-can happen.
-They also introduce a scheduling algorithm 
-for the communication tasks, based on mixed-ILP (MILP)
-problem formulation, minimizing either the
-number of DMA data communications or 
-the maximum communication delay to period ratio
-of each task.
-Their MILP method produces an optimal schedule
-and improves by up to 98\% the communication delays
-compared to the classic Giotto approach of LET\cite{henzinger2003giotto}.
-Unfortunately, 
-they do not consider the scalability, in terms of the number of subtasks
-per DAG tasks, of their method and they do not provide any 
-evaluation of their method applied to existing DAG scheduling algorithms
-to see how their LET protocol impacts the acceptance ratio of those scheduling algorithms.
-Evaluating the scalability is particularly important when looking at the computing time 
-of the ILP method\cite{Zhao2024GATDRLmodel} which is known to explode
-exponentially when adding subtasks to the problem, making the method impractical.
-
 
 \subsubsection{Machine Learning techniques}
 ~
@@ -478,14 +418,6 @@ Table \ref{tab:slt_sum_table} gives a summary of the findings.
         \cite{Xiao2019} & DAG task scheduling is NP-hard so one can only approximate the optimal algorithm (when considering polynomial timed algorithms)
         and not a lot has been done on scheduling parrallel reccuring tasks & Introduces a scheduling algorithm 'MAS' that shortens the makespan of recurring DAG tasks compared to EDF & only compares EDF and MAS using one example of a DAG task for makespans and also only compares with EDF.
         Even though MAS shortens the makespan, it is less scalable than comparable algorithms. & The MAS algorithm integrates clustering, scheduling, and task duplication techniques and is evaluated using a TMS320C6678 simulation for measurements closely aligned with real-world results.\\
-        \hline
-        \cite{Igarashi2020HeuristicContentionFree}  & 
-        Multi-core systems can cause contention and unpredictability. 
-        LET tasks address this but add execution time due to overhead.
-        & Proposes a DAG LET tasks scheduling algorithm that avoids contentions while reducing the running time overhead
-        due to LET implementation & They are using a multiple-clusters, multi-core architecture to evaluate their scheduling algorithm
-        but only consider one cluster. & It addresses multi-rate DAGs and reduces LET intervals to minimize makespan. 
-        Uses minimum-laxity-first and Earliest Finish Time (EFT) to optimize core assignment and reduce makespan in multi-rate DAGs.\\
         \hline
         \cite{jiangUtilTensityBound}  & The capacity-bound measures performance and tests 
         schedulability for DAG scheduling, but it may exclude schedulable tasks by using the 
@@ -605,34 +537,16 @@ Table \ref{tab:slt_sum_table} gives a summary of the findings.
         tasks and use excess capacity for 
         Passive VPs. Allocation is based on deadlines, critical path length, and task usefulness.\\
         \hline
-        \cite{Pazzaglia2021DMALETtransfer} & The LET paradigm effectively handles memory contentions and I/O 
-        determinism but typically requires costly
-         local buffers for large data transfers. Direct Memory Access (DMA) could address this, 
-        but LET hasn't been tested with DMA. &
-        Propose a DMA-based protocol for LET communications on multicore systems to minimize task latency. 
-        They also provide a MILP-based scheduling algorithm that improves communication delays 
-        by up to 98\% compared to the classic Giotto LET approach. & Doesn't address the scalability of 
-        their method for multiple tasks/data
-         transfers and lacks evaluation of existing DAG scheduling algorithms with and without their LET communication protocol.
-        & For the protocol, each core’s LET task programs the DMA engine for communications. 
-        The scheduling and data allocation are optimized using MILP to minimize DMA communications 
-        or the maximum communication delay-to-period ratio.  \\
-        \hline
     \end{tabular}
 \end{table*}
 
 According to these findings,
-the current state-of-the-Art for DAG task scheduling (RQ1.1)
+the current state-of-the-Art for DAG task scheduling (RQ1)
 seems to be a federated-based scheduling approach for inter-task 
 scheduling and a global priority-list approach for intra-task scheduling
 \cite{He2023DegreeOfParallelism}\cite{Zhao2022DAGsched}.
-Although those papers don't consider communication overheads
-which is where LET (RQ1.2) is moslty used when looking at scheduling 
-LET tasks, to reduce the amount of overhead 
-so that the LET interval of a task can be as close to 
-its wcet as possible while respecting the advantageous LET semantics.
 
-In terms of machine learning techniques (RQ1.3), every article found uses 
+In terms of machine learning techniques (RQ2), every article found uses 
 deep reinforcement learning for scheduling DAG tasks.
 More specifically, the model proposed is often a combination
 of a kind of graph neural network and attention layers 
