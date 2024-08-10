@@ -6,7 +6,7 @@ class DagSubtask;
 class ProcCore
 {
 public:
-    ProcCore();
+    ProcCore(int _id = 0);
     ProcCore(DagSubtask* task);
 
     DagSubtask* getExecutingTask() const;
@@ -18,9 +18,9 @@ public:
     int getWorkload(int timer) const;
 
 private:
-
     DagSubtask* taskExecuting;
     int taskExecuteStartTime;
+    int id;
 };
 
 

@@ -1,24 +1,25 @@
 #include "makespan_solver.h"
 #include <queue>
-#include <numeric>
+#include <limits>
 #include <algorithm>
 #include <iostream>
 #include "proc_core.h"
 
 static auto dagSubtaskCompare = [](const DagSubtask* left, const DagSubtask* right)
 {
-    return left->priority < right->priority;
+    return left->priority > right->priority;
 };
 
 typedef std::priority_queue<DagSubtask*, std::vector<DagSubtask*>, decltype(dagSubtaskCompare)> dagReadyQueue;
 
 int minPosWorkload(const std::vector<ProcCore>& cores, int timer)
 {
-    int min_w = cores[0].getWorkload(timer);
-    for(unsigned i = 1;i<cores.size();++i)
+    int min_w = std::numeric_limits<int>::max();
+    for(unsigned i = 0;i<cores.size();++i)
         if(cores[i].getWorkload(timer) > 0)
             min_w = std::min(min_w, cores[i].getWorkload(timer));
-
+    if(min_w >= std::numeric_limits<int>::max())
+        return 1;
     return min_w;
 }
 
@@ -66,15 +67,28 @@ void updateWaitingAndReadyList(std::vector<DagSubtask*>& waitingList, dagReadyQu
         return false;
     });
 
-    if(new_end == waitingList.end())
-        waitingList.clear();
-    else
+    if(new_end != waitingList.end())
         waitingList.erase(new_end, waitingList.end());
 }
 
 MakespanSolver::MakespanSolver(int numberOfCores)
     :numCores(numberOfCores)
 {
+}
+
+void printreadlist(dagReadyQueue list)
+{
+    while(!list.empty())
+    {
+        std::cout<<list.top()->id<<" ";
+        list.pop();
+    }
+}
+
+void printwaitinglist(const std::vector<DagSubtask*>& list)
+{
+    for(DagSubtask* task : list)
+        std::cout<<task->id<<" ";
 }
 
 int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::vector<DagSubtask> dagTask)
@@ -89,23 +103,33 @@ int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::v
     int timer = 0;
 
     for(int m = 0; m < numCores;++m)
-        cores.push_back(ProcCore());
+        cores.push_back(ProcCore(m));
     for(DagSubtask& task : dagTask)
         waitingList.push_back(&task);
 
     while(!readyList.empty() || !waitingList.empty())
     {
         //first update waiting list and ready queue
+/*         std::cout<<"before ready: ";
+        printreadlist(readyList);
+        std::cout<<std::endl<<"before waiting: ";
+        printwaitinglist(waitingList);
+        std::cout<<std::endl; */
         updateDependencies(dagTask, cores, timer);
         updateWaitingAndReadyList(waitingList, readyList);
         //then test if a core can execute the readlist's top task
-        
+        /* std::cout<<"after ready: ";
+        printreadlist(readyList);
+        std::cout<<std::endl<<"after waiting: ";
+        printwaitinglist(waitingList);
+        std::cout<<std::endl; */
+
         for(ProcCore& core : cores)
         {
             if(readyList.empty())
                 break;
-            //either the core is free, or the task executing on it has a lower priority (higher value) than the ready task
-            if(core.getWorkload(timer) == 0 || (core.getExecutingTask() && core.getExecutingTask()->priority > readyList.top()->priority))
+            //if the core is free
+            if(core.getWorkload(timer) == 0)
             {
                 core.assignTask(readyList.top(), timer);
                 readyList.pop();
@@ -115,5 +139,5 @@ int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::v
         timer += minPosWorkload(cores, timer);
     }
 
-    return timer + maxWorkload(cores, timer) + dagTask[dagTask.size() - 1].wcet;
+    return timer + maxWorkload(cores, timer);
 }

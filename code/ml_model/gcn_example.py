@@ -3,6 +3,8 @@
 import torch
 import makespan_solver as ms
 import data_loader as dl
+import random as rand
+import time
 
 
 class myGCNmodule(torch.nn.Module):
@@ -83,13 +85,13 @@ def getDagTask(graph, wcets):
 
 
 if __name__ == "__main__":
-
-    makespanSolver = ms.MakespanSolver()
+    rand.seed = time.time()
+    makespanSolver = ms.MakespanSolver(numberOfCores=4)
     dataLoader = dl.DataLoader("../dag_generator/data/")
-    task = 1
+    task = 4
     dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
     
-    priorities = ms.IntVector([0, 1, 1, 1, 2, 3])
+    priorities = ms.IntVector([rand.randint(0, 4) for i in range(dagTask.size())])
     
     makespan = makespanSolver.computeMakespan(priorities, dagTask)
 

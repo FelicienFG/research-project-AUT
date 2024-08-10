@@ -1,8 +1,9 @@
 #include "proc_core.h"
 #include "makespan_solver.h"
+#include <iostream>
 
-ProcCore::ProcCore()
-    :taskExecuting(nullptr), taskExecuteStartTime(0)
+ProcCore::ProcCore(int _id)
+    :taskExecuting(nullptr), taskExecuteStartTime(0), id(_id)
 {
 }
 
@@ -27,5 +28,7 @@ DagSubtask *ProcCore::assignTask(DagSubtask *newTask, int timer)
 
 int ProcCore::getWorkload(int timer) const
 {
+    /* if(taskExecuting)
+        std::cout<<"core: "<<id<<" wl: "<< taskExecuting->wcet - (timer - taskExecuteStartTime)<<std::endl; */
     return (taskExecuting ? std::max(taskExecuting->wcet - (timer - taskExecuteStartTime),0) : 0);
 }
