@@ -44,6 +44,26 @@ class myGCNmodule(torch.nn.Module):
         return H
     
 
+class attentionLayer(torch.nn.Module):
+
+    def __init__(self, embedding_dim):
+        """
+        embedding dim is the dimension of the feature vectors, i.e., the numbers of feature for each input vector
+        """
+        self.mha = torch.nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=1)
+        self.Wq = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+        self.Wk = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+        self.Wv = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+
+    def forward(self, X: torch.Tensor):
+        queries = torch.matmul(X, self.Wq)
+        keys = torch.matmul(X, self.Wk)
+        values = torch.matmul(X, self.Wv)
+
+        attention_output = self.mha(queries, keys, values, need_weights=False)
+
+        return attention_output
+
 def gcn_test():
 
     input_dim = 3
