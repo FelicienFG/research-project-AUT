@@ -3,6 +3,7 @@
 import torch
 import makespan_solver as ms
 import data_loader as dl
+import makespan_loss
 import random as rand
 import time
 
@@ -44,16 +45,17 @@ class myGCNmodule(torch.nn.Module):
         return H
     
 
-class attentionLayer(torch.nn.Module):
+class AttentionLayer(torch.nn.Module):
 
-    def __init__(self, embedding_dim):
+    def __init__(self, embedding_dim, n_heads = 1):
         """
         embedding dim is the dimension of the feature vectors, i.e., the numbers of feature for each input vector
         """
-        self.mha = torch.nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=1)
+        super(AttentionLayer, self).__init__()
+        self.mha = torch.nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=n_heads)
         self.Wq = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
         self.Wk = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
-        self.Wv = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+        self.Wv = torch.nn.Parameter(torch.rand( embedding_dim, embedding_dim))
 
     def forward(self, X: torch.Tensor):
         queries = torch.matmul(X, self.Wq)
@@ -83,6 +85,80 @@ def gcn_test():
 
     print(output)
 
+def attention_test():
+    embed_size = 3
+    n_heads = 3
+    
+    attention_layer = AttentionLayer(embed_size, n_heads)
+
+    X = torch.tensor([[1., 2., 3.],
+                      [4., 5., 6.],
+                      [7., 8., 9.],
+                      [10. ,11., 12.]])
+    
+    output = attention_layer(X)
+
+    print(output)
+    
+
+def train_one_epoch(model, epoch_num, batches, optimizer, loss_fn):
+    running_loss = 0
+
+    for (dagTaskBatch, featureBatch, ilpOutputs) in batches:
+
+        #reset gradients
+        optimizer.zero_grad()
+        
+        outputs = model(featureBatch)
+
+        #compute loss and gradients
+        loss = loss_fn(outputs, dagTaskBatch, ilpOutputs)
+        loss.backward()
+
+        optimizer.step()
+
+        running_loss += loss.item()
+
+
+    #return the average training loss for this epoch
+    return running_loss / len(batches)
+
+
+
+def training_and_eval(model, num_cores):
+    EPOCHS = 10
+    optimizer = torch.optim.sgd.SGD(model.parameters(), lr=0.001)
+    trainDataBatches = []#TODO
+    valDataBatches = []#TODO
+
+    loss_fn = makespan_loss.MakespanLoss(num_cores)
+
+
+    for epoch_num in range(EPOCHS):
+
+        #train
+        model.train(True)
+        avg_train_loss = train_one_epoch(model, epoch_num, trainDataBatches, optimizer, loss_fn)
+
+        #evaluation
+        # Set the model to evaluation mode, disabling dropout and using population
+        # statistics for batch normalization.
+        model.eval()
+        running_vloss = 0.0
+
+        # Disable gradient computation and reduce memory consumption.
+        with torch.no_grad():
+            for (dagTaskBatch, featureBatch, ilpOutputs) in valDataBatches:
+                voutputs = model(featureBatch)
+                vloss = loss_fn(dagTaskBatch, voutputs, ilpOutputs)
+                running_vloss += vloss
+        avg_vloss = running_vloss / len(valDataBatches)
+
+
+        print("epoch %i -- avg train loss: %f, avg validation loss: %f" % (epoch_num, avg_train_loss, avg_vloss))
+        
+
+
 def getDagTask(graph, wcets):
     """
     get the list of DagSubtasks from the graph
@@ -103,8 +179,7 @@ def getDagTask(graph, wcets):
 
     return dagTask
 
-
-if __name__ == "__main__":
+def test_makespan_compute():
     rand.seed = time.time()
     makespanSolver = ms.MakespanSolver(numberOfCores=4)
     dataLoader = dl.DataLoader("../dag_generator/data/")
@@ -116,3 +191,8 @@ if __name__ == "__main__":
     makespan = makespanSolver.computeMakespan(priorities, dagTask)
 
     print(makespan)
+
+
+if __name__ == "__main__":
+
+    attention_test()
