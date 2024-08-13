@@ -127,9 +127,9 @@ def train_one_epoch(model, epoch_num, batches, optimizer, loss_fn):
 
 def training_and_eval(model, num_cores):
     EPOCHS = 10
+    data_loader = dl.DataLoader('../dag_generator/data/')
     optimizer = torch.optim.sgd.SGD(model.parameters(), lr=0.001)
-    trainDataBatches = []#TODO
-    valDataBatches = []#TODO
+    trainDataBatches, valDataBatches = data_loader.train_val_split(train_percentage=0.7)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
 
