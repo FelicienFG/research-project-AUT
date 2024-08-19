@@ -109,10 +109,11 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
         #reset gradients
         optimizer.zero_grad()
         
-        outputs = model(dataLoader.taskFeatures[batch])
-
+        outputs, _ = model(dataLoader.taskFeatures[batch])
+        
         #compute loss and gradients
         loss = loss_fn([dataLoader.dagTasks[i] for i in batch], outputs, dataLoader.ilpOutputs[batch])
+        loss.requires_grad = True
         loss.backward()
 
         optimizer.step()
@@ -148,7 +149,7 @@ def training_and_eval(model, num_cores):
 
         # Disable gradient computation and reduce memory consumption.
         with torch.no_grad():
-            voutputs = model(valTaskFeatures)
+            voutputs, _ = model(valTaskFeatures)
             vloss = loss_fn(valDagTasks, voutputs, valILPoutputs)
             avg_vloss = vloss / len(valDagTasks)
 
