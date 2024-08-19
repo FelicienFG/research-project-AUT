@@ -4,45 +4,35 @@
 Real-time systems are utilized in various domains such as air traffic 
 control, public transportation, and automated vehicles. Unlike non-real-time systems, 
 tasks in real-time systems must be both functionally correct and meet strict 
-(or flexible) execution time constraints, known as deadlines. Failure 
+ execution time constraints, known as deadlines. Failure 
 to meet these deadlines can lead to severe consequences. The critical 
 nature of these systems necessitates designing the system 
 architecture with a focus on time and incorporating fault tolerance 
 to ensure high reliability.
 
 One example of such architecture is the time-triggered 
-architecture (TTA)\cite{kopetz2003tta}\cite{kopetz1998timetriggered}, which offers a fault-tolerant communication protocol and a precise timing system to synchronize different electronic control units. Developing and running tasks on these architectures require in-depth knowledge of the system and its architecture, which complicates code reusability and scalability when adding hardware resources or upgrading to a larger system.
-
-To address these issues, the Automotive Open System Architecture 
-(AUTOSAR\footnote{\url{https://www.autosar.org/}}) was developed. 
-AUTOSAR introduces layers of abstraction between hardware, firmware, 
-and software, enhancing software reusability and hardware 
-scalability across different systems while maintaining safety and 
-security standards. It is now the most widely used architecture among car 
-manufacturers, with notable core partners including BMW, Ford, and Toyota.
-
-Scalability, in particular, plays a crucial role in modern 
-real-time systems. Increasingly, real-time systems such as 
-autonomous cars or computer vision systems are enhancing their 
+architecture (TTA)\cite{kopetz2003tta}\cite{kopetz1998timetriggered}, which offers a fault-tolerant 
+communication protocol and a precise timing system to synchronize different electronic control units. 
+Increasingly, these real-time system architectures are enhancing their 
 computational resources by transitioning to multiprocessor systems. 
 This shift from uniprocessor to multiprocessor systems addresses 
 the growing complexity and computational demands of tasks executed 
-on these systems, aiming to reduce both the execution time of these 
-tasks and the required resources\cite{maiza2019survey}.
+on these systems (e.g., autonomous cars, computer vision systems), aiming to reduce both the execution time of these 
+tasks and the required resources to run them\cite{maiza2019survey}.
 
 Hence, an increasing number of real-time systems are 
 utilizing multi-core hardware to parallelize their tasks 
 and convert sequential programs into parallelized ones using 
 frameworks such as OpenMP
 \footnote{OpenMP (2011) OpenMP Application Program Interface v3.1. 
-\url{http://www.openmp.org/mp-documents/OpenMP3.1.pdf}}. 
+\url{http://www.openmp.org/mp-documents/OpenMP3.1.pdf}} to do so. 
 Unfortunately, in most real-life scenarios, the number of available 
 processors/cores is fewer than the number of tasks/subtasks that 
 can be executed in parallel (i.e., independent tasks). This means 
 that not all independent tasks can be executed simultaneously on 
 the system, raising the question: which task should be executed first?
 
-This question is particularly important in a real-time context 
+This question is particularly important in a real-time context
 because having the wrong execution order, or schedule, could lead 
 to, at best, a slow system, and at worst, deadline misses, which 
 can have fatal repercussions. In the case of a self-driving car 
@@ -57,22 +47,21 @@ The extreme case of this scheduling problem arises when only one
 processor is available to execute tasks. This is known as task 
 scheduling on a uniprocessor, and \cite{liu1973scheduling} 
 provided two major priority policies: Rate Monotonic (RM) and 
-Earliest Deadline First (EDF) for scheduling periodic tasks. 
+Earliest Deadline First (EDF) for scheduling independent periodic tasks. 
 However, when considering multiple processors, the scheduling 
 problem becomes much more complex, and different task models must 
 be considered.
 
-A prevalent task model is the time-triggered task model, 
-which specifies tasks that execute periodically and is well-suited 
-for time-triggered systems. Another type of task model is the 
+A prevalent task model when considering periodic tasks that can be parallelized is the 
 Directed Acyclic Graph (DAG) task model which arises when a time-triggered task
-can be parallelized into subtasks which are the nodes of the graph.
+can be parallelized into subtasks which are the nodes of the graph,
+thus reducing the worst-case execution time of the reccurent task when executed on a designated set of cores.
 Those nodes have dependency constraints which are modeled by the directed edges between the nodes.
-The DAG task model is used to model tasks that are parallelizable\cite{baruah1993PFair},
-fitting the ever-increasing multicore architectures found in today's real-time systems. 
+The DAG task model is used to model tasks that are parallelizable\cite{baruah2012DAGdef},
+fitting the ever-increasing multicore architectures found in today's real-time system architectures. 
 
 Given that the problem of scheduling independent tasks or dependency-constrained groups of jobs (i.e., DAGs) is NP-hard\footnote{If a problem is 
-NP-hard, it means that it is very unlikely to find a solution in 
+NP-hard, it means that it is impossible to find a solution in 
 polynomial time complexity, i.e., solutions are not scalable}\cite{du1989schedNPhard}
 \cite{ULLMAN1975NPhard}, 
 people have resorted to either heuristics 
@@ -82,8 +71,8 @@ or the optimal but not scalable Integer Linear Programming
 
 Consequently, machine learning will be considered here as it can 
 better approximate the unattainable perfect solution while being 
-scalable in terms of computing time after the training phase. 
-The research questions are:
+scalable in terms of computing time after the training phase\cite{Zhao2024GATDRLmodel}\cite{Lee2021GlobalDagSchedDRL}. 
+More specifically, the research questions are the following:
 
 \begin{itemize}
     \item [RQ1] What is the current state-of-the-Art for DAG tasks scheduling ?        

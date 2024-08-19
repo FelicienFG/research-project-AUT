@@ -101,18 +101,18 @@ def attention_test():
     print(output)
     
 
-def train_one_epoch(model, epoch_num, batches, optimizer, loss_fn):
+def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
     running_loss = 0
 
-    for (dagTaskBatch, featureBatch, ilpOutputs) in batches:
+    for batch in batches:
 
         #reset gradients
         optimizer.zero_grad()
         
-        outputs = model(featureBatch)
+        outputs = model(dataLoader.taskFeatures[batch])
 
         #compute loss and gradients
-        loss = loss_fn(outputs, dagTaskBatch, ilpOutputs)
+        loss = loss_fn([dataLoader.dagTasks[i] for i in batch], outputs, dataLoader.ilpOutputs[batch])
         loss.backward()
 
         optimizer.step()
@@ -127,9 +127,9 @@ def train_one_epoch(model, epoch_num, batches, optimizer, loss_fn):
 
 def training_and_eval(model, num_cores):
     EPOCHS = 10
-    data_loader = dl.DataLoader('../dag_generator/data/')
-    optimizer = torch.optim.sgd.SGD(model.parameters(), lr=0.001)
-    trainDataBatches, valDataBatches = data_loader.train_val_split(train_percentage=0.7)
+    data_loader = dl.DataLoader('../dag_generator/data/', maxNodesPerDag=24)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
+    trainDataBatches, (valDagTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
 
@@ -138,7 +138,7 @@ def training_and_eval(model, num_cores):
 
         #train
         model.train(True)
-        avg_train_loss = train_one_epoch(model, epoch_num, trainDataBatches, optimizer, loss_fn)
+        avg_train_loss = train_one_epoch(model, epoch_num, trainDataBatches, data_loader, optimizer, loss_fn)
 
         #evaluation
         # Set the model to evaluation mode, disabling dropout and using population
@@ -148,11 +148,9 @@ def training_and_eval(model, num_cores):
 
         # Disable gradient computation and reduce memory consumption.
         with torch.no_grad():
-            for (dagTaskBatch, featureBatch, ilpOutputs) in valDataBatches:
-                voutputs = model(featureBatch)
-                vloss = loss_fn(dagTaskBatch, voutputs, ilpOutputs)
-                running_vloss += vloss
-        avg_vloss = running_vloss / len(valDataBatches)
+            voutputs = model(valTaskFeatures)
+            vloss = loss_fn(valDagTasks, voutputs, valILPoutputs)
+            avg_vloss = vloss / len(valDagTasks)
 
 
         print("epoch %i -- avg train loss: %f, avg validation loss: %f" % (epoch_num, avg_train_loss, avg_vloss))
@@ -195,4 +193,5 @@ def test_makespan_compute():
 
 if __name__ == "__main__":
 
-    attention_test()
+    model = torch.nn.Sequential(AttentionLayer(embedding_dim=5, n_heads=5))
+    training_and_eval(model, 4)
