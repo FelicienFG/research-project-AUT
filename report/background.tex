@@ -2,66 +2,131 @@
 \section{Background}
 \label{sec:bg}
 
-Task scheduling introduces several fundamental concepts.
+DAG task scheduling introduces several fundamental concepts.
 
-\subsection{Periodic task and schedule}
+%\subsection{Periodic task and schedule}
+%~
+%
+%Firstly, a periodic task $\tau_i(C_i, D_i, T_i)$ is characterized 
+%by its worst-case execution time (wcet) $C_i$, its deadline $D_i$, and 
+%its period $T_i$. This definition can be expanded by including an 
+%initial offset, which corresponds to the time of the task's first 
+%execution, and an activation offset, which is the time delay between 
+%the task being ready to execute (i.e., its execution period has begun) 
+%and the task actually starting to run. Secondly, a schedule $S$ is a 
+%function that assigns a boolean value for each task $\tau$ and each 
+%time tick $t$, indicating whether the task $\tau$ is running at 
+%time $t$. Therefore, a scheduling algorithm is the method that, 
+%given a set of tasks, produces a schedule $S$ for the task set.
+%
+%This task model and schedule definition are widely adopted in the literature (see section \ref{sec:literature}) 
+%and are the building blocks of all scheduling algorithms.
+%The periodic task model, in particular, is used to define more complex
+%tasks such as DAG tasks (see below) that will be used as input in the 
+%machine learning model (see section \ref{sec:methodology}).
+
+\subsection{DAG task model}
 ~
 
-Firstly, a periodic task $\tau_i(C_i, D_i, T_i)$ is characterized 
-by its worst-case execution time (wcet) $C_i$, its deadline $D_i$, and 
-its period $T_i$. This definition can be expanded by including an 
-initial offset, which corresponds to the time of the task's first 
-execution, and an activation offset, which is the time delay between 
-the task being ready to execute (i.e., its execution period has begun) 
-and the task actually starting to run. Secondly, a schedule $S$ is a 
-function that assigns a boolean value for each task $\tau$ and each 
-time tick $t$, indicating whether the task $\tau$ is running at 
-time $t$. Therefore, a scheduling algorithm is the method that, 
-given a set of tasks, produces a schedule $S$ for the task set.
+A Directed Acyclic Graph (DAG) task
+$\tau = (G, D, T)$ is comprised of 
+a directed acyclic graph $G = (V, E)$, a relative deadline $D > 0$ and a period $T > 0$.
+The graph $G$ has a set of vertices $V$ and a set of edges $E \subseteq V \times V$
+that models the precedence constraints of the vertices,
+i.e., for all $(v_i, v_j) \in V^2$, with $i \neq j$, $(v_i, v_j) \in E$ if and only if
+$v_j$ must wait the end of $v_i$'s execution to start executing(i.e., $v_i$ is a precedence constraint for $v_j$).
+The nodes of the graph $G$ are characterized by their own worst-case execution time $C_{v_i}$ 
+and $vol(G) = \sum_{v_i \in V} C_{v_i}$ is the worst-case execution time of the DAG task $\tau$,
+also called the total workload of the DAG task.
+In this paper, the words nodes, vertices and subtasks will be used
+to address the same thing, that is the vertices of the graph of a DAG task.\\
 
-This task model and schedule definition are widely adopted in the literature (see section \ref{sec:literature}) 
-and are the building blocks of all scheduling algorithms.
-The periodic task model, in particular, is used to define more complex
-tasks such as DAG tasks (see below) that will be used as input in the 
-machine learning model (see section \ref{sec:methodology}).
+An example of a DAG task is shown in Figure \ref{fig:dag_example},
+where the DAG task has a wcet of 24 time units.
 
-\subsection{DAG task}
-~
-
-A Directed Acyclic Graph (DAG) task 
-is a task that models the multiple subtasks of an chain of tasks
-that have a precedence constraints.
-For example, when considering the task $\tau_1$ that makes an 
-aircraft keep its altitude, you usually have a number of subtasks
-to handle this task, namely : reading from the altitude sensor ($\tau_{11}$),
-reading for the speed sensor ($\tau_{12}$), computing the new speed for the aircraft
-to keep its altitude ($\tau_13$), computing the amount of thrust needed to achieve
-this new speed ($\tau_14$), and finally actuating the aircraft's jet engine ($\tau_15$).
-In this example, the DAG for $\tau_1$ can be seen in Figure \ref{fig:dag_example}.
-
-\begin{figure}
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/example_dag.png}
-    \caption{DAG task $\tau_1$. The nodes are the subtasks,
-    the edges of the graph represent the precedence constraints between each subtasks and the worst-case execution time (wcet) of each subtask written as an exponent.}
+    \includegraphics[width=0.5\linewidth]{images/example_DAG.png}
+    \caption{a) DAG task $\tau$. The worst-case execution time (wcet) of each subtask written as an exponent
+    and the nodes highlighted in red are the nodes in the critical path, the path of maximum length in terms of wcets.}
     \label{fig:dag_example}
+    \includegraphics[width=\linewidth]{images/example_DAG_schedules.png}
+    \caption{b) Execution schedules for the DAG task above. Heavily inspired from \citet{zhao2020DAGsched}.}
+    \label{fig:dag_schedule_example}
 \end{figure}
 
-A DAG task $\tau_i$ also has a period $T_i$ and a wcet $C_i$ which 
-is the sum of its subtasks wcets, and a deadline $D_i$.
-For instance, according to Figure \ref{fig:dag_example},
-the wcet for $\tau_1$ is 10 time units.
-You can also see how, for $\tau_1$, 
-the subtasks $\tau_{12}$ and $\tau_{11}$ can be parrallelized (i.e., 
-executed in parallel) but the subtask $\tau_{13}$ needs to wait 
-for both $\tau_{11}$ and $\tau_{12}$ to finish their execution 
-before it can start running.
-\\
 
 This concept will be the task model used in to conduct 
 part of the systematic literature review (see Section \ref{sec:literature})
 and it also will be the task model used for designing 
 the machine learning model (see Section \ref{sec:methodology}).
+
+\subsection{Makespan}
+
+The makespan or end-to-end response time of a 
+DAG task is the amount of time it takes for all the subtasks
+in the DAG task to finish executing when given a schedule.
+For instance, for the task $\tau$ shown in Figure \ref{fig:dag_example},
+the makespan of $\tau$ for the first schedule (from top to bottom) shown in Figure \ref{fig:dag_schedule_example}
+is 17.
+Notice that Figure \ref{fig:dag_schedule_example} shows multiple
+ways of scheduling the DAG task, the bottom one yielding a makespan of 13.
+
+This is a key measurement when scheduling the nodes of a single DAG task,
+also called intra-task scheduling (see Section \ref{sec:literature}),
+and it will be the main efficacy criteria when comparing 
+the machine learning model with state-of-the-art heuristics and ILP
+(see Section \ref{sec:methodology}).
+
+\subsection{Intra-task and inter-task scheduling}
+~
+
+When considering the DAG task model,
+two concepts arise : intra-task scheduling and inter-task scheduling.
+
+Intra-task scheduling of DAG tasks is when only the execution
+order of the nodes in a single DAG task is considered.
+The goal of such a problem being to minimize the makespan
+of a single DAG task.
+
+Inter-task scheduling, on the other hand, is when multiple DAG tasks
+are considered and the goal then becomes to maximize the acceptance ratio (see below)
+of the scheduling algorithm.
+
+\subsection{NP-hardness intuition and problem motivation}
+~
+
+The problem of intra-task scheduling of DAG tasks,
+that is, scheduling the nodes of a single DAG task so that 
+the makespan is minimized,
+is a NP-hard problem\cite{ULLMAN1975NPhard}\cite{du1989schedNPhard}
+but can also be intuitively seen as a NP-difficult problem when looking at 
+the schedules shown in Figure \ref{fig:dag_schedule_example}.
+Indeed, 
+when looking at a single DAG task,
+a simple yet efficient way of scheduling the nodes 
+is looking at a critical-path-first execution order(CPFE).
+The critical path, highlighted in red in Figure \ref{fig:dag_example},
+is the longest path of the graph in terms of wcets.
+The CPFE principle is applied in the third schedule (from top to bottom)
+in Figure \ref{fig:dag_schedule_example} and achieves a makespan of 14.
+But this is not the minimum makespan as the fourth schedule yields a makespan
+of 13.
+
+This is due to the fact that, although executing the critical path first
+is the best strategy\cite{zhao2020DAGsched}, 
+one needs to take into account the dependency constraints
+and thus the global structure of the graph.
+The fourth schedule in Figure \ref{fig:dag_schedule_example}
+achieves a makespan of 13 by prioritizing the execution of node $v_8$
+before node $v_5$ which is crucial to enable $v_3$ to execute sooner
+than in the third schedule.
+Typically in graph theory, when the global structure needs to be known 
+in advance
+in order to find the best solution, it often means that the problem is NP-hard
+(e.g., the problem of coloring a graph\cite{book1975richardNPhardColorGraph}
+or coloring a path of a graph\cite{ERLEBACH2001ColorPathNPhard}).
+Therefore, researchers have resorted to heuristics to solve the problem(see Section \ref{sec:literature}).
 
 
 \subsection{Utilization factor}
@@ -70,7 +135,7 @@ The utilization factor represents the percentage of processing
 time that a taskset $(\tau_1, \cdots, \tau_n)$ will utilize. 
 Formally, it is defined as
 \begin{align}
-U = \sum_{k=1}^{n} \frac{C_k}{T_k}
+U = \sum_{k=1}^{n} \frac{vol(G_k)}{T_k}
 \end{align}
 where $U$ is the utilization factor. This concept is significant 
 because, when evaluating a scheduling algorithm $S$, we desire 
@@ -87,33 +152,6 @@ and considering their utilization bound(see Section \ref{sec:literature}),
 or used as a parameter to generate tasksets or DAG tasks with 
 a fixed utilization (see Section \ref{sec:methodology}).
 
-\subsection{Makespan}
-
-The makespan or end-to-end response time of a 
-DAG task is the amount of time it takes for all the subtasks
-in the DAG task to finish executing when given a schedule.
-For instance, for the task $\tau_1$ shown in Figure \ref{fig:dag_example},
-the makespan of $\tau_1$ for the schedule shown in Figure \ref{fig:schedule_example}
-is 9.
-Notice that in Figure \ref{fig:schedule_example},
-if the subtasks $\tau_{11}$ and $\tau_{12}$ were executed 
-sequentially instead of in parrallel, the makespan would be 
-one time unit longer, in this case 10 instead of 9.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\linewidth]{images/schedule_example.png}
-    \caption{Example of schedule for $\tau_1$. The y axis represents the number
-    of processors that are not idle. For the first two subtasks there are two processors
-    active and for the rest there is only one active processor.}
-    \label{fig:schedule_example}
-\end{figure}
-
-This is a key measurement when dealing with DAG tasks (see Section \ref{sec:literature})
-and it will be the main efficacy criteria when comparing 
-the machine learning model with state-of-the-art heuristics and ILP
-(see Section \ref{sec:methodology}).
-
 \subsection{Capacity augmentation bound}
 
 Another measurement used when scheduling event-chains, or DAG, tasks  
@@ -127,7 +165,7 @@ satisfying the following condition :
     \beta \times U \leq m \wedge  \beta \times len(G) \leq D,
 \end{align}
 the associated DAG is schedulable by $S$.
-Here, $len(G)$ is the length of the longest path, in terms of WCETs,
+Here, $len(G)$ is the length of the critical path, in terms of WCETs,
 in the graph $G$, $D$ is the DAG task's deadline, $m$ the number of processors and $U$
 is the utilization factor of the DAG task (with the WCET of the DAG being the sum of all tasks' WCET).
 As you can see, the lower $\beta$ is, the better the scheduling algorithm.\\
@@ -162,67 +200,68 @@ The resulting percentage is the acceptance ratio
 and the closer it gets to 100\% for a scheduling algorithm, the better the scheduling algorithm.
 
 This concept is also used as a metric, to assert the efficiency
-of scheduling algorithms when considering independent tasks (see Section \ref{sec:literature}).
+of scheduling algorithms when considering inter-task scheduling (see Section \ref{sec:literature}).
 \\
 
 
 While the acceptance ratio, also called system schedulability, is used 
-to measure the performance of scheduling alrogithms for independent tasks,
+to measure the performance of scheduling algorithms for inter-DAG task scheduling
+(i.e., scheduling multiple DAG tasks),
 the makespan and the capacity bound are only used for DAG tasks and tasksets representing chain of events.
 
-\subsection{RM and EDF scheduling}
-~
-
-When designing a scheduling algorithm, the key decision involves 
-determining which task should execute first when two or more 
-independent tasks are ready to execute. This requires assigning each 
-task a priority. \cite{liu1973scheduling} introduced two 
-heuristics for this purpose: Rate Monotonic (RM) and Earliest 
-Deadline First (EDF).
-
-The RM algorithm is a fixed-priority scheduling algorithm, 
-meaning that the priority of each task is known before execution 
-begins. RM assigns the highest priority to tasks with the minimum 
-execution rate, i.e., $\frac{C_k}{T_k}$, and is considered optimal 
-for assigning fixed priorities to tasks. In contrast, EDF assigns 
-priorities dynamically by selecting tasks based on which one has 
-the earliest absolute deadline.
-
-Figure \ref{fig:edf_rm_examples} illustrates the difference 
-between the two algorithms by scheduling the same two tasks, 
-$\tau_1$ and $\tau_2$. $\tau_1$ has a worst-case execution time of 0.5 time units 
-and a period of 2 time units, while $\tau_2$ has a worst-case execution 
-time of 2 time units and a period of 3 time units. These are 
-examples of implicit deadline tasks, where the relative deadline 
-equals the end of their execution period. 
-
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth, height=100px]{images/schedule_rm.png}
-    a)
-    \includegraphics[width=\linewidth, height=100px]{images/schedule_edf.png}
-    b)
-    \caption{Schedules of $\tau_1$ and $\tau_2$ using Rate Monotonic (a)
-    and Earliest Deadline First (b) heuristics.}
-    \label{fig:edf_rm_examples}
-\end{figure}
-
-Although EDF calculates each priority at runtime, it is optimal 
-for uniprocessor scheduling and has a theoretical utilization bound 
-of 1, which is the maximum possible for a feasible taskset on a 
-single processor. RM, on the other hand, has a much lower 
-utilization bound than EDF. While one might argue that RM introduces 
-less runtime overhead and is therefore more practical, it has been 
-shown that RM leads to more task preemptions (interrupting the 
-execution of a task, as seen at times 2 and 4 for task $\tau_2$ in 
-Figure \ref{fig:edf_rm_examples}.a). This, combined with its lower 
-utilization bound and non-optimality, makes EDF perform better than 
-RM\cite{buttazzo2005RMvsEDF}.
-
-Although \cite{liu1973scheduling}'s work focused on uniprocessor 
-systems, the proposed algorithms have also been applied to 
-multi-processor scheduling.
-For example, Global EDF (GEDF)
-can be used on multi-core systems when allowing task migrations
-and Partitioned EDF (PEDF) is used when forbidding task migrations
-(The RM equivalents also exist).
+%\subsection{RM and EDF scheduling}
+%~
+%
+%When designing a scheduling algorithm, the key decision involves 
+%determining which task should execute first when two or more 
+%independent tasks are ready to execute. This requires assigning each 
+%task a priority. \cite{liu1973scheduling} introduced two 
+%heuristics for this purpose: Rate Monotonic (RM) and Earliest 
+%Deadline First (EDF).
+%
+%The RM algorithm is a fixed-priority scheduling algorithm, 
+%meaning that the priority of each task is known before execution 
+%begins. RM assigns the highest priority to tasks with the minimum 
+%execution rate, i.e., $\frac{C_k}{T_k}$, and is considered optimal 
+%for assigning fixed priorities to tasks. In contrast, EDF assigns 
+%priorities dynamically by selecting tasks based on which one has 
+%the earliest absolute deadline.
+%
+%Figure \ref{fig:edf_rm_examples} illustrates the difference 
+%between the two algorithms by scheduling the same two tasks, 
+%$\tau_1$ and $\tau_2$. $\tau_1$ has a worst-case execution time of 0.5 time units 
+%and a period of 2 time units, while $\tau_2$ has a worst-case execution 
+%time of 2 time units and a period of 3 time units. These are 
+%examples of implicit deadline tasks, where the relative deadline 
+%equals the end of their execution period. 
+%
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=\linewidth, height=100px]{images/schedule_rm.png}
+%    a)
+%    \includegraphics[width=\linewidth, height=100px]{images/schedule_edf.png}
+%    b)
+%    \caption{Schedules of $\tau_1$ and $\tau_2$ using Rate Monotonic (a)
+%    and Earliest Deadline First (b) heuristics.}
+%    \label{fig:edf_rm_examples}
+%\end{figure}
+%
+%Although EDF calculates each priority at runtime, it is optimal 
+%for uniprocessor scheduling and has a theoretical utilization bound 
+%of 1, which is the maximum possible for a feasible taskset on a 
+%single processor. RM, on the other hand, has a much lower 
+%utilization bound than EDF. While one might argue that RM introduces 
+%less runtime overhead and is therefore more practical, it has been 
+%shown that RM leads to more task preemptions (interrupting the 
+%execution of a task, as seen at times 2 and 4 for task $\tau_2$ in 
+%Figure \ref{fig:edf_rm_examples}.a). This, combined with its lower 
+%utilization bound and non-optimality, makes EDF perform better than 
+%RM\cite{buttazzo2005RMvsEDF}.
+%
+%Although \cite{liu1973scheduling}'s work focused on uniprocessor 
+%systems, the proposed algorithms have also been applied to 
+%multi-processor scheduling.
+%For example, Global EDF (GEDF)
+%can be used on multi-core systems when allowing task migrations
+%and Partitioned EDF (PEDF) is used when forbidding task migrations
+%(The RM equivalents also exist).

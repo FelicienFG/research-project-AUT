@@ -20,7 +20,8 @@ class MakespanLoss(torch.nn.Module):
         for matrix_index in range(output.shape[0]):
 
             _, prio_list = torch.max(output[matrix_index], dim=1)
-            #problem, makespan calculation not differentiable, IDEA: forward pass outputs the schedule instead of just a priority list
+            #problem, makespan calculation not differentiable, IDEA: instead of comparing makespans, compare output priority list with
+            #"optimal" priority list that minimizes the makespan, computed with a brute force algorithm (with n! complexity)
             makespan = 1#self.makespanSolver.computeMakespan(ms.IntVector(prio_list.tolist()), dagTask[matrix_index])
             
             accu_loss += 1. - makespan / target_makespan[matrix_index]
