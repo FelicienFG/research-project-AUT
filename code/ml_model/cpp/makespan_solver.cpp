@@ -5,6 +5,17 @@
 #include <iostream>
 #include "proc_core.h"
 
+namespace
+{
+    size_t factorial(size_t num)
+    {
+        if(num <= 1)
+            return 1;
+        
+        return num * factorial(num - 1);
+    }
+}
+
 static auto dagSubtaskCompare = [](const DagSubtask* left, const DagSubtask* right)
 {
     return left->priority > right->priority;
@@ -140,4 +151,71 @@ int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::v
     }
 
     return timer + maxWorkload(cores, timer);
+}
+
+std::vector<std::list<int>> MakespanSolver::computePermutations(std::vector<int>& priorities)
+{
+    if(priorities.size() == 2)
+        return {{priorities[0], priorities[1]}, {priorities[1], priorities[0]}};
+    
+    //compute the permutations of the priorities vector minus the last element
+    //and then for each permutation, insert the last element in every spot to compute all the permutations
+    int lastItem = priorities.back();
+    priorities.pop_back();
+    std::vector<std::list<int>> permutationsMinusOne = computePermutations(priorities);
+    std::vector<std::list<int>> permutations;
+
+    for(auto& permutation : permutationsMinusOne)
+    {
+        for(auto iter = permutation.begin();iter!=permutation.end();++iter)
+        {
+            auto lastInsertedPos = permutation.insert(iter, lastItem);
+            permutations.push_back(permutation);
+            permutation.erase(lastInsertedPos);
+        }
+
+        auto lastInsertedPos = permutation.insert(permutation.end(), lastItem);
+        permutations.push_back(permutation);
+        permutation.erase(lastInsertedPos);
+    }
+
+    return permutations;
+}
+
+void initVectorFromList(std::vector<int>& vector, std::list<int>& list)
+{
+    size_t i = 0;
+    for(const int& element : list)
+    {
+        vector[i++] = element;
+    }
+}
+
+std::vector<int> MakespanSolver::computeBestPriorityList(const std::vector<DagSubtask> &dagTask)
+{
+    size_t maxPriority = dagTask.size();
+    std::vector<int> priorities(maxPriority);
+    std::vector<int> minimumPriorities(maxPriority);
+    int minimumMakespan = std::numeric_limits<int>::max();
+    int currentMakespan = 0;
+
+    for(size_t p = 0; p < maxPriority; ++p)
+        priorities[p] = p;
+
+    std::vector<std::list<int>> priorityPermutations = computePermutations(priorities);
+
+    for(std::list<int>& priorityPermutation : priorityPermutations)
+    {
+        std::vector<int> prioritiesVector(priorityPermutation.size());
+        initVectorFromList(prioritiesVector, priorityPermutation);
+        currentMakespan = computeMakespan(prioritiesVector, dagTask);
+        if(currentMakespan < minimumMakespan)
+        {
+            minimumMakespan = currentMakespan;
+            minimumPriorities = prioritiesVector;
+        }
+
+    }
+
+    return minimumPriorities;
 }

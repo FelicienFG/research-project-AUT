@@ -33,6 +33,21 @@ public:
      * @return the exact makespan when scheduled on a preemptive GFPS
      */
     int computeMakespan(const std::vector<int>& priorityList, std::vector<DagSubtask> dagTask);
+
+    /**
+     * @brief gives the priority list that gives the minimum makespan for a specific DAG task,
+     * it uses brute force by looping through each possible permutation of priorities to find the one minimizing the makespan.
+     * 
+     * @param dagTask the dag task to schedule, the priorities will range from 0 to the total number of subtasks - 1
+     * 
+     * @return priority list that minimizes the makespan for dagTask using non-preemptive GFPS
+     */
+    std::vector<int> computeBestPriorityList(const std::vector<DagSubtask>& dagTask);
+
+
+    //returns every permutations of the priorities vector
+    static std::vector<std::list<int>> computePermutations(std::vector<int>& priorities);
+
 };
 
 
