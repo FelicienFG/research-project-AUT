@@ -6,7 +6,24 @@ import makespan_solver as ms
 import torch
 import torch.utils.data.sampler as torch_samplers
 import numpy
+import json
+import parse
 
+def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
+    priorityList = []
+    with open(scheduleFileName, "r") as scheduleFile:
+        scheduleJSON = json.load(scheduleFile)
+        scheduledTasks = scheduleJSON['TaskInstancesStore']
+        priorityList = [0 for _ in range(len(scheduledTasks))]
+
+        priority = 0
+        for taskJSON in scheduledTasks:
+            subtaskID = parse.parse("task_{}", taskJSON['name'])
+            subtaskID = int(subtaskID[0])
+            priorityList[subtaskID - 1] = priority
+            priority += 1
+
+    return priorityList
 
 def load_task(dataFolder, id):
     dag_task_file = dataFolder + "Tau_{:d}.gpickle".format(id)
@@ -75,6 +92,59 @@ def getDagTask(graph, wcets):
 
     return dagTask
 
+def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
+    outputJSON = {}
+    outputFile = '../LET-LP-Scheduler/dag_tasks_input_files/multicore_system_DAGtask_%i.json' % (dagTaskID)
+
+    #first add the cores
+    outputJSON['CoreStore'] = []
+    for core in range(numCores):
+        outputJSON['CoreStore'].append({"name": ("c%i" % (core)), "speedup": 1})
+
+    #then add the tasks and edges
+    outputJSON['TaskStore'] = []
+    outputJSON['DependencyStore'] = []
+    for node in graph:
+        outputJSON['TaskStore'].append(
+            {
+                "name": ("task_%i" % (node)),
+                "initialOffset":0,
+                "activationOffset":0,
+                "duration":wcets[node],
+                "period":totalW,
+                "inputs":[
+                    "in"
+                ],
+                "outputs":[
+                    "out"
+                ],
+                "wcet":wcets[node],
+                "acet":wcets[node],
+                "bcet":wcets[node],
+                "distribution":"Uniform"
+            }
+        )
+
+        if len(graph[node]['out']) > 0:
+            for outNeighbour in graph[node]['out']:
+                outputJSON['DependencyStore'].append(
+                {
+                    "name":("v%iv%i" % (node, outNeighbour)),
+                    "source":{
+                        "task":("task_%i" % (node)),
+                        "port":"out"
+                    },
+                    "destination":{
+                        "task":("task_%i" % (outNeighbour)),
+                        "port":"in"
+                    }
+                })
+    
+    with open(outputFile, "w") as jsonFile:
+        jsonFile.write(json.dumps(outputJSON, indent=4))
+
+    
+
 def criticalPath(graph, start, wcets):
     if graph[start]['out'] == []: #it's the sink node
         path = [start]
@@ -94,13 +164,15 @@ def criticalPath(graph, start, wcets):
     return biggest_path, max_length
        
 
+
 class DataLoader:
 
-    def __init__(self, data_folder, maxNodesPerDag = 30):
+    def __init__(self, data_folder, numCores = 2, maxNodesPerDag = 30):
         self.numberOfTasks = len(os.listdir(data_folder)) // 3
         self.dataFolder = data_folder
         self.maxNodesPerDag = maxNodesPerDag
         self.tasks = []
+        self.numCores = numCores
         #node features : C_i / W , deg_in, deg_out, is_source_or_sink, is_in_critical_path
         self.taskFeatures = []
         self.dagTasks = []
@@ -108,6 +180,7 @@ class DataLoader:
 
         for id in range(self.numberOfTasks):
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
+            outputILPSystemJSON(G_adjaList, 1, C_dict, W, numCores, id)
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
             self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
@@ -144,7 +217,8 @@ class DataLoader:
     
 if __name__ == "__main__":
 
-    data = DataLoader("../dag_generator/data/", 24)
-    print(data.taskFeatures.shape)
-    print(data.taskFeatures[6])
-    #print(criticalPath(data.tasks[1]['G'], 1, data.tasks[1]['C']))
+    #data = DataLoader("../dag_generator/data/")
+    
+    pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
+
+    print(pList)
