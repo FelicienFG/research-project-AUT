@@ -112,7 +112,7 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
         outputs, _ = model(dataLoader.taskFeatures[batch])
         
         #compute loss and gradients
-        loss = loss_fn([dataLoader.dagTasks[i] for i in batch], outputs, dataLoader.ilpOutputs[batch])
+        loss = loss_fn(outputs, dataLoader.ilpOutputs[batch])
         loss.requires_grad = True
         loss.backward()
 
@@ -128,9 +128,9 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
 
 def training_and_eval(model, num_cores):
     EPOCHS = 10
-    data_loader = dl.DataLoader('../dag_generator/data/', maxNodesPerDag=24)
+    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules')
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-    trainDataBatches, (valDagTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7)
+    trainDataBatches, (valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
 
@@ -150,46 +150,11 @@ def training_and_eval(model, num_cores):
         # Disable gradient computation and reduce memory consumption.
         with torch.no_grad():
             voutputs, _ = model(valTaskFeatures)
-            vloss = loss_fn(valDagTasks, voutputs, valILPoutputs)
-            avg_vloss = vloss / len(valDagTasks)
+            vloss = loss_fn(voutputs, valILPoutputs)
+            avg_vloss = vloss / valILPoutputs.shape[0]
 
 
         print("epoch %i -- avg train loss: %f, avg validation loss: %f" % (epoch_num, avg_train_loss, avg_vloss))
-        
-
-
-def getDagTask(graph, wcets):
-    """
-    get the list of DagSubtasks from the graph
-    """
-    dagTask = ms.DagSubtaskVector()
-    for vertex_key in wcets:
-        dagSubtask = ms.DagSubtask()
-        dagSubtask.id = vertex_key - 1 
-        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
-        for i in range(dagSubtask.inDependencies.size()):
-            dagSubtask.inDependencies[i] -= 1
-        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
-        for i in range(dagSubtask.outDependencies.size()):
-            dagSubtask.outDependencies[i] -= 1
-        dagSubtask.wcet = wcets[vertex_key]
-
-        dagTask.append(dagSubtask)
-
-    return dagTask
-
-def test_makespan_compute():
-    rand.seed = time.time()
-    makespanSolver = ms.MakespanSolver(numberOfCores=4)
-    dataLoader = dl.DataLoader("../dag_generator/data/")
-    task = 4
-    dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
-    
-    priorities = ms.IntVector([rand.randint(0, 4) for i in range(dagTask.size())])
-    
-    makespan = makespanSolver.computeMakespan(priorities, dagTask)
-
-    print(makespan)
 
 
 if __name__ == "__main__":

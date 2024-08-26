@@ -72,25 +72,38 @@ def load_task(dataFolder, id):
 
     return G_dict, C_dict, T, W
 
-def getDagTask(graph, wcets):
-    """
-    get the list of DagSubtasks from the graph
-    """
-    dagTask = ms.DagSubtaskVector()
-    for vertex_key in wcets:
-        dagSubtask = ms.DagSubtask()
-        dagSubtask.id = vertex_key - 1 
-        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
-        for i in range(dagSubtask.inDependencies.size()):
-            dagSubtask.inDependencies[i] -= 1
-        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
-        for i in range(dagSubtask.outDependencies.size()):
-            dagSubtask.outDependencies[i] -= 1
-        dagSubtask.wcet = wcets[vertex_key]
+#def getDagTask(graph, wcets):
+#    """
+#    get the list of DagSubtasks from the graph
+#    """
+#    dagTask = ms.DagSubtaskVector()
+#    for vertex_key in wcets:
+#        dagSubtask = ms.DagSubtask()
+#        dagSubtask.id = vertex_key - 1 
+#        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
+#        for i in range(dagSubtask.inDependencies.size()):
+#            dagSubtask.inDependencies[i] -= 1
+#        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
+#        for i in range(dagSubtask.outDependencies.size()):
+#            dagSubtask.outDependencies[i] -= 1
+#        dagSubtask.wcet = wcets[vertex_key]
+#
+#        dagTask.append(dagSubtask)
+#
+#    return dagTask
 
-        dagTask.append(dagSubtask)
-
-    return dagTask
+#def test_makespan_compute():
+#    rand.seed = time.time()
+#    makespanSolver = ms.MakespanSolver(numberOfCores=4)
+#    dataLoader = dl.DataLoader("../dag_generator/data/")
+#    task = 4
+#    dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
+#    
+#    priorities = ms.IntVector([rand.randint(0, 4) for i in range(dagTask.size())])
+#    
+#    makespan = makespanSolver.computeMakespan(priorities, dagTask)
+#
+#    print(makespan)
 
 def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
     outputJSON = {}
@@ -167,30 +180,43 @@ def criticalPath(graph, start, wcets):
 
 class DataLoader:
 
-    def __init__(self, data_folder, numCores = 2, maxNodesPerDag = 30):
-        self.numberOfTasks = len(os.listdir(data_folder)) // 3
-        self.dataFolder = data_folder
+    def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30):
+        self.numberOfTasks = len(os.listdir(input_data_folder)) // 3
+        self.dataFolder = input_data_folder
+        self.ilpSchedulesFolder = ilp_schedules_folder
         self.maxNodesPerDag = maxNodesPerDag
         self.tasks = []
         self.numCores = numCores
         #node features : C_i / W , deg_in, deg_out, is_source_or_sink, is_in_critical_path
         self.taskFeatures = []
-        self.dagTasks = []
+        #self.dagTasks = []
         self.ilpOutputs = []
 
         for id in range(self.numberOfTasks):
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
-            outputILPSystemJSON(G_adjaList, 1, C_dict, W, numCores, id)
+            #outputILPSystemJSON(G_adjaList, 1, C_dict, W, numCores, id)
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
-            self.dagTasks.append(getDagTask(G_adjaList, C_dict))
+            #self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
+            self.addILPoutput(id)
+
         self.taskFeatures = torch.Tensor(self.taskFeatures)
         self.ilpOutputs = torch.Tensor(self.ilpOutputs)
+
+    def addILPoutput(self, taskID):
+        prioList = getOptimalPriorityListFromILPscheduleFile("%s/schedule_dag_%i.json" % (self.ilpSchedulesFolder, taskID))
+
+        if len(prioList) > self.maxNodesPerDag:
+            raise RuntimeError("DataLoader: ILP schedule priorirty list has more priorities than what is permitted (%i > max = %i)" % (len(prioList), self.maxNodesPerDag))
+        if len(prioList) < self.maxNodesPerDag:
+            for i in range(len(prioList), self.maxNodesPerDag):
+                prioList.append(0)
+
+            self.ilpOutputs.append(prioList)
 
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
         self.taskFeatures.append([])
         crit_path, crit_length = criticalPath(adjaList, 1, wcets)
-        self.ilpOutputs.append(crit_length)
         for node in adjaList:
             is_source_sink = int(len(adjaList[node]['in']) == 0 or len(adjaList[node]['out']) == 0)
             is_in_critical_path = int(node in crit_path)
@@ -211,7 +237,7 @@ class DataLoader:
         batches_indices = list(torch_samplers.BatchSampler(torch_samplers.RandomSampler(self.taskFeatures[:train_threshold]), 
                                                            batch_size=batch_size,drop_last=True))
         train_batches = batches_indices
-        val_set = (self.dagTasks[train_threshold:], self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
+        val_set = (self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
 
         return train_batches, val_set
     
