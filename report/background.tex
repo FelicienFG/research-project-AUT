@@ -156,19 +156,9 @@ a fixed utilization (see Section \ref{sec:methodology}).
 
 Another measurement used when scheduling event-chains, or DAG, tasks  
 is the capacity bounds, or capacity augmentation bound,
-which compares resource use to an theoretically optimal scheduling algorithm.
+which compares resource use to a theoretically optimal scheduling algorithm.
 It can also be used as a simple schedulability test.
-The matehmatical definition for a scheduling algorithm $S$ of its capacity
-augmentation bound $\beta$ is that, for any chain of events represented by a DAG $G$
-satisfying the following condition :
-\begin{align}
-    \beta \times U \leq m \wedge  \beta \times len(G) \leq D,
-\end{align}
-the associated DAG is schedulable by $S$.
-Here, $len(G)$ is the length of the critical path, in terms of WCETs,
-in the graph $G$, $D$ is the DAG task's deadline, $m$ the number of processors and $U$
-is the utilization factor of the DAG task (with the WCET of the DAG being the sum of all tasks' WCET).
-As you can see, the lower $\beta$ is, the better the scheduling algorithm.\\
+It is often refer to as a $\beta$ coefficient and the lower $\beta$ is, the better the scheduling algorithm.\\
 This metric is used for DAG tasks or event-chains of tasks.
 
 %\cite{tiryaki2006sunit} is really good with MAS but really bad with something else.

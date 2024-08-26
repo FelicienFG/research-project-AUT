@@ -37,22 +37,62 @@ of artifacts intended to solve practical problems. It emphasizes
 the development of knowledge through the design and implementation 
 of innovative solutions, such as algorithms, methods, tools, 
 and frameworks, particularly in fields like software engineering\cite{Wieringa2010DesignScienceMethod}.
-
 In this methodology,
 the designed artifact(s) need(s) to answer a precise problem,
 defined beforehand, and choices in the design must be clearly justified.
 The evaluation of the artifact(s) needs not only to answer research questions, but also
 demonstrate practical applications,
 thus balancing methodological rigor and practical utility.
-
 In our case, the problem of scheduling DAG tasks
 has important practical applications and there are space 
 for evaluating new artifacts, to better answer RQ3.
 
 \subsection{Case study}
 
-\subsection{Experiments}
+A case study is useful at providing a great understanding of a real-life scenario that happened 
+or that is currently happening, illustrating a specific issue with a real-life context.
+In a case study, you look closely at real-life observations to evaluate or investigate
+a design in the context of a real-life scenario\cite{sarah2011caseStudy}.
+One can use a case study methodology to study a specific phenomena and how an application react to it
+which can lead, in the case of a software application, to finding
+limitations or missing elements.
+Another use of the case study methodology is 
+to address one or more real-life issues by analyzing 
+a system using multiple datasets.
+For instance, a case study might design a benchmark for testing 
+certain types of applications.
+In this research, no real-life scenario will be considered and the focus will be on designing an artifact,
+rather than investigating an existing one. 
+Therefore, the case study approach will not be useful to this research.
+
+\subsection{Experiment}
  
  
+The experiment, or controlled experiment, methodology aims at identifying cause-effect 
+chains by defining hypotheses and control variables on a specific system,
+and running multiple tests or experiments while having fixed and varying variables to assert 
+their role in the system's behaviour\cite{basili2007controlledExperiment}.
+The controlled experiment approach 
+can provide insights on relationships between the controlled variables and the system
+which contributes to the body of knowledge of the specific system.
+This can be used, for instance, to observe and explain the impact of hyperparameters of a machine learning
+model on its performance.
+This approach has its drawbacks, the main one being 
+that the experiment always has biases and doesn't fully reflect the reality
+of the matter. This drawback can be exacerbated when considering 
+a small sample size or forgetting
+to take into account controlled variables that impact the results
+of the experiment, which is why great care needs to be taken 
+for the design phase of the experiment(s).
+Nonetheless, the controlled experiment approach will be used in this research to validate or invalidate hypotheses
+about the designed AI model performances, especially when compared to the ILP method.\\
 
 
+On one hand, the SLR can answer research questions 1 and 2,
+by identifying the state-of-the-art and finding gaps in the research.
+Gaps that can be filled, in part, by the design science methodology,
+designing an artifact that will address this / these gap(s).
+On the other hand, the controlled experiment approach
+will be used to analyze the behaviour of the artifact
+according to controlled variables, 
+aiming to answer RQ3.

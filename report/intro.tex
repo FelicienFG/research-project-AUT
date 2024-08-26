@@ -6,8 +6,8 @@ control, public transportation, and automated vehicles. Unlike non-real-time sys
 tasks in real-time systems must be both functionally correct and meet strict 
  execution time constraints, known as deadlines. Failure 
 to meet these deadlines can lead to severe consequences. The critical 
-nature of these systems necessitates designing the system 
-architecture with a focus on time and incorporating fault tolerance 
+nature of these systems necessitates the design of a system 
+architecture that focuses on time and incorporating fault tolerance 
 to ensure high reliability.
 
 One example of such architecture is the time-triggered 
@@ -35,7 +35,7 @@ the system, raising the question: which task should be executed first?
 This question is particularly important in a real-time context
 because having the wrong execution order, or schedule, could lead 
 to, at best, a slow system, and at worst, deadline misses, which 
-can have fatal repercussions. In the case of a self-driving car 
+can have fatal repercussions\cite{ABBOTT2018RealtimeDeadlineMissCons}. In the case of a self-driving car 
 system, for instance, a slight delay of 500 ms in detecting a pedestrian 
 crossing the road can, in some cases, be enough to drive over 
 the pedestrian or cause a car accident. Note that the resources of 
