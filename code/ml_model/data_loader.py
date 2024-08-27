@@ -41,14 +41,14 @@ def load_task(dataFolder, id):
 
     max_key = 0
     for u, v, weight in G.edges(data='label'):
-        if u not in G_dict:
-            G_dict[u] = {"in": [], "out": [v]}
+        if (u - 1) not in G_dict:
+            G_dict[u-1] = {"in": [], "out": [v-1]}
         else:
-            G_dict[u]["out"].append(v)
-        if v not in G_dict:
-            G_dict[v] = {"in": [u], "out": []}
+            G_dict[u-1]["out"].append(v-1)
+        if (v-1) not in G_dict:
+            G_dict[v-1] = {"in": [u-1], "out": []}
         else:
-            G_dict[v]["in"].append(u)
+            G_dict[v-1]["in"].append(u-1)
 
         if v > max_key:
             max_key = v
@@ -58,9 +58,9 @@ def load_task(dataFolder, id):
         #if v not in V_array:
         #    V_array.append(v)
 
-        C_dict[u] = weight
+        C_dict[u-1] = weight
 
-    C_dict[max_key] = G.nodes[max_key]['C']
+    C_dict[max_key-1] = G.nodes[max_key]['C']
 
     # formulate the c list (c[0] is c for v1!!)
     C_array = []
@@ -176,7 +176,14 @@ def criticalPath(graph, start, wcets):
 
     return biggest_path, max_length
        
+def filledUpAdjaListAndWcets(adjalist, wcets, maxNodes):
+    filledUpAdjalist = adjalist
+    filledUpWcets = wcets
+    for n in range(len(wcets), maxNodes):
+        filledUpAdjalist[n] = {"in": [], "out": []}
+        filledUpWcets[n] = 0
 
+    return filledUpAdjalist, filledUpWcets
 
 class DataLoader:
 
@@ -186,6 +193,7 @@ class DataLoader:
         self.ilpSchedulesFolder = ilp_schedules_folder
         self.maxNodesPerDag = maxNodesPerDag
         self.tasks = []
+        self.tasksFilledUp = []
         self.numCores = numCores
         #node features : C_i / W , deg_in, deg_out, is_source_or_sink, is_in_critical_path
         self.taskFeatures = []
@@ -196,6 +204,8 @@ class DataLoader:
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
             #outputILPSystemJSON(G_adjaList, 1, C_dict, W, numCores, id)
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
+            filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(G_adjaList, C_dict, self.maxNodesPerDag)
+            self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
             #self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
             self.addILPoutput(id)
@@ -216,7 +226,7 @@ class DataLoader:
 
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
         self.taskFeatures.append([])
-        crit_path, crit_length = criticalPath(adjaList, 1, wcets)
+        crit_path, crit_length = criticalPath(adjaList, 0, wcets)
         for node in adjaList:
             is_source_sink = int(len(adjaList[node]['in']) == 0 or len(adjaList[node]['out']) == 0)
             is_in_critical_path = int(node in crit_path)
@@ -237,14 +247,13 @@ class DataLoader:
         batches_indices = list(torch_samplers.BatchSampler(torch_samplers.RandomSampler(self.taskFeatures[:train_threshold]), 
                                                            batch_size=batch_size,drop_last=True))
         train_batches = batches_indices
-        val_set = (self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
+        val_set = (self.tasksFilledUp[train_threshold:], self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
 
         return train_batches, val_set
     
 if __name__ == "__main__":
 
-    #data = DataLoader("../dag_generator/data/")
+    data = DataLoader("../dag_generator/data/")
     
-    pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
-
-    print(pList)
+    #pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
+    #print(pList)

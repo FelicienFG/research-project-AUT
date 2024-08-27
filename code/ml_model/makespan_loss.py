@@ -17,11 +17,11 @@ class MakespanLoss(torch.nn.Module):
 
         accu_loss = 0.0
         #print(output)
-        for matrix_index in range(output.shape[0]):
+        #for matrix_index in range(output.shape[0]):
 
-            _, prio_list = torch.max(output[matrix_index], dim=1)
-            #applying rmse
-            accu_loss += torch.sqrt(torch.sum(torch.square(target_priorities[matrix_index] - prio_list)) / len(prio_list))
+        _, prio_list = torch.max(output, dim=0)
+        #applying rmse
+        accu_loss += torch.sqrt(torch.sum(torch.square(target_priorities[0] - prio_list)) / len(prio_list))
 
         return accu_loss
 
