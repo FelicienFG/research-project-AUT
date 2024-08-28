@@ -318,10 +318,10 @@ class  PuLPWriter:
             self.prob += self.getIntVar(delayVariable) <= delayValue 
             
     def solve(self, solverName):
-        solverDict = {'keepFiles': 0,
+        solverDict = {#'keepFiles': 0,
                      'mip': True,
                      'msg': True,
-                     'options': [],
+                     #'options': [],
                      'solver': solverName,
                      'timeLimit': None,
                      'warmStart': False}

@@ -8,20 +8,30 @@ import torch.utils.data.sampler as torch_samplers
 import numpy
 import json
 import parse
+import heapq
 
 def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
     priorityList = []
     with open(scheduleFileName, "r") as scheduleFile:
         scheduleJSON = json.load(scheduleFile)
         scheduledTasks = scheduleJSON['TaskInstancesStore']
-        priorityList = [0 for _ in range(len(scheduledTasks))]
+        taskList = []
 
-        priority = 0
         for taskJSON in scheduledTasks:
             subtaskID = parse.parse("task_{}", taskJSON['name'])
             subtaskID = int(subtaskID[0])
+            subTaskStartTime = taskJSON['value'][0]['executionIntervals'][0]['startTime']
+            heapq.heappush(taskList, (subTaskStartTime, subtaskID))
+        
+        priority = 0
+        priorityList = [0 for i in range(len(scheduledTasks))]
+        while taskList:
+            (st, subtaskID) = heapq.heappop(taskList)
+            print(subtaskID, st)
             priorityList[subtaskID - 1] = priority
             priority += 1
+        
+        print(priorityList)
 
     return priorityList
 
@@ -124,7 +134,7 @@ def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
                 "initialOffset":0,
                 "activationOffset":0,
                 "duration":wcets[node],
-                "period":totalW,
+                "period":totalW * totalW,
                 "inputs":[
                     "in"
                 ],
@@ -185,6 +195,13 @@ def filledUpAdjaListAndWcets(adjalist, wcets, maxNodes):
 
     return filledUpAdjalist, filledUpWcets
 
+def outputAllILPSystemJSON(inputDataFolder, numCores):
+    numberOfTasks = len(os.listdir(inputDataFolder)) // 3
+
+    for id in range(numberOfTasks):
+        G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
+        outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id)
+
 class DataLoader:
 
     def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30):
@@ -202,7 +219,6 @@ class DataLoader:
 
         for id in range(self.numberOfTasks):
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
-            #outputILPSystemJSON(G_adjaList, 1, C_dict, W, numCores, id)
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
             filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(G_adjaList, C_dict, self.maxNodesPerDag)
             self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
@@ -253,7 +269,8 @@ class DataLoader:
     
 if __name__ == "__main__":
 
-    data = DataLoader("../dag_generator/data/")
+    outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
+    #data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
     
     #pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
     #print(pList)
