@@ -10,6 +10,7 @@
 
 import networkx as nx
 import pickle
+import os
 
 def load_task(task_idx, dag_base_folder = "../data/"):
     # << load DAG task <<
@@ -61,12 +62,22 @@ def load_task(task_idx, dag_base_folder = "../data/"):
     return G_dict, V_array, C_dict, C_array, T, W
 
 
+def outputExceedingNodesDagTasks(maxNodes = 20):
+    numberOfTasks = len(os.listdir("data/")) // 3
+
+    with open("tasks_to_remove", "w+") as outputFile:
+        for id in range(numberOfTasks):
+            _, V, _, _, _, _ = load_task(id, dag_base_folder="data/")
+            if len(V) > maxNodes:
+                outputFile.write("%i\n" % (id))
+
 # below is an example of how to use the load function:
 if __name__ == "__main__":
-    G, V, C, _, T, W = load_task(task_idx=0, dag_base_folder="./data/")
+    #G, V, C, _, T, W = load_task(task_idx=0, dag_base_folder="./data/")
 
-    print("G: ", G)
-    print("V: ", V)
-    print("T: ", T)
-    print("C: ", C)
-    print("W: ", W)
+    #print("G: ", G)
+    #print("V: ", V)
+    #print("T: ", T)
+    #print("C: ", C)
+    #print("W: ", W)
+    outputExceedingNodesDagTasks()

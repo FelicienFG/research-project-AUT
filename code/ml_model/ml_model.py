@@ -43,24 +43,66 @@ class myGCNmodule(torch.nn.Module):
         self.INattentionLayer = AttentionLayer(input_dim, n_heads=5)
         self.OUTattentionLayer = AttentionLayer(input_dim, n_heads=5)
         self.FINALattentionLayer = torch.nn.MultiheadAttention(input_dim, num_heads=1)
-        self.W = torch.nn.Parameter(torch.rand([input_dim, 30]))
+        self.linearLayer = torch.nn.Linear(input_dim, input_dim)
 
-    def forward(self, X: torch.Tensor, taskGraph):
+    def forward(self, X_batch: torch.Tensor, taskGraph_batch):
+        H_kplus1_batch = torch.zeros_like(X_batch)
+        for batch in range(X_batch.shape[0]):
+            X = X_batch[batch]
+            taskGraph = taskGraph_batch[batch]        
+            H_kplus1 = torch.zeros_like(X)
+            for node in range(X.shape[0]):
+                h_k = X[node]
+                #get the neighbours
+                h_INneighbours = X[taskGraph['G'][node]['in'],:]
+                h_OUTneighbours = X[taskGraph['G'][node]['out'],:]
+                #attention with the in and out neighbours
+                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0]
+                attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0]
+                attention = torch.concat((attention_in, attention_out), dim=0)
 
-        H_kplus1 = torch.zeros([X.shape[0], self.W.shape[1]])
-        for node in range(X.shape[0]):
-            h_k = X[node]
-            h_INneighbours = X[taskGraph['G'][node]['in'],:]
-            h_OUTneighbours = X[taskGraph['G'][node]['out'],:]
-            attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0]
-            attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0]
-            attention = torch.concat((attention_in, attention_out), dim=0)
-            finalAttention, _ = self.FINALattentionLayer(attention, attention, attention, need_weights=False)
-            output = torch.nn.functional.elu(torch.matmul(finalAttention[0], self.W), alpha=1.0)
-            H_kplus1[node] = output
-        
-        return H_kplus1
+                #self attention with the two resulting attentions from in an out neighbours
+                finalAttention, _ = self.FINALattentionLayer(attention, attention, attention, need_weights=False)
+                finalAttentionVector = torch.max(finalAttention, dim=0)[0]
+                output = torch.nn.functional.elu(self.linearLayer(finalAttentionVector), alpha=1.0)
+                H_kplus1[node] = output
+
+            H_kplus1_batch[batch] = H_kplus1
+
+        return H_kplus1_batch
     
+class GCNAttention(torch.nn.Module):
+
+    def __init__(self, embedding_dim, outDim = 30):
+        super(GCNAttention, self).__init__()
+
+        self.ff1 = torch.nn.Linear(embedding_dim, embedding_dim)
+        self.ff2 = torch.nn.Linear(embedding_dim, embedding_dim)
+        self.ff3 = torch.nn.Linear(embedding_dim, embedding_dim)
+        self.relu = torch.nn.ReLU()
+        self.sig = torch.nn.Sigmoid()
+
+        self.firstGCN  = myGCNmodule(embedding_dim)
+        self.secondGCN = myGCNmodule(embedding_dim)
+        self.thirdGCN = myGCNmodule(embedding_dim)
+
+        self.attentionLayer = AttentionLayer(embedding_dim, embedding_dim)
+
+        self.ff4 = torch.nn.Linear(embedding_dim, embedding_dim)
+        self.ff5 = torch.nn.Linear(embedding_dim, embedding_dim)
+        self.ff6 = torch.nn.Linear(embedding_dim, outDim)
+
+    def forward(self, X: torch.Tensor, taskGraphs):
+        
+        firstLayer = self.relu(self.ff3(self.relu(self.ff2(self.relu(self.ff1(X))))))
+
+        secondLayer = self.thirdGCN(self.secondGCN(self.firstGCN(firstLayer, taskGraphs), taskGraphs), taskGraphs)
+
+        thirdLayer, _ = self.attentionLayer(secondLayer)
+    
+        finalLayer = self.sig(self.ff6(self.relu(self.ff5(self.relu(self.ff4(thirdLayer))))))
+
+        return finalLayer
 
 def gcn_test():
 
@@ -105,7 +147,7 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
         #reset gradients
         optimizer.zero_grad()
         
-        outputs = model(dataLoader.taskFeatures[batch[0]], dataLoader.tasksFilledUp[batch[0]])
+        outputs = model(dataLoader.taskFeatures[batch], [dataLoader.tasksFilledUp[i] for i in batch])
         
         #compute loss and gradients
         loss = loss_fn(outputs, dataLoader.ilpOutputs[batch])
@@ -123,10 +165,10 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
 
 
 def training_and_eval(model, num_cores):
-    EPOCHS = 10
+    EPOCHS = 5
     data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules')
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7, batch_size=1)
+    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7, batch_size=2)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
 
@@ -145,7 +187,7 @@ def training_and_eval(model, num_cores):
 
         # Disable gradient computation and reduce memory consumption.
         with torch.no_grad():
-            voutputs = model(valTaskFeatures[0], valTasks[0])
+            voutputs = model(valTaskFeatures, valTasks)
             vloss = loss_fn(voutputs, valILPoutputs)
             avg_vloss = vloss / valILPoutputs.shape[0]
 
@@ -155,5 +197,5 @@ def training_and_eval(model, num_cores):
 
 if __name__ == "__main__":
 
-    model = myGCNmodule(input_dim=5)
-    training_and_eval(model, 4)
+    model = GCNAttention(embedding_dim=5)
+    training_and_eval(model, 2)

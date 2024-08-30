@@ -27,11 +27,11 @@ def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
         priorityList = [0 for i in range(len(scheduledTasks))]
         while taskList:
             (st, subtaskID) = heapq.heappop(taskList)
-            print(subtaskID, st)
+            #print(subtaskID, st)
             priorityList[subtaskID - 1] = priority
             priority += 1
         
-        print(priorityList)
+        #print(priorityList)
 
     return priorityList
 
@@ -201,6 +201,7 @@ def outputAllILPSystemJSON(inputDataFolder, numCores):
     for id in range(numberOfTasks):
         G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
         outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id)
+
 
 class DataLoader:
 
