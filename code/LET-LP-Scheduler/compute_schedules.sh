@@ -21,7 +21,6 @@ compute_schedules_parallel()
     done
 }
 
-
 for c in `seq 0 $(($total_cores-1))` ;
 do
 

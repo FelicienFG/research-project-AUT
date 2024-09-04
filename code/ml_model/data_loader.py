@@ -82,25 +82,25 @@ def load_task(dataFolder, id):
 
     return G_dict, C_dict, T, W
 
-#def getDagTask(graph, wcets):
-#    """
-#    get the list of DagSubtasks from the graph
-#    """
-#    dagTask = ms.DagSubtaskVector()
-#    for vertex_key in wcets:
-#        dagSubtask = ms.DagSubtask()
-#        dagSubtask.id = vertex_key - 1 
-#        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
-#        for i in range(dagSubtask.inDependencies.size()):
-#            dagSubtask.inDependencies[i] -= 1
-#        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
-#        for i in range(dagSubtask.outDependencies.size()):
-#            dagSubtask.outDependencies[i] -= 1
-#        dagSubtask.wcet = wcets[vertex_key]
-#
-#        dagTask.append(dagSubtask)
-#
-#    return dagTask
+def getDagTask(graph, wcets):
+    """
+    get the list of DagSubtasks from the graph
+    """
+    dagTask = ms.DagSubtaskVector()
+    for vertex_key in wcets:
+        dagSubtask = ms.DagSubtask()
+        dagSubtask.id = vertex_key - 1 
+        dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
+        for i in range(dagSubtask.inDependencies.size()):
+            dagSubtask.inDependencies[i] -= 1
+        dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
+        for i in range(dagSubtask.outDependencies.size()):
+            dagSubtask.outDependencies[i] -= 1
+        dagSubtask.wcet = wcets[vertex_key]
+
+        dagTask.append(dagSubtask)
+
+    return dagTask
 
 #def test_makespan_compute():
 #    rand.seed = time.time()
@@ -215,7 +215,7 @@ class DataLoader:
         self.numCores = numCores
         #node features : C_i / W , deg_in, deg_out, is_source_or_sink, is_in_critical_path
         self.taskFeatures = []
-        #self.dagTasks = []
+        self.dagTasks = []
         self.ilpOutputs = []
 
         for id in range(self.numberOfTasks):
@@ -223,7 +223,7 @@ class DataLoader:
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
             filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(G_adjaList, C_dict, self.maxNodesPerDag)
             self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
-            #self.dagTasks.append(getDagTask(G_adjaList, C_dict))
+            self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
             self.addILPoutput(id)
 
@@ -237,9 +237,17 @@ class DataLoader:
             raise RuntimeError("DataLoader: ILP schedule priorirty list has more priorities than what is permitted (%i > max = %i)" % (len(prioList), self.maxNodesPerDag))
         if len(prioList) < self.maxNodesPerDag:
             for i in range(len(prioList), self.maxNodesPerDag):
-                prioList.append(0)
-
-            self.ilpOutputs.append(prioList)
+                prioList.append(self.maxNodesPerDag - 1)
+        
+        prioMatrix = [prioList for _ in range(len(prioList))]
+        for task in range(len(prioList)):
+            for prio in range(len(prioList)):
+                if prioList[task] == prio:
+                    prioMatrix[task][prio] = 1
+                else:
+                    prioMatrix[task][prio] = 0
+                    
+        self.ilpOutputs.append(prioMatrix)
 
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
         self.taskFeatures.append([])
@@ -259,15 +267,24 @@ class DataLoader:
                 self.taskFeatures[taskID].append([0,0,0,0,0])
             
 
-    def train_val_split(self, train_percentage = 0.8, batch_size = 2):
+    def train_val_split(self, train_percentage = 0.8, batch_size = 2, return_dags = False):
         train_threshold = int(train_percentage * self.numberOfTasks)
         batches_indices = list(torch_samplers.BatchSampler(torch_samplers.RandomSampler(self.taskFeatures[:train_threshold]), 
                                                            batch_size=batch_size,drop_last=True))
         train_batches = batches_indices
         val_set = (self.tasksFilledUp[train_threshold:], self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
-
+        if return_dags:
+            return train_batches, val_set, self.dagTasks[train_threshold:]
         return train_batches, val_set
     
+    def getTasksWithFixedNumNodes(self, numNodes):
+        tasks_ids = []
+        for id in range(len(self.tasks)):
+            if len(self.tasks[id]['G']) == numNodes:
+                tasks_ids.append(id)
+
+        return self.tasksFilledUp[tasks_ids], tasks_ids
+
 if __name__ == "__main__":
 
     outputAllILPSystemJSON("../dag_generator/data/", numCores=2)

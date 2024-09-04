@@ -15,13 +15,8 @@ class MakespanLoss(torch.nn.Module):
         the target is assumed to be the batch of ILP optimal calculations of the priorities
         """
 
-        accu_loss = 0.0
-        #print(output)
-        #for matrix_index in range(output.shape[0]):
-
-        _, prio_list = torch.max(output, dim=0)
-        #applying rmse
-        accu_loss += torch.sqrt(torch.sum(torch.square(target_priorities[0] - prio_list)) / len(prio_list))
+        #applying cross-entropy
+        accu_loss = torch.nn.functional.binary_cross_entropy_with_logits(output, target_priorities)
 
         return accu_loss
 

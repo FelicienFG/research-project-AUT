@@ -2705,10 +2705,11 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_std__listT_int_std__allocatorT_int_t_t swig_types[10]
 #define SWIGTYPE_p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t swig_types[11]
 #define SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t swig_types[12]
-#define SWIGTYPE_p_swig__SwigPyIterator swig_types[13]
-#define SWIGTYPE_p_value_type swig_types[14]
-static swig_type_info *swig_types[16];
-static swig_module_info swig_module = {swig_types, 15, 0, 0, 0, 0};
+#define SWIGTYPE_p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t swig_types[13]
+#define SWIGTYPE_p_swig__SwigPyIterator swig_types[14]
+#define SWIGTYPE_p_value_type swig_types[15]
+static swig_type_info *swig_types[17];
+static swig_module_info swig_module = {swig_types, 16, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -11779,6 +11780,69 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_MakespanSolver_computeBestPriorityList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  MakespanSolver *arg1 = (MakespanSolver *) 0 ;
+  std::vector< DagSubtask,std::allocator< DagSubtask > > *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 = SWIG_OLDOBJ ;
+  PyObject *swig_obj[2] ;
+  std::vector< int,std::allocator< int > > result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "MakespanSolver_computeBestPriorityList", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_MakespanSolver, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MakespanSolver_computeBestPriorityList" "', argument " "1"" of type '" "MakespanSolver *""'"); 
+  }
+  arg1 = reinterpret_cast< MakespanSolver * >(argp1);
+  {
+    std::vector< DagSubtask,std::allocator< DagSubtask > > *ptr = (std::vector< DagSubtask,std::allocator< DagSubtask > > *)0;
+    res2 = swig::asptr(swig_obj[1], &ptr);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MakespanSolver_computeBestPriorityList" "', argument " "2"" of type '" "std::vector< DagSubtask,std::allocator< DagSubtask > > const &""'"); 
+    }
+    if (!ptr) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "MakespanSolver_computeBestPriorityList" "', argument " "2"" of type '" "std::vector< DagSubtask,std::allocator< DagSubtask > > const &""'"); 
+    }
+    arg2 = ptr;
+  }
+  result = (arg1)->computeBestPriorityList((std::vector< DagSubtask,std::allocator< DagSubtask > > const &)*arg2);
+  resultobj = swig::from(static_cast< std::vector< int,std::allocator< int > > >(result));
+  if (SWIG_IsNewObj(res2)) delete arg2;
+  return resultobj;
+fail:
+  if (SWIG_IsNewObj(res2)) delete arg2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_MakespanSolver_computePermutations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  std::vector< int,std::allocator< int > > *arg1 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  SwigValueWrapper< std::vector< std::list< int,std::allocator< int > >,std::allocator< std::list< int,std::allocator< int > > > > > result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_std__vectorT_int_std__allocatorT_int_t_t,  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MakespanSolver_computePermutations" "', argument " "1"" of type '" "std::vector< int,std::allocator< int > > &""'"); 
+  }
+  if (!argp1) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "MakespanSolver_computePermutations" "', argument " "1"" of type '" "std::vector< int,std::allocator< int > > &""'"); 
+  }
+  arg1 = reinterpret_cast< std::vector< int,std::allocator< int > > * >(argp1);
+  result = MakespanSolver::computePermutations(*arg1);
+  resultobj = SWIG_NewPointerObj((new std::vector< std::list< int,std::allocator< int > >,std::allocator< std::list< int,std::allocator< int > > > >(static_cast< const std::vector< std::list< int,std::allocator< int > >,std::allocator< std::list< int,std::allocator< int > > > >& >(result))), SWIGTYPE_p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_delete_MakespanSolver(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   MakespanSolver *arg1 = (MakespanSolver *) 0 ;
@@ -11954,6 +12018,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "DagSubtask_swiginit", DagSubtask_swiginit, METH_VARARGS, NULL},
 	 { "new_MakespanSolver", _wrap_new_MakespanSolver, METH_VARARGS, NULL},
 	 { "MakespanSolver_computeMakespan", _wrap_MakespanSolver_computeMakespan, METH_VARARGS, NULL},
+	 { "MakespanSolver_computeBestPriorityList", _wrap_MakespanSolver_computeBestPriorityList, METH_VARARGS, NULL},
+	 { "MakespanSolver_computePermutations", _wrap_MakespanSolver_computePermutations, METH_O, NULL},
 	 { "delete_MakespanSolver", _wrap_delete_MakespanSolver, METH_O, NULL},
 	 { "MakespanSolver_swigregister", MakespanSolver_swigregister, METH_O, NULL},
 	 { "MakespanSolver_swiginit", MakespanSolver_swiginit, METH_VARARGS, NULL},
@@ -11980,6 +12046,7 @@ static swig_type_info _swigt__p_std__invalid_argument = {"_p_std__invalid_argume
 static swig_type_info _swigt__p_std__listT_int_std__allocatorT_int_t_t = {"_p_std__listT_int_std__allocatorT_int_t_t", "std::list< int,std::allocator< int > > *|std::list< int > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t = {"_p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t", "std::vector< DagSubtask > *|std::vector< DagSubtask,std::allocator< DagSubtask > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_std__vectorT_int_std__allocatorT_int_t_t = {"_p_std__vectorT_int_std__allocatorT_int_t_t", "std::vector< int,std::allocator< int > > *|std::vector< int > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t = {"_p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t", "std::vector< std::list< int,std::allocator< int > >,std::allocator< std::list< int,std::allocator< int > > > > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_swig__SwigPyIterator = {"_p_swig__SwigPyIterator", "swig::SwigPyIterator *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_value_type = {"_p_value_type", "value_type *", 0, 0, (void*)0, 0};
 
@@ -11997,6 +12064,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_std__listT_int_std__allocatorT_int_t_t,
   &_swigt__p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t,
   &_swigt__p_std__vectorT_int_std__allocatorT_int_t_t,
+  &_swigt__p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t,
   &_swigt__p_swig__SwigPyIterator,
   &_swigt__p_value_type,
 };
@@ -12014,6 +12082,7 @@ static swig_cast_info _swigc__p_std__invalid_argument[] = {  {&_swigt__p_std__in
 static swig_cast_info _swigc__p_std__listT_int_std__allocatorT_int_t_t[] = {  {&_swigt__p_std__listT_int_std__allocatorT_int_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t[] = {  {&_swigt__p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_std__vectorT_int_std__allocatorT_int_t_t[] = {  {&_swigt__p_std__vectorT_int_std__allocatorT_int_t_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t[] = {  {&_swigt__p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_swig__SwigPyIterator[] = {  {&_swigt__p_swig__SwigPyIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_value_type[] = {  {&_swigt__p_value_type, 0, 0, 0},{0, 0, 0, 0}};
 
@@ -12031,6 +12100,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_std__listT_int_std__allocatorT_int_t_t,
   _swigc__p_std__vectorT_DagSubtask_std__allocatorT_DagSubtask_t_t,
   _swigc__p_std__vectorT_int_std__allocatorT_int_t_t,
+  _swigc__p_std__vectorT_std__listT_int_std__allocatorT_int_t_t_std__allocatorT_std__listT_int_std__allocatorT_int_t_t_t_t,
   _swigc__p_swig__SwigPyIterator,
   _swigc__p_value_type,
 };

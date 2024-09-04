@@ -42,8 +42,8 @@ class myGCNmodule(torch.nn.Module):
         super(myGCNmodule, self).__init__()
         self.INattentionLayer = AttentionLayer(input_dim, n_heads=5)
         self.OUTattentionLayer = AttentionLayer(input_dim, n_heads=5)
-        self.FINALattentionLayer = torch.nn.MultiheadAttention(input_dim, num_heads=1)
-        self.linearLayer = torch.nn.Linear(input_dim, input_dim)
+
+        self.linearLayer = torch.nn.Linear(input_dim*2, input_dim)
 
     def forward(self, X_batch: torch.Tensor, taskGraph_batch):
         H_kplus1_batch = torch.zeros_like(X_batch)
@@ -57,13 +57,12 @@ class myGCNmodule(torch.nn.Module):
                 h_INneighbours = X[taskGraph['G'][node]['in'],:]
                 h_OUTneighbours = X[taskGraph['G'][node]['out'],:]
                 #attention with the in and out neighbours
-                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0]
-                attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0]
-                attention = torch.concat((attention_in, attention_out), dim=0)
+                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0][0, :]
+                attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0][0, :]
 
-                #self attention with the two resulting attentions from in an out neighbours
-                finalAttention, _ = self.FINALattentionLayer(attention, attention, attention, need_weights=False)
-                finalAttentionVector = torch.max(finalAttention, dim=0)[0]
+                #concatenating the two resulting attentions from in an out neighbours into one vector
+                finalAttentionVector = torch.concat((attention_in, attention_out), dim=0)
+                
                 output = torch.nn.functional.elu(self.linearLayer(finalAttentionVector), alpha=1.0)
                 H_kplus1[node] = output
 
@@ -104,24 +103,6 @@ class GCNAttention(torch.nn.Module):
 
         return finalLayer
 
-def gcn_test():
-
-    input_dim = 3
-    output_dim = 2
-
-    A = torch.tensor([[1., 0., 0.],
-                      [0., 1., 1.],
-                      [0., 1., 1.]])
-
-    gcn_layer = myGCNmodule(input_dim=input_dim, output_dim=output_dim, A=A)
-
-    X = torch.tensor([[1., 2., 3.],
-                      [4., 5., 6.],
-                      [7., 8., 9.]])
-    
-    output = gcn_layer(X)
-
-    print(output)
 
 def attention_test():
     embed_size = 3
@@ -139,8 +120,22 @@ def attention_test():
     print(output)
     
 
+def getAccuracy(output, target):
+    avg_accu = 0.0
+    for b in range(output.shape[0]):
+        _, transform_output = torch.max(output[b], dim=0)
+        _, transform_target = torch.max(target[b], dim=0)
+        
+        accu = transform_output - transform_target
+        accu = torch.count_nonzero(accu) / len(accu)
+
+        avg_accu += accu
+    
+    return avg_accu / output.shape[0]
+
 def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
     running_loss = 0
+    avg_training_accu = 0.0
 
     for batch in batches:
 
@@ -149,9 +144,10 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
         
         outputs = model(dataLoader.taskFeatures[batch], [dataLoader.tasksFilledUp[i] for i in batch])
         
-        #compute loss and gradients
+        #compute loss, accu and gradients
         loss = loss_fn(outputs, dataLoader.ilpOutputs[batch])
-        loss.requires_grad = True
+        avg_training_accu += getAccuracy(outputs, dataLoader.ilpOutputs[batch])
+
         loss.backward()
 
         optimizer.step()
@@ -160,15 +156,25 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
 
 
     #return the average training loss for this epoch
-    return running_loss / len(batches)
+    return running_loss / len(batches), avg_training_accu / len(batches)
 
 
+def evaluateTiming(model, data_loader, listsOfNumberOfTasks):
+    
+    with open("results_time", "w+") as result_file:
+        for numTasks in listsOfNumberOfTasks:
+            data, ids = data_loader.getTasksWithFixedNumNodes(numTasks)
+            start = time.time_ns()
+            _ = model(data, [data_loader.tasks[id] for id in ids])
+            end = time.time_ns()
+            result_file.write("%i tasks -- avg %fµs -- %i samples\n" 
+                              % (numTasks, (end - start) * 1.0e-3 / data.shape[0], data.shape[0]))
 
 def training_and_eval(model, num_cores):
-    EPOCHS = 5
+    EPOCHS = 10
     data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules')
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7, batch_size=2)
+    optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7, batch_size=5)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
 
@@ -177,25 +183,47 @@ def training_and_eval(model, num_cores):
 
         #train
         model.train(True)
-        avg_train_loss = train_one_epoch(model, epoch_num, trainDataBatches, data_loader, optimizer, loss_fn)
+        avg_train_loss, avg_train_accu = train_one_epoch(model, epoch_num, trainDataBatches, data_loader, optimizer, loss_fn)
 
         #evaluation
         # Set the model to evaluation mode, disabling dropout and using population
         # statistics for batch normalization.
         model.eval()
-        running_vloss = 0.0
+        validation_start = 0
+        validation_end = 0
 
         # Disable gradient computation and reduce memory consumption.
         with torch.no_grad():
             voutputs = model(valTaskFeatures, valTasks)
             vloss = loss_fn(voutputs, valILPoutputs)
             avg_vloss = vloss / valILPoutputs.shape[0]
+            avg_vaccu = getAccuracy(voutputs, valILPoutputs)
 
 
-        print("epoch %i -- avg train loss: %f, avg validation loss: %f" % (epoch_num, avg_train_loss, avg_vloss))
+        with open("results_lossaccu", "w+") as result_file:
+            result_file.write("epoch %i -- avg train loss/accu: %f/%f, avg validation loss/accu: %f/%f -- avg val time: %fµs\n" 
+              % (epoch_num, avg_train_loss, avg_train_accu, avg_vloss, avg_vaccu))
 
+    evaluateTiming(model, data_loader, [10, 15, 20])
+
+def evaluateMakespan(trained_model, data_loader, numcores):
+    scheduler = ms.MakespanSolver(numcores)
+    _, (valTasks, valTaskFeatures, valILPoutputs), dags = data_loader.train_val_split(train_percentage=0.8, batch_size=5, return_dags=True)
+
+    outputs = trained_model(valTaskFeatures, valTasks)
+
+    with open("results_makespan", "w+") as result_file:
+        for id in range(outputs.shape[0]):
+            _, model_priorities = torch.max(outputs[id], dim=0)
+            _, ilp_priorities = torch.max(valILPoutputs[id], dim=0)
+
+            makespan_model = scheduler.computeMakespan(ms.IntVector(model_priorities), dags[id])
+            makespan_ilp = scheduler.computeMakespan(ms.IntVector(ilp_priorities), dags[id])
+
+            result_file.write("makespan model %i -- makespan ilp %i\n" % (makespan_model, makespan_ilp))
+    
 
 if __name__ == "__main__":
 
-    model = GCNAttention(embedding_dim=5)
-    training_and_eval(model, 2)
+    #model = GCNAttention(embedding_dim=5)
+    #training_and_eval(model, 2)

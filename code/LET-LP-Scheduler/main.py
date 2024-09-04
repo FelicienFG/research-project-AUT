@@ -40,8 +40,8 @@ Config = SimpleNamespace(
     lpFile = "system.lp",
     objectiveVariable = "sumDependencyDelays",
     individualLetInstanceParams = False,  # Each instance of a LET task can have different parameters
-    useOffSet = True, # Enable task offset
-    useHeterogeneousCores = True,
+    useOffSet = False, # Enable task offset
+    useHeterogeneousCores = False,
     restrictTaskInstancesToSameCore = False,
 )
 

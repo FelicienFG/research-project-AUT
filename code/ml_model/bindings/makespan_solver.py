@@ -468,10 +468,20 @@ class MakespanSolver(object):
 
     def computeMakespan(self, priorityList, dagTask):
         return _makespan_solver.MakespanSolver_computeMakespan(self, priorityList, dagTask)
+
+    def computeBestPriorityList(self, dagTask):
+        return _makespan_solver.MakespanSolver_computeBestPriorityList(self, dagTask)
+
+    @staticmethod
+    def computePermutations(priorities):
+        return _makespan_solver.MakespanSolver_computePermutations(priorities)
     __swig_destroy__ = _makespan_solver.delete_MakespanSolver
 
 # Register MakespanSolver in _makespan_solver:
 _makespan_solver.MakespanSolver_swigregister(MakespanSolver)
+
+def MakespanSolver_computePermutations(priorities):
+    return _makespan_solver.MakespanSolver_computePermutations(priorities)
 
 
 
