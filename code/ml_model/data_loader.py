@@ -6,9 +6,12 @@ import makespan_solver as ms
 import torch
 import torch.utils.data.sampler as torch_samplers
 import numpy
+import copy
 import json
 import parse
 import heapq
+import random as rand
+import time
 
 def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
     priorityList = []
@@ -26,12 +29,9 @@ def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
         priority = 0
         priorityList = [0 for i in range(len(scheduledTasks))]
         while taskList:
-            (st, subtaskID) = heapq.heappop(taskList)
-            #print(subtaskID, st)
-            priorityList[subtaskID - 1] = priority
+            (_, subtaskID) = heapq.heappop(taskList)
+            priorityList[subtaskID] = priority
             priority += 1
-        
-        #print(priorityList)
 
     return priorityList
 
@@ -89,31 +89,27 @@ def getDagTask(graph, wcets):
     dagTask = ms.DagSubtaskVector()
     for vertex_key in wcets:
         dagSubtask = ms.DagSubtask()
-        dagSubtask.id = vertex_key - 1 
+        dagSubtask.id = vertex_key
         dagSubtask.inDependencies = ms.IntList(graph[vertex_key]['in'])
-        for i in range(dagSubtask.inDependencies.size()):
-            dagSubtask.inDependencies[i] -= 1
         dagSubtask.outDependencies = ms.IntList(graph[vertex_key]['out'])
-        for i in range(dagSubtask.outDependencies.size()):
-            dagSubtask.outDependencies[i] -= 1
         dagSubtask.wcet = wcets[vertex_key]
 
         dagTask.append(dagSubtask)
 
     return dagTask
 
-#def test_makespan_compute():
-#    rand.seed = time.time()
-#    makespanSolver = ms.MakespanSolver(numberOfCores=4)
-#    dataLoader = dl.DataLoader("../dag_generator/data/")
-#    task = 4
-#    dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
-#    
-#    priorities = ms.IntVector([rand.randint(0, 4) for i in range(dagTask.size())])
-#    
-#    makespan = makespanSolver.computeMakespan(priorities, dagTask)
-#
-#    print(makespan)
+def test_makespan_compute():
+    rand.seed = time.time()
+    makespanSolver = ms.MakespanSolver(numberOfCores=2)
+    dataLoader = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules/")
+    task = 4
+    dagTask = getDagTask(dataLoader.tasks[task]['G'], dataLoader.tasks[task]['C'])
+    
+    priorities = ms.IntVector([rand.randint(0, dagTask.size()) for i in range(dagTask.size())])
+    
+    makespan = makespanSolver.computeMakespan(priorities, dagTask)
+
+    print(makespan)
 
 def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
     outputJSON = {}
@@ -221,7 +217,7 @@ class DataLoader:
         for id in range(self.numberOfTasks):
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
             self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
-            filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(G_adjaList, C_dict, self.maxNodesPerDag)
+            filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(copy.deepcopy(G_adjaList), copy.deepcopy(C_dict), self.maxNodesPerDag)
             self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
             self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
@@ -239,14 +235,15 @@ class DataLoader:
             for i in range(len(prioList), self.maxNodesPerDag):
                 prioList.append(self.maxNodesPerDag - 1)
         
-        prioMatrix = [prioList for _ in range(len(prioList))]
+        prioMatrix = [[0 for _ in range(len(prioList))] for _ in range(len(prioList))]
         for task in range(len(prioList)):
             for prio in range(len(prioList)):
                 if prioList[task] == prio:
                     prioMatrix[task][prio] = 1
                 else:
                     prioMatrix[task][prio] = 0
-                    
+        if taskID == 123:
+            print("123: \n", prioMatrix, "\npriolist: \n", prioList)
         self.ilpOutputs.append(prioMatrix)
 
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
@@ -272,23 +269,26 @@ class DataLoader:
         batches_indices = list(torch_samplers.BatchSampler(torch_samplers.RandomSampler(self.taskFeatures[:train_threshold]), 
                                                            batch_size=batch_size,drop_last=True))
         train_batches = batches_indices
+        #print(self.ilpOutputs)
         val_set = (self.tasksFilledUp[train_threshold:], self.taskFeatures[train_threshold:], self.ilpOutputs[train_threshold:])
         if return_dags:
-            return train_batches, val_set, self.dagTasks[train_threshold:]
+            return train_threshold, len(self.dagTasks), val_set, self.dagTasks[train_threshold:]
+        
         return train_batches, val_set
     
-    def getTasksWithFixedNumNodes(self, numNodes):
+    def getTasksWithFixedNumNodes(self, numNodes, epsilon):
         tasks_ids = []
         for id in range(len(self.tasks)):
-            if len(self.tasks[id]['G']) == numNodes:
+            if len(self.tasks[id]['G']) <= numNodes + epsilon and len(self.tasks[id]['G']) >= numNodes - epsilon:
                 tasks_ids.append(id)
 
-        return self.tasksFilledUp[tasks_ids], tasks_ids
+        return self.taskFeatures[tasks_ids], tasks_ids
 
 if __name__ == "__main__":
 
-    outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
-    #data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
+    #outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
+    #test_makespan_compute()
+    data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
     
     #pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
     #print(pList)

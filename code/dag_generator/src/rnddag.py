@@ -198,7 +198,7 @@ class DAG:
         # generate layer by layer
         for k in range(layer_num_this):
             # randomised nodes in each layer
-            m = randint(1, parallelism)
+            m = randint(2, parallelism)
 
             nodes_t = []
             for _ in range(m):

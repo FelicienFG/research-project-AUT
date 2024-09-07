@@ -96,3 +96,14 @@ On the other hand, the controlled experiment approach
 will be used to analyze the behaviour of the artifact
 according to controlled variables, 
 aiming to answer RQ3.
+
+
+\subsection{Hyper Parameters}
+~
+
+\begin{list}{}{}
+    \item - \citet{Zhao2024GATDRLmodel} : procs = 4, num nodes = [10, 20, 30, 40, 50], num dag tasks = 1000 for training and 600 for testing (1600 total)
+    \item - \citet{Lee2021GlobalDagSchedDRL} experiment : procs = [2, 3, 4, 6, 8], num dag tasks = 8000 for training | 1000 validation | 1000 testing (10000 total)
+    \item -  \citet{zhao2020DAGsched} dag gen: layer min = 5, layer max = 8, parallelism = Unif(2, [4,5,6,7,8]) (with procs=4), connect prob = 0.5,
+                num dag tasks = 1000  but doesn't say what's the total workload they're using. 
+\end{list}
