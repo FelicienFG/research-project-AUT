@@ -90,28 +90,28 @@ class GCNAttention(torch.nn.Module):
 
     def forward(self, X: torch.Tensor, taskGraphs):
         
-        print("initial: ", X)
+#       print("initial: ", X)
         firstLayer = self.relu(self.ff1(X))
 
-        print("first: ", firstLayer)
+#       print("first: ", firstLayer)
         secondLayer = self.relu(self.ff2(firstLayer))
         
-        print("second: ", secondLayer)
+#       print("second: ", secondLayer)
         thirdLayer = self.relu(self.ff3(secondLayer))
         
-        print("third: ", thirdLayer)
+#       print("third: ", thirdLayer)
         fourthLayer = self.firstGCN(thirdLayer, taskGraphs)
 
-        print("fourth: ", fourthLayer)
+#       print("fourth: ", fourthLayer)
         fifthLayer = self.relu(self.ff4(fourthLayer))
 
-        print("fifth: ", fifthLayer)
+#       print("fifth: ", fifthLayer)
         sixthLayer = self.relu(self.ff5(fifthLayer))
 
-        print("sixth: ", sixthLayer)
+#       print("sixth: ", sixthLayer)
         finalLayer = self.sig(self.ff6(sixthLayer))
 
-        print("final: ", finalLayer)
+#        print("final: ", finalLayer)
         return finalLayer
 
 
@@ -169,7 +169,7 @@ def evaluateTiming(model, data_loader, listsOfNumberOfTasks, epsilon):
                               % (numTasks, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
 
 def training_and_eval(model, num_cores):
-    EPOCHS = 0
+    EPOCHS = 5
     data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=20)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
     trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.8, batch_size=5)
