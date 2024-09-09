@@ -1,6 +1,7 @@
 not learning / same results problem :
 - model layers problem (too many gcn layers, not good activation funcion) --> tried and nope 
-- maybe normalize nb of neighbours ?
-- maybe try having a more stable dataset --> same number of tasks ?
-- maybe try having more diverse features ?
-- maybe all three above ?
+- maybe normalize nb of neighbours ? --> not enough, actually counter-productive
+- maybe try having a more stable dataset like the same number of tasks ? --> still not enough, althgough sometimes slightly better
+- maybe try having more diverse features ?  --> ok what features ?
+- maybe all three above ? --> nope normalizing nb of neighbours not good
+

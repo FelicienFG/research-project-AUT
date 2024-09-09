@@ -87,31 +87,44 @@ class GCNAttention(torch.nn.Module):
         self.ff4 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff5 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff6 = torch.nn.Linear(embedding_dim, outDim)
+        self.printForward = True
 
     def forward(self, X: torch.Tensor, taskGraphs):
         
-        #print("initial: ", X)
-        firstLayer = self.relu(self.ff1(X))
+        if self.printForward:
+            print("initial: ", X[0])
+        """         firstLayer = self.relu(self.ff1(X))
 
-        #print("first: ", firstLayer)
+        if self.printForward:
+            print("first: ", firstLayer[0])
         secondLayer = self.relu(self.ff2(firstLayer))
         
-        #print("second: ", secondLayer)
+        if self.printForward:
+           print("second: ", secondLayer[0])
         thirdLayer = self.relu(self.ff3(secondLayer))
         
-        #print("third: ", thirdLayer)
-        fourthLayer = self.firstGCN(thirdLayer, taskGraphs)
+        if self.printForward:
+           print("third: ", thirdLayer[0]) """
+        fourthLayer = self.firstGCN(X, taskGraphs)
 
-        #print("fourth: ", fourthLayer)
-        fifthLayer = self.relu(self.ff4(fourthLayer))
+        if self.printForward:
+           print("fourth: ", fourthLayer[0])
+        attentionLayer = self.attentionLayer(fourthLayer)[0]
 
-        #print("fifth: ", fifthLayer)
+        if self.printForward:
+           print("attention: ", attentionLayer[0])
+        """         fifthLayer = self.relu(self.ff4(attentionLayer))
+
+        if self.printForward:
+           print("fifth: ", fifthLayer[0])
         sixthLayer = self.relu(self.ff5(fifthLayer))
 
-        #print("sixth: ", sixthLayer)
-        finalLayer = self.sig(self.ff6(sixthLayer))
+        if self.printForward:
+           print("sixth: ", sixthLayer[0]) """
+        finalLayer = self.sig(self.ff6(attentionLayer))
 
-        #print("final: ", finalLayer)
+        if self.printForward:
+           print("final: ", finalLayer[0])
         return finalLayer
 
 
