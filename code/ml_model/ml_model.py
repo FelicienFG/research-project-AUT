@@ -41,8 +41,8 @@ class myGCNmodule(torch.nn.Module):
     """
     def __init__(self, input_dim: int):
         super(myGCNmodule, self).__init__()
-        self.INattentionLayer = AttentionLayer(input_dim, n_heads=5)
-        self.OUTattentionLayer = AttentionLayer(input_dim, n_heads=5)
+        self.INattentionLayer = AttentionLayer(input_dim, n_heads=1)
+        self.OUTattentionLayer = AttentionLayer(input_dim, n_heads=1)
 
         self.linearLayer = torch.nn.Linear(input_dim*2, input_dim)
 
@@ -58,9 +58,9 @@ class myGCNmodule(torch.nn.Module):
                 h_INneighbours = X[taskGraph['G'][node]['in'],:]
                 h_OUTneighbours = X[taskGraph['G'][node]['out'],:]
                 #attention with the in and out neighbours
-                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0][0, :]
+                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0][0,:]
                 attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0][0, :]
-
+                
                 #concatenating the two resulting attentions from in an out neighbours into one vector
                 finalAttentionVector = torch.concat((attention_in, attention_out), dim=0)
                 H_kplus1[node] = torch.nn.functional.elu(self.linearLayer(finalAttentionVector), alpha=1.0, inplace=False)
@@ -78,7 +78,7 @@ class GCNAttention(torch.nn.Module):
         self.ff2 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff3 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.relu = torch.nn.ReLU()
-        self.sig = torch.nn.Sigmoid()
+        self.sig = torch.nn.Tanh()
 
         self.firstGCN  = myGCNmodule(embedding_dim)
 
@@ -90,29 +90,31 @@ class GCNAttention(torch.nn.Module):
 
     def forward(self, X: torch.Tensor, taskGraphs):
         
-        firstLayer = self.relu(self.ff3(self.relu(self.ff2(self.relu(self.ff1(X))))))
+        print("initial: ", X)
+        firstLayer = self.relu(self.ff1(X))
+
+        print("first: ", firstLayer)
+        secondLayer = self.relu(self.ff2(firstLayer))
         
-        secondLayer = self.sig(self.ff6(self.firstGCN(firstLayer, taskGraphs)))
+        print("second: ", secondLayer)
+        thirdLayer = self.relu(self.ff3(secondLayer))
+        
+        print("third: ", thirdLayer)
+        fourthLayer = self.firstGCN(thirdLayer, taskGraphs)
+
+        print("fourth: ", fourthLayer)
+        fifthLayer = self.relu(self.ff4(fourthLayer))
+
+        print("fifth: ", fifthLayer)
+        sixthLayer = self.relu(self.ff5(fifthLayer))
+
+        print("sixth: ", sixthLayer)
+        finalLayer = self.sig(self.ff6(sixthLayer))
+
+        print("final: ", finalLayer)
+        return finalLayer
 
 
-        #print(secondLayer)
-        return secondLayer
-
-
-def attention_test():
-    embed_size = 3
-    n_heads = 3
-    
-    attention_layer = AttentionLayer(embed_size, n_heads)
-
-    X = torch.tensor([[1., 2., 3.],
-                      [4., 5., 6.],
-                      [7., 8., 9.],
-                      [10. ,11., 12.]])
-    
-    output = attention_layer(X)
-
-    print(output)
     
 
 def getAccuracy(output, target):
@@ -167,8 +169,8 @@ def evaluateTiming(model, data_loader, listsOfNumberOfTasks, epsilon):
                               % (numTasks, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
 
 def training_and_eval(model, num_cores):
-    EPOCHS = 1
-    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules')
+    EPOCHS = 0
+    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=20)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
     trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.8, batch_size=5)
 
@@ -211,12 +213,14 @@ def evaluateMakespan(trained_model, data_loader, numcores):
         for id in range(outputs.shape[0]):
             if id == 4:
                 print("model: ", outputs[id])
-                print("ilp: ", valILPoutputs[id])
+            #extract priority lists
             _, model_priorities = torch.max(outputs[id], dim=1)
             _, ilp_priorities = torch.max(valILPoutputs[id], dim=1)
+            #drop out the excess priorities from dummy nodes added beforehand
             model_priorities = (model_priorities[:len(dags[id])]).tolist()
             ilp_priorities = (ilp_priorities[:len(dags[id])]).tolist()
             print("priorities: ", model_priorities, ilp_priorities)
+            #compute makespans
             makespan_model = scheduler.computeMakespan(ms.IntVector(model_priorities), dags[id])
             makespan_ilp = scheduler.computeMakespan(ms.IntVector(ilp_priorities), dags[id])
 
@@ -225,7 +229,7 @@ def evaluateMakespan(trained_model, data_loader, numcores):
 
 if __name__ == "__main__":
 
-    model = GCNAttention(embedding_dim=5)
+    model = GCNAttention(embedding_dim=5, outDim=20)
     pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(pytorch_total_params)
     training_and_eval(model, 2)

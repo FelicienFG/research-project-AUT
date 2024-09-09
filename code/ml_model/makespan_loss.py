@@ -16,7 +16,7 @@ class MakespanLoss(torch.nn.Module):
         """
 
         #applying cross-entropy
-        accu_loss = torch.nn.functional.binary_cross_entropy(output, target_priorities)
+        accu_loss = torch.nn.functional.binary_cross_entropy_with_logits(output, target_priorities)
 
         return accu_loss
 

@@ -242,8 +242,6 @@ class DataLoader:
                     prioMatrix[task][prio] = 1
                 else:
                     prioMatrix[task][prio] = 0
-        if taskID == 123:
-            print("123: \n", prioMatrix, "\npriolist: \n", prioList)
         self.ilpOutputs.append(prioMatrix)
 
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
