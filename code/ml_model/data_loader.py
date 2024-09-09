@@ -198,6 +198,20 @@ def outputAllILPSystemJSON(inputDataFolder, numCores):
         G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
         outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id)
 
+def getMaxNeighbours(adjaList):
+    max_in = 0
+    max_out = 0
+
+    for vertex in adjaList:
+        inNeighbours = len(adjaList[vertex]["in"])
+        outNeighbours = len(adjaList[vertex]["out"])
+
+        if inNeighbours > max_in:
+            max_in = inNeighbours
+        if outNeighbours > max_out:
+            max_out = outNeighbours
+
+    return max_in, max_out
 
 class DataLoader:
 
@@ -247,10 +261,11 @@ class DataLoader:
     def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
         self.taskFeatures.append([])
         crit_path, crit_length = criticalPath(adjaList, 0, wcets)
+        max_in_neighbours, max_out_neighbours = getMaxNeighbours(adjaList)
         for node in adjaList:
             is_source_sink = int(len(adjaList[node]['in']) == 0 or len(adjaList[node]['out']) == 0)
             is_in_critical_path = int(node in crit_path)
-            self.taskFeatures[id].append([wcets[node] / totalW, len(adjaList[node]['in']), len(adjaList[node]['out']), is_source_sink, is_in_critical_path])
+            self.taskFeatures[id].append([wcets[node] / totalW, len(adjaList[node]['in']) / max_in_neighbours, len(adjaList[node]['out']) / max_out_neighbours, is_source_sink, is_in_critical_path])
         self.fillZerosTaskFeatureMatrix(id)
         
     def fillZerosTaskFeatureMatrix(self, taskID):
