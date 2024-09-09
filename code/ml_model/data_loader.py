@@ -284,9 +284,9 @@ class DataLoader:
 
 if __name__ == "__main__":
 
-    #outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
+    outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
     #test_makespan_compute()
-    data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
+    #data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
     
     #pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
     #print(pList)

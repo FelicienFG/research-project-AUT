@@ -90,28 +90,28 @@ class GCNAttention(torch.nn.Module):
 
     def forward(self, X: torch.Tensor, taskGraphs):
         
-        print("initial: ", X)
+        #print("initial: ", X)
         firstLayer = self.relu(self.ff1(X))
 
-        print("first: ", firstLayer)
+        #print("first: ", firstLayer)
         secondLayer = self.relu(self.ff2(firstLayer))
         
-        print("second: ", secondLayer)
+        #print("second: ", secondLayer)
         thirdLayer = self.relu(self.ff3(secondLayer))
         
-        print("third: ", thirdLayer)
+        #print("third: ", thirdLayer)
         fourthLayer = self.firstGCN(thirdLayer, taskGraphs)
 
-        print("fourth: ", fourthLayer)
+        #print("fourth: ", fourthLayer)
         fifthLayer = self.relu(self.ff4(fourthLayer))
 
-        print("fifth: ", fifthLayer)
+        #print("fifth: ", fifthLayer)
         sixthLayer = self.relu(self.ff5(fifthLayer))
 
-        print("sixth: ", sixthLayer)
+        #print("sixth: ", sixthLayer)
         finalLayer = self.sig(self.ff6(sixthLayer))
 
-        print("final: ", finalLayer)
+        #print("final: ", finalLayer)
         return finalLayer
 
 
@@ -169,8 +169,8 @@ def evaluateTiming(model, data_loader, listsOfNumberOfTasks, epsilon):
                               % (numTasks, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
 
 def training_and_eval(model, num_cores):
-    EPOCHS = 0
-    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=20)
+    EPOCHS = 10
+    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
     trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.8, batch_size=5)
 
@@ -200,7 +200,7 @@ def training_and_eval(model, num_cores):
             result_file.write("epoch %i -- avg train loss/accu: %f/%f, avg validation loss/accu: %f/%f\n" 
                 % (epoch_num, avg_train_loss, avg_train_accu, avg_vloss, avg_vaccu))
 
-    evaluateTiming(model, data_loader, [10, 15, 20], 2)
+    evaluateTiming(model, data_loader, [15], 2)
     evaluateMakespan(model, data_loader, data_loader.numCores)
 
 def evaluateMakespan(trained_model, data_loader, numcores):
@@ -229,7 +229,7 @@ def evaluateMakespan(trained_model, data_loader, numcores):
 
 if __name__ == "__main__":
 
-    model = GCNAttention(embedding_dim=5, outDim=20)
+    model = GCNAttention(embedding_dim=5, outDim=15)
     pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(pytorch_total_params)
     training_and_eval(model, 2)

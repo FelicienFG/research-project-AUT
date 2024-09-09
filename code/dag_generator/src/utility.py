@@ -71,6 +71,15 @@ def outputExceedingNodesDagTasks(maxNodes = 20):
             if len(V) > maxNodes:
                 outputFile.write("%i\n" % (id))
 
+def outputLowNodesDagTasks(minNodes = 20):
+    numberOfTasks = len(os.listdir("data/")) // 3
+
+    with open("tasks_to_remove", "a") as outputFile:
+        for id in range(numberOfTasks):
+            _, V, _, _, _, _ = load_task(id, dag_base_folder="data/")
+            if len(V) < minNodes:
+                outputFile.write("%i\n" % (id))
+
 # below is an example of how to use the load function:
 if __name__ == "__main__":
     #G, V, C, _, T, W = load_task(task_idx=0, dag_base_folder="./data/")
@@ -80,4 +89,5 @@ if __name__ == "__main__":
     #print("T: ", T)
     #print("C: ", C)
     #print("W: ", W)
-    outputExceedingNodesDagTasks()
+    outputExceedingNodesDagTasks(15)
+    outputLowNodesDagTasks(15)
