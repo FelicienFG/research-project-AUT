@@ -17,8 +17,17 @@ class MakespanLoss(torch.nn.Module):
 
         #applying cross-entropy
         accu_loss = torch.nn.functional.binary_cross_entropy_with_logits(output, target_priorities)
+        reg_term = 0.0
+        for X in output:
+            avg_dist = 0.0
+            for node_a in range(X.shape[0]):
+                for node_b in range(node_a+1, X.shape[0]):
+                    avg_dist += torch.dist(X[node_a], X[node_b], p=2)
 
-        return accu_loss
+            avg_dist /= X.shape[0]
+            reg_term += avg_dist
+
+        return accu_loss - reg_term
 
 
 

@@ -5,3 +5,10 @@ not learning / same results problem :
 - maybe try having more diverse features ?  --> ok what features ?
 - maybe all three above ? --> nope normalizing nb of neighbours not good
 
+
+Feature representation: need more information about the nodes
+--> - length of longest path going through the node
+    - include some global graph info like length of crit path / total workload
+--> No bad idea
+
+oversmoothing problem: add regularization term instead

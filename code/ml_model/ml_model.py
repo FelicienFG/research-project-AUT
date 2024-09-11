@@ -81,19 +81,21 @@ class GCNAttention(torch.nn.Module):
         self.sig = torch.nn.Tanh()
 
         self.firstGCN  = myGCNmodule(embedding_dim)
+        self.secondGCN  = myGCNmodule(embedding_dim)
+        self.thirdGCN  = myGCNmodule(embedding_dim)
 
         self.attentionLayer = AttentionLayer(embedding_dim, embedding_dim)
 
         self.ff4 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff5 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff6 = torch.nn.Linear(embedding_dim, outDim)
-        self.printForward = True
+        self.printForward = False
 
     def forward(self, X: torch.Tensor, taskGraphs):
         
         if self.printForward:
             print("initial: ", X[0])
-        """         firstLayer = self.relu(self.ff1(X))
+        firstLayer = self.relu(self.ff1(X))
 
         if self.printForward:
             print("first: ", firstLayer[0])
@@ -104,7 +106,7 @@ class GCNAttention(torch.nn.Module):
         thirdLayer = self.relu(self.ff3(secondLayer))
         
         if self.printForward:
-           print("third: ", thirdLayer[0]) """
+           print("third: ", thirdLayer[0])
         fourthLayer = self.firstGCN(X, taskGraphs)
 
         if self.printForward:
@@ -113,14 +115,14 @@ class GCNAttention(torch.nn.Module):
 
         if self.printForward:
            print("attention: ", attentionLayer[0])
-        """         fifthLayer = self.relu(self.ff4(attentionLayer))
+        fifthLayer = self.relu(self.ff4(attentionLayer))
 
         if self.printForward:
            print("fifth: ", fifthLayer[0])
         sixthLayer = self.relu(self.ff5(fifthLayer))
 
         if self.printForward:
-           print("sixth: ", sixthLayer[0]) """
+           print("sixth: ", sixthLayer[0])
         finalLayer = self.sig(self.ff6(attentionLayer))
 
         if self.printForward:
