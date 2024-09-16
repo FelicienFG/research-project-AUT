@@ -124,6 +124,9 @@ def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
     outputJSON['TaskStore'] = []
     outputJSON['DependencyStore'] = []
     for node in graph:
+        is_sink = False
+        if len(graph[node]['out']) == 0:
+            is_sink = True
         outputJSON['TaskStore'].append(
             {
                 "name": ("task_%i" % (node)),
@@ -131,6 +134,7 @@ def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
                 "activationOffset":0,
                 "duration":wcets[node],
                 "period":totalW * totalW,
+                "is_sink": is_sink,
                 "inputs":[
                     "in"
                 ],
@@ -299,9 +303,18 @@ class DataLoader:
 
 if __name__ == "__main__":
 
-    outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
-    #test_makespan_compute()
-    #data = DataLoader("../dag_generator/data/", "../LET-LP-Scheduler/dag_tasks_output_schedules")
+    #outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
     
-    #pList = getOptimalPriorityListFromILPscheduleFile("../LET-LP-Scheduler/dag_tasks_output_schedules/schedule_dag_2.json")
-    #print(pList)
+    data_loader = DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
+
+    msSolver = ms.MakespanSolver(numberOfCores=2)
+    task_108 = data_loader.dagTasks[108]
+    _, ilp_priolist = torch.max(data_loader.ilpOutputs[108], dim=1)
+    ilp_priolist = ilp_priolist.tolist()
+    model_priolist = [14, 14, 14, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]
+
+    ilpMakespan = msSolver.computeMakespan(ilp_priolist, task_108)
+    modelMakespan = msSolver.computeMakespan(model_priolist, task_108)
+
+    print("ilp: ", ilpMakespan, "model: ", modelMakespan)
+

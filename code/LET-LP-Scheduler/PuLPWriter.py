@@ -11,10 +11,11 @@ class  PuLPWriter:
     def __init__(self, filename, objectiveVariable, lpLargeConstant):
         self.prob = pl.LpProblem(filename, pl.LpMinimize)
         self.filename = filename
-        self.objectiveVariable = pl.LpVariable(objectiveVariable, None, None, pl.LpInteger)
+        self.objectiveVariable = pl.LpVariable(objectiveVariable, lowBound=0)#pl.LpVariable(objectiveVariable, None, None, pl.LpInteger)
         self.lpLargeConstant = lpLargeConstant
         
         self.dependencyInstanceDelayVariables = {}
+        self.maxAFTsinkNode = ''
         
         # All variables
         self.vars = {}
@@ -30,7 +31,7 @@ class  PuLPWriter:
         #dependencyInstanceDelays = ' - '.join([x for v in self.dependencyInstanceDelayVariables.values() for x in v])
         #self.write(f"{self.objectiveVariable} - {dependencyInstanceDelays} = 0;\n", "Objective equation")
         #print([self.getIntVar(x) for v in self.dependencyInstanceDelayVariables.values() for x in v])
-        self.prob += self.objectiveVariable == pl.lpSum([self.getIntVar(x) for v in self.dependencyInstanceDelayVariables.values() for x in v])
+        self.prob += self.objectiveVariable == self.getIntVar(self.taskInstEndTime(self.instVarName(self.maxAFTsinkNode, 0)))
 
     def taskOffset(self, taskInstance):
         return f"{taskInstance}_offset"
@@ -83,6 +84,8 @@ class  PuLPWriter:
             taskName = task['name']
             taskWcet = task['wcet']
             taskPeriod = task['period']
+            if task['is_sink'] == True:
+                self.maxAFTsinkNode = taskName
             
             self.writeComment(f"Task instance properties of {taskName}")
             

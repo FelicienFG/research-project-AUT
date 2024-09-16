@@ -22,7 +22,8 @@ DagSubtask *ProcCore::assignTask(DagSubtask *newTask, int timer)
     DagSubtask* taskBuffer = taskExecuting;
     taskExecuting = newTask;
     taskExecuteStartTime = timer;
-
+    /* if(newTask)
+        std::cout<<"core "<<id<<" task: "<<newTask->id<<" start/end: "<<timer<<'/'<<timer + newTask->wcet<<std::endl; */
     return taskBuffer;
 }
 

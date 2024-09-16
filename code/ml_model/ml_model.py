@@ -226,8 +226,6 @@ def evaluateMakespan(trained_model, data_loader, numcores):
     print(train_threshold, total_size)
     with open("results_makespan", "w+") as result_file:
         for id in range(outputs.shape[0]):
-            if id == 4:
-                print("model: ", outputs[id])
             #extract priority lists
             _, model_priorities = torch.max(outputs[id], dim=1)
             _, ilp_priorities = torch.max(valILPoutputs[id], dim=1)
