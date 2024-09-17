@@ -13,6 +13,8 @@ and the ones which fit best to this research will be selected.
 The systematic literature review (SLR) methodology aims at
 looking at the current state-of-the art in a specific domain by selecting a range 
 of articles in the scientific literature\cite{KITCHENHAM2009SLR}.
+The main difference between a simple literature review is that the results need to be reproducable,
+that is, one can get the exact same results by simply following the different steps described by the one writing the SLR.
 This is done by first defining a set of keywords to search for, i.e., a search string, 
 and then identifying the databases to search on.
 The resulting articles are then filtered out using exclusion and/or inclusion criteria
@@ -37,15 +39,21 @@ of artifacts intended to solve practical problems. It emphasizes
 the development of knowledge through the design and implementation 
 of innovative solutions, such as algorithms, methods, tools, 
 and frameworks, particularly in fields like software engineering\cite{Wieringa2010DesignScienceMethod}.
-In this methodology,
+For instance, one might design a new machine learning architecture or a new algorithm to 
+better answer a specific problem, while rigorously detailing the design and evaluation aspect of this new technology or system.
+Indeed, in this methodology,
 the designed artifact(s) need(s) to answer a precise problem,
 defined beforehand, and choices in the design must be clearly justified.
 The evaluation of the artifact(s) needs not only to answer research questions, but also
 demonstrate practical applications,
 thus balancing methodological rigor and practical utility.
 In our case, the problem of scheduling DAG tasks
-has important practical applications and there are space 
-for evaluating new artifacts, to better answer RQ3.
+has important practical applications and according to the SLR, 
+no one looked at supervised learning as a solution to generating priority-lists for 
+global fixed-priority scheduling.
+The non-existence of a supervised learning model implies it needs to be created, or designed,
+which is exactly the purpose of the design science methodology.
+Hence, RQ3 will be answered by designing a supervised learning model and evaluating this potential solution to the fixed-priority DAG task scheduling problem.
 
 \subsection{Case study}
 
@@ -53,7 +61,10 @@ A case study is useful at providing a great understanding of a real-life scenari
 or that is currently happening, illustrating a specific issue with a real-life context.
 In a case study, you look closely at real-life observations to evaluate or investigate
 a design in the context of a real-life scenario\cite{sarah2011caseStudy}.
-One can use a case study methodology to study a specific phenomena and how an application react to it
+It is especially used in the medical field to study and investigate a group of people and their 
+eating habits or look at the effect of placebo in a control group compared to a medical subtsance to be tested
+on a test group.
+One can also use a case study methodology to study a specific phenomena and how an application react to it
 which can lead, in the case of a software application, to finding
 limitations or missing elements.
 Another use of the case study methodology is 
@@ -61,9 +72,13 @@ to address one or more real-life issues by analyzing
 a system using multiple datasets.
 For instance, a case study might design a benchmark for testing 
 certain types of applications.
-In this research, no real-life scenario will be considered and the focus will be on designing an artifact,
-rather than investigating an existing one. 
-Therefore, the case study approach will not be useful to this research.
+In this research, no real-life scenario will be considered as 
+the data collected will be via a DAG task generator because real-life data collection is very time-consuming
+and isn't the focus of this study.
+Indeed, the focus will be on designing an artifact,
+rather than investigating an existing one, simply because there aren't any supervised 
+learning model that has been found in the literature (see Section \ref{sec:literature}). 
+Therefore, the case study approach will not be used in this research.
 
 \subsection{Experiment}
  
@@ -85,17 +100,30 @@ to take into account controlled variables that impact the results
 of the experiment, which is why great care needs to be taken 
 for the design phase of the experiment(s).
 Nonetheless, the controlled experiment approach will be used in this research to validate or invalidate hypotheses
-about the designed AI model performances, especially when compared to the ILP method.\\
+about the designed AI model performances, especially when compared to the ILP method.
+It will answer RQ3 by not only evaluating the model designed using the design science methodology, 
+but also experimenting with different values and parameters that are not part of the evaluation,
+to better grasp the behaviour and performances of the designed model.
+The drawback mentioned previously will be tackled using a random dag generator as well as a 
+large DAG task set, to keep the observational bias to a minimum.
+Cross-validation of the model will also be used to minimize the impact of this drawback.\\
 
 
-On one hand, the SLR can answer research questions 1 and 2,
-by identifying the state-of-the-art and finding gaps in the research.
-Gaps that can be filled, in part, by the design science methodology,
-designing an artifact that will address this / these gap(s).
-On the other hand, the controlled experiment approach
-will be used to analyze the behaviour of the artifact
-according to controlled variables, 
-aiming to answer RQ3.
+The SLR can answer research questions 1 and 2,
+by first collecting and comparing the different papers in the literature
+and then identifying not only the state-of-the-Art for scheduling DAG tasks on real-time systems,
+but also the machine learning techniques that are currently used in the literature as well as their drawbacks and limitations.
+The fact that only very few papers use machine learning to tackle the problem of real-time DAG task scheduling
+motivates the design of a new machine learning model to better answer RQ3 which implies 
+applying the design science methodology to provide a more complete answer as to how a supervised machine learning model 
+can compare to reinforcement learning models, heuristics, and also the ILP method.
+In addition, the controlled experiment approach can help interpret the evaluation results of the designed model by 
+playing with different hyperparameter sets and also  
+ providing an answer to the scalability aspect in RQ3.2.
+The time limitations of this study as well as the fact that the identified SOTA papers
+use a dag task generation script and not real-life dag tasks datasets, makes
+the use of the case study methology not relevant in this research's context and not able to correctly compare the results with 
+the SOTA papers. 
 
 
 \subsection{Hyper Parameters}
