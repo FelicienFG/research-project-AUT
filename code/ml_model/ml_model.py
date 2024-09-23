@@ -183,6 +183,11 @@ def evaluateTiming(model, data_loader, listsOfNumberOfTasks, epsilon):
             result_file.write("%i tasks -- avg %fµs -- %i samples\n" 
                               % (numTasks, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
 
+def write_to_csv(opened_file, input_list):
+    for i in range(len(input_list) - 1):
+        opened_file.write("%f, " % (input_list[i]))
+    opened_file.write("%f\n" % (input_list[len(input_list) - 1]))
+
 def training_and_eval(model, num_cores):
     EPOCHS = 10
     data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
@@ -190,30 +195,40 @@ def training_and_eval(model, num_cores):
     trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.8, batch_size=5)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
+    train_loss_scores = []
+    val_loss_scores = []
+    train_accu_scores = []
+    val_accu_scores = []
 
+    for epoch_num in range(EPOCHS):
+        #train
+        model.train(True)
+        avg_train_loss, avg_train_accu = train_one_epoch(model, epoch_num, trainDataBatches, data_loader, optimizer, loss_fn)
 
+        #evaluation
+        # Set the model to evaluation mode, disabling dropout and using population
+        # statistics for batch normalization.
+        model.eval()
+
+        # Disable gradient computation and reduce memory consumption.
+        with torch.no_grad():
+            voutputs = model(valTaskFeatures, valTasks)
+            vloss = loss_fn(voutputs, valILPoutputs)
+            avg_vloss = vloss / valILPoutputs.shape[0]
+            avg_vaccu = getAccuracy(voutputs, valILPoutputs)
+
+        print("epoch %i -- avg train loss/accu: %f/%f, avg validation loss/accu: %f/%f\n" 
+            % (epoch_num, avg_train_loss, avg_train_accu, avg_vloss, avg_vaccu))
+        train_loss_scores.append(avg_train_loss)
+        train_accu_scores.append(avg_train_accu)
+        val_loss_scores.append(avg_vloss)
+        val_accu_scores.append(avg_vaccu)
+                    
     with open("results_lossaccu", "w+") as result_file:
-        for epoch_num in range(EPOCHS):
-            #train
-            model.train(True)
-            avg_train_loss, avg_train_accu = train_one_epoch(model, epoch_num, trainDataBatches, data_loader, optimizer, loss_fn)
-
-            #evaluation
-            # Set the model to evaluation mode, disabling dropout and using population
-            # statistics for batch normalization.
-            model.eval()
-
-            # Disable gradient computation and reduce memory consumption.
-            with torch.no_grad():
-                voutputs = model(valTaskFeatures, valTasks)
-                vloss = loss_fn(voutputs, valILPoutputs)
-                avg_vloss = vloss / valILPoutputs.shape[0]
-                avg_vaccu = getAccuracy(voutputs, valILPoutputs)
-
-            print("epoch %i -- avg train loss/accu: %f/%f, avg validation loss/accu: %f/%f\n" 
-                % (epoch_num, avg_train_loss, avg_train_accu, avg_vloss, avg_vaccu))
-            result_file.write("epoch %i -- avg train loss/accu: %f/%f, avg validation loss/accu: %f/%f\n" 
-                % (epoch_num, avg_train_loss, avg_train_accu, avg_vloss, avg_vaccu))
+        write_to_csv(result_file, train_loss_scores)
+        write_to_csv(result_file, val_loss_scores)
+        write_to_csv(result_file, train_accu_scores)
+        write_to_csv(result_file, val_accu_scores)
 
     evaluateTiming(model, data_loader, [15], 2)
     evaluateMakespan(model, data_loader, data_loader.numCores)

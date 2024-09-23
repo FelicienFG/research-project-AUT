@@ -7,8 +7,8 @@ def read_data_from_file(filename):
         lines = file.readlines()
 
         # Assuming the file has exactly two lines of comma-separated values
-        list1 = list(map(float, lines[0].strip().split(',')))
-        list2 = list(map(float, lines[1].strip().split(',')))
+        list1 = list(map(float, lines[2].strip().split(',')))
+        list2 = list(map(float, lines[3].strip().split(',')))
 
     return list1, list2
 
@@ -17,7 +17,7 @@ def plot_curves(list1, list2):
     plt.figure(figsize=(10, 5))
     
     # Plotting the first list with label 'train'
-    plt.plot(list1, label='train', marker='o', linestyle='-')
+    plt.plot(list1, label='training', marker='o', linestyle='-')
     
     # Plotting the second list with label 'validation'
     plt.plot(list2, label='validation', marker='x', linestyle='--')

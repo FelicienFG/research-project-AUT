@@ -1,0 +1,83 @@
+\section{System design}
+\label{sec:system_design}
+~
+
+No supervised learning model has been designed to 
+tackle the non-preemptive, global fixed-priority scheduling problem 
+for DAG tasks.
+Therefore, we must first design a supervised learning model.
+
+In supervised learning, the machine learning model 
+predicts an output (forward pass) and then computes the error between
+the predicted output and a known true output.
+The gradient of the error function is then propagated through the network to tweak the model's 
+trainable parameters, which is also called the backward pass (see Figure \ref{fig:supervised_learning}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/supervised_learning_diagram.drawio.png}
+    \caption{The supervised learning method.}
+    \label{fig:supervised_learning}
+\end{figure}
+
+\subsection{Supervised design}
+~
+
+\subsubsection{Input DAGs}
+~
+
+Each input DAG  task will be represented using 
+a matrix of numbers with each row being a node
+and each column being a raw feature of a node.
+The list of raw features is similar to what is proposed by \citet{Lee2021GlobalDagSchedDRL},
+that is :
+\begin{list}{}{}
+    \item - the normalized wcet of the node, i.e., $C_i / L$ for node $i$ with $L$ being the total workload ;
+    \item - the number of incoming neighbours ;
+    \item - the number of outgoing neighbours ;
+    \item - a boolean value of whether the node is the source or sink node ;
+    \item - a boolean value of whether the node is part of the critical path of the DAG.
+\end{list}
+
+The wcet is widely used as a criteria for priority-list scheduling algorithm (RM, EDF\cite{buttazzo2005RMvsEDF}, etc.)
+but it needs to be normalized to have the context information of the whole graph.
+The number of incoming and outgoing neighbours makes it possible 
+to take into account the inner structure of the graph to compute the execution order.
+The source and sink nodes are particular nodes in that their priority
+is not important because they will respectively execute first and last due to their dependency constraints.
+Finally, the critical path plays a huge role in state-of-the-art heuristics\cite{He2019DagIntra}\cite{zhao2020DAGsched},
+with nodes in the critical path often having higher priorities than those
+that aren't.
+An example of such a DAG task representation is shown in Figure \ref{fig:dag_task_matrix_example}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/dag_matrix_example.drawio.png}
+    \caption{Example dag task with 5 nodes a total workload of 12
+    and the matrix representation of each node with the column respectively being the above list of features.}
+    \label{fig:dag_task_matrix_example}
+\end{figure}
+
+\subsubsection{Output labels}
+~
+
+An Integer Linear Programming (ILP) solver will be used to compute
+the optimal (minimum makespan) schedule for each DAG task and then
+ordering the nodes according to their release time in the ILP schedule.
+
+The output of the model will be a matrix of probabilities,
+with each row being the index of a node and each column being the index of the priority.
+There are as many priorities as there are nodes and 
+the priority list of each DAG is then retrieved using the column
+index of the maximum probability as the assigned probability, for each row.
+Matrix output example for the DAG task shown in Figure \ref{fig:dag_task_matrix_example}
+is shown in Figure \ref{fig:dag_output_matrix_example}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/output_matrix_example.drawio.png}
+    \caption{Example of an matrix output from the model, the predicted list of priorities
+    is retrieved from the probabilities.}
+    \label{fig:dag_output_matrix_example}
+\end{figure}
+
