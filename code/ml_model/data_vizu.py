@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # Function to read data from file and return two lists of values
 def read_data_from_file(filename):
@@ -11,6 +12,31 @@ def read_data_from_file(filename):
         list2 = list(map(float, lines[3].strip().split(',')))
 
     return list1, list2
+
+def plot_barchart(csv_file):
+
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+    print(df)
+    # Assuming the first two columns are the ones to be used for the bars
+    first_column = df.columns[0]
+    second_column = df.columns[1]
+
+    # Create the bar chart
+    plt.bar([first_column, second_column], [df[first_column].mean(), df[second_column].mean()], width=0.4, label=[first_column, second_column], color=['blue', 'red'], align='center')
+    #plt.bar([first_column, second_column], df[second_column].mean(), width=0.4, label=second_column, align='center')
+
+    # Add labels and title
+    plt.xlabel('Index')
+    plt.ylabel('Makespan')
+    plt.title('Average makespan for the Model and ILP methods')
+
+    # Show legend
+    plt.legend()
+
+    # Display the plot
+    plt.show()
+
 
 # Function to plot two lists as curves
 def plot_curves(list1, list2):
@@ -36,9 +62,10 @@ def plot_curves(list1, list2):
 
 # Main function to execute the program
 def main():
-    filename = 'results_lossaccu'  # Change this to your file's path
-    list1, list2 = read_data_from_file(filename)
-    plot_curves(list1, list2)
+    filename = 'results_makespan'  # Change this to your file's path
+    #list1, list2 = read_data_from_file(filename)
+    #plot_curves(list1, list2)
+    plot_barchart(filename)
 
 # Execute the main function
 if __name__ == '__main__':

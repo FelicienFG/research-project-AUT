@@ -240,6 +240,7 @@ def evaluateMakespan(trained_model, data_loader, numcores):
     outputs = trained_model(valTaskFeatures, valTasks)
     print(train_threshold, total_size)
     with open("results_makespan", "w+") as result_file:
+        result_file.write("model, ilp\n")
         for id in range(outputs.shape[0]):
             #extract priority lists
             _, model_priorities = torch.max(outputs[id], dim=1)
@@ -252,7 +253,7 @@ def evaluateMakespan(trained_model, data_loader, numcores):
             makespan_model = scheduler.computeMakespan(ms.IntVector(model_priorities), dags[id])
             makespan_ilp = scheduler.computeMakespan(ms.IntVector(ilp_priorities), dags[id])
 
-            result_file.write("makespan model %i -- makespan ilp %i -- task id: %i\n" % (makespan_model, makespan_ilp, id))
+            result_file.write("%i, %i\n" % (makespan_model, makespan_ilp))
     
 
 if __name__ == "__main__":
