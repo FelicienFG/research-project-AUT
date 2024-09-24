@@ -76,8 +76,29 @@ is shown in Figure \ref{fig:dag_output_matrix_example}.
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/output_matrix_example.drawio.png}
-    \caption{Example of an matrix output from the model, the predicted list of priorities
+    \caption{Example of an matrix output from the model, the predicted list of priorities (on the right)
     is retrieved from the probabilities.}
     \label{fig:dag_output_matrix_example}
 \end{figure}
+
+The ILP output matrix to compare the predicted output to is of the same shape
+as the predicted output matrix with the probabilities being 1 on the optimal priority for each row 
+, and 0 otherwise.
+
+\subsubsection{Loss function}
+~
+
+The problem is being treated as a classification problem,
+hence the binary cross-entropy loss function will be used.
+This function is defined as follows :
+\[
+    loss(x, y) = \sum_{i=1}^{n} -y_i\log(x_i),
+\]
+where $x$ is the flattened matrix representing the predicted output,
+$y$ is the flattened matrix representing the true output (ILP output),
+and $n$ is the number of element in $x$ and $y$.
+
+
+\subsection{Model design}
+~
 
