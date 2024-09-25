@@ -30,9 +30,11 @@ public:
      * 
      * @param priorityList the indices must correspond to the ID of subtasks
      * @param dagTask the indices must correspond to the ID of each dag subtask.
+     * @param priorityOrder if equal to 1 then the lower the priority value, the higher the execution priority, if equal
+     * to -1, the higher the priority value, the higher the execution priority.
      * @return the exact makespan when scheduled on a preemptive GFPS
      */
-    int computeMakespan(const std::vector<int>& priorityList, std::vector<DagSubtask> dagTask);
+    int computeMakespan(const std::vector<int>& priorityList, std::vector<DagSubtask> dagTask, int priorityOrder = 1);
 
     /**
      * @brief gives the priority list that gives the minimum makespan for a specific DAG task,

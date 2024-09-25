@@ -458,8 +458,8 @@ class MakespanSolver(object):
     def __init__(self, numberOfCores=4):
         _makespan_solver.MakespanSolver_swiginit(self, _makespan_solver.new_MakespanSolver(numberOfCores))
 
-    def computeMakespan(self, priorityList, dagTask):
-        return _makespan_solver.MakespanSolver_computeMakespan(self, priorityList, dagTask)
+    def computeMakespan(self, priorityList, dagTask, priorityOrder=1):
+        return _makespan_solver.MakespanSolver_computeMakespan(self, priorityList, dagTask, priorityOrder)
 
     def computeBestPriorityList(self, dagTask):
         return _makespan_solver.MakespanSolver_computeBestPriorityList(self, dagTask)

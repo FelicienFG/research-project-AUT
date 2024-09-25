@@ -12224,7 +12224,62 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan(PyObject *self, PyObject *args) {
+SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan__SWIG_0(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
+  PyObject *resultobj = 0;
+  MakespanSolver *arg1 = (MakespanSolver *) 0 ;
+  std::vector< int,std::allocator< int > > *arg2 = 0 ;
+  std::vector< DagSubtask,std::allocator< DagSubtask > > arg3 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 = SWIG_OLDOBJ ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int result;
+  
+  (void)self;
+  if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_MakespanSolver, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MakespanSolver_computeMakespan" "', argument " "1"" of type '" "MakespanSolver *""'"); 
+  }
+  arg1 = reinterpret_cast< MakespanSolver * >(argp1);
+  {
+    std::vector< int,std::allocator< int > > *ptr = (std::vector< int,std::allocator< int > > *)0;
+    res2 = swig::asptr(swig_obj[1], &ptr);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "MakespanSolver_computeMakespan" "', argument " "2"" of type '" "std::vector< int,std::allocator< int > > const &""'"); 
+    }
+    if (!ptr) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "MakespanSolver_computeMakespan" "', argument " "2"" of type '" "std::vector< int,std::allocator< int > > const &""'"); 
+    }
+    arg2 = ptr;
+  }
+  {
+    std::vector< DagSubtask,std::allocator< DagSubtask > > *ptr = (std::vector< DagSubtask,std::allocator< DagSubtask > > *)0;
+    int res = swig::asptr(swig_obj[2], &ptr);
+    if (!SWIG_IsOK(res) || !ptr) {
+      SWIG_exception_fail(SWIG_ArgError((ptr ? res : SWIG_TypeError)), "in method '" "MakespanSolver_computeMakespan" "', argument " "3"" of type '" "std::vector< DagSubtask,std::allocator< DagSubtask > >""'"); 
+    }
+    arg3 = *ptr;
+    if (SWIG_IsNewObj(res)) delete ptr;
+  }
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "MakespanSolver_computeMakespan" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
+  result = (int)(arg1)->computeMakespan((std::vector< int,std::allocator< int > > const &)*arg2,arg3,arg4);
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  if (SWIG_IsNewObj(res2)) delete arg2;
+  return resultobj;
+fail:
+  if (SWIG_IsNewObj(res2)) delete arg2;
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan__SWIG_1(PyObject *self, Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   MakespanSolver *arg1 = (MakespanSolver *) 0 ;
   std::vector< int,std::allocator< int > > *arg2 = 0 ;
@@ -12232,11 +12287,10 @@ SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan(PyObject *self, PyObje
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 = SWIG_OLDOBJ ;
-  PyObject *swig_obj[3] ;
   int result;
   
   (void)self;
-  if (!SWIG_Python_UnpackTuple(args, "MakespanSolver_computeMakespan", 3, 3, swig_obj)) SWIG_fail;
+  if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_MakespanSolver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "MakespanSolver_computeMakespan" "', argument " "1"" of type '" "MakespanSolver *""'"); 
@@ -12269,6 +12323,64 @@ SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan(PyObject *self, PyObje
 fail:
   if (SWIG_IsNewObj(res2)) delete arg2;
   return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_MakespanSolver_computeMakespan(PyObject *self, PyObject *args) {
+  Py_ssize_t argc;
+  PyObject *argv[5] = {
+    0
+  };
+  
+  if (!(argc = SWIG_Python_UnpackTuple(args, "MakespanSolver_computeMakespan", 0, 4, argv))) SWIG_fail;
+  --argc;
+  if (argc == 3) {
+    int _v = 0;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_MakespanSolver, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = swig::asptr(argv[1], (std::vector< int,std::allocator< int > >**)(0));
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = swig::asptr(argv[2], (std::vector< DagSubtask,std::allocator< DagSubtask > >**)(0));
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          return _wrap_MakespanSolver_computeMakespan__SWIG_1(self, argc, argv);
+        }
+      }
+    }
+  }
+  if (argc == 4) {
+    int _v = 0;
+    void *vptr = 0;
+    int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_MakespanSolver, 0);
+    _v = SWIG_CheckState(res);
+    if (_v) {
+      int res = swig::asptr(argv[1], (std::vector< int,std::allocator< int > >**)(0));
+      _v = SWIG_CheckState(res);
+      if (_v) {
+        int res = swig::asptr(argv[2], (std::vector< DagSubtask,std::allocator< DagSubtask > >**)(0));
+        _v = SWIG_CheckState(res);
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
+          if (_v) {
+            return _wrap_MakespanSolver_computeMakespan__SWIG_0(self, argc, argv);
+          }
+        }
+      }
+    }
+  }
+  
+fail:
+  SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'MakespanSolver_computeMakespan'.\n"
+    "  Possible C/C++ prototypes are:\n"
+    "    MakespanSolver::computeMakespan(std::vector< int,std::allocator< int > > const &,std::vector< DagSubtask,std::allocator< DagSubtask > >,int)\n"
+    "    MakespanSolver::computeMakespan(std::vector< int,std::allocator< int > > const &,std::vector< DagSubtask,std::allocator< DagSubtask > >)\n");
+  return 0;
 }
 
 

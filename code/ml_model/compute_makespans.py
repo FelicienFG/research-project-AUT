@@ -29,7 +29,7 @@ def convertDictPrioritiesToIntVector(prios):
 
 if __name__ == "__main__":
 
-    numCores = 5
+    numCores = 2
     msSolver = ms.MakespanSolver(numCores)
     #dags custom have in and out neighbours in the adjacency list
     dags, dags_custom = load_all_tasks('../dag_generator/data/')
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         prio_zhao2020 = convertDictPrioritiesToIntVector(Eligiblity_Ordering_PA(dags[i]['G'], dags[i]['C']))
         prio_he2019 = convertDictPrioritiesToIntVector(TPDS_Ordering_PA(dags[i]['G'], dags[i]['C']))
         
-        makespan_zhao2020 = msSolver.computeMakespan(prio_zhao2020, dagsVector[i])
+        makespan_zhao2020 = msSolver.computeMakespan(prio_zhao2020, dagsVector[i], -1)
         makespan_he2019 = msSolver.computeMakespan(prio_he2019, dagsVector[i])
 
         makespans["zhao2020"].append(makespan_zhao2020)

@@ -16,12 +16,25 @@ namespace
     }
 }
 
-static auto dagSubtaskCompare = [](const DagSubtask* left, const DagSubtask* right)
+class dagSubtaskCompare 
 {
-    return left->priority > right->priority;
+public:
+    int priorityOrder;
+
+    dagSubtaskCompare(int _priorityOrder = 1)
+        :priorityOrder(_priorityOrder){}
+
+    bool operator()(const DagSubtask* left, const DagSubtask* right)
+    {
+        if(priorityOrder == -1)
+            return left->priority < right->priority;
+        
+        return left->priority > right->priority;
+         
+    }
 };
 
-typedef std::priority_queue<DagSubtask*, std::vector<DagSubtask*>, decltype(dagSubtaskCompare)> dagReadyQueue;
+typedef std::priority_queue<DagSubtask*, std::vector<DagSubtask*>, dagSubtaskCompare> dagReadyQueue;
 
 int minPosWorkload(const std::vector<ProcCore>& cores, int timer)
 {
@@ -102,14 +115,15 @@ void printwaitinglist(const std::vector<DagSubtask*>& list)
         std::cout<<task->id<<" ";
 }
 
-int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::vector<DagSubtask> dagTask)
+int MakespanSolver::computeMakespan(const std::vector<int> &priorityList, std::vector<DagSubtask> dagTask, int priorityOrder)
 {
     for(unsigned i = 0;i<priorityList.size();++i)
         dagTask[i].priority = priorityList[i];
 
     //first initialize the different arrays and queue
     std::vector<DagSubtask*> waitingList;
-    dagReadyQueue readyList(dagSubtaskCompare);
+    dagReadyQueue readyList{dagSubtaskCompare(priorityOrder)};
+        
     std::vector<ProcCore> cores;
     int timer = 0;
 
