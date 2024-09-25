@@ -27,7 +27,7 @@ class MakespanLoss(torch.nn.Module):
             avg_dist /= X.shape[0]
             reg_term += avg_dist
 
-        return accu_loss + 1.0 / reg_term
+        return accu_loss + 1.0 / (reg_term * reg_term)
 
 
 

@@ -8,25 +8,59 @@ import random as rand
 import time
 import copy
 
+#torch.autograd.set_detect_anomaly(True)
+
+class AttentionModule(torch.nn.Module):
+
+    def __init__(self, embedding_dim):
+        super(AttentionModule, self).__init__()
+
+        self.W_sum = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+        self.W_alpha = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
+        self.a_alpha = torch.nn.Parameter(torch.rand(embedding_dim, 1))
+        self.b_alpha = torch.nn.Parameter(torch.rand(embedding_dim, 1))
+
+    def forward(self, X):
+        """
+        it is assumed that X[0] is h_i and X[1:] are its neighbours
+        """
+        alpha_ij = torch.zeros((X.shape[0], 1))
+        final_sum = torch.zeros_like(X)
+        
+        for j in range(X.shape[0]):
+            
+            a_w = torch.matmul(self.a_alpha.T, self.W_alpha)
+            b_w = torch.matmul(self.b_alpha.T, self.W_alpha)
+            alpha_exponent = torch.matmul(a_w, X[0].T) + torch.matmul(b_w, X[j].T)
+            alpha_ij[j] = torch.exp(alpha_exponent)
+            final_sum[j] = alpha_ij[j].clone() * X[j]
+        
+        sum_output = torch.div(torch.sum(final_sum, dim=0), torch.sum(alpha_ij))
+        final_output = torch.matmul(sum_output, self.W_sum)
+
+        return final_output
 
 class AttentionLayer(torch.nn.Module):
 
-    def __init__(self, embedding_dim, n_heads = 1):
+    def __init__(self, embedding_dim, n_heads = 2):
         """
         embedding dim is the dimension of the feature vectors, i.e., the numbers of feature for each input vector
         """
         super(AttentionLayer, self).__init__()
-        self.mha = torch.nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=n_heads)
-        self.Wq = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
-        self.Wk = torch.nn.Parameter(torch.rand(embedding_dim, embedding_dim))
-        self.Wv = torch.nn.Parameter(torch.rand( embedding_dim, embedding_dim))
+        
+        self.elu = torch.nn.ELU()
+        self.linear = torch.nn.Linear(embedding_dim * n_heads, embedding_dim)
 
-    def forward(self, X: torch.Tensor):
-        queries = torch.matmul(X, self.Wq)
-        keys = torch.matmul(X, self.Wk)
-        values = torch.matmul(X, self.Wv)
+        self.inAttention = AttentionModule(embedding_dim)
+        self.outAttention = AttentionModule(embedding_dim)
 
-        attention_output = self.mha(queries, keys, values, need_weights=False)
+    def forward(self, X_in: torch.Tensor, X_out: torch.Tensor):
+
+        attentionINresult = self.inAttention(X_in)
+        attentionOUTresult = self.outAttention(X_out)
+
+        attention_output = torch.concat((attentionINresult, attentionOUTresult), dim=0)
+        attention_output = self.elu(self.linear(attention_output))
 
         return attention_output
 
@@ -41,8 +75,7 @@ class myGCNmodule(torch.nn.Module):
     """
     def __init__(self, input_dim: int):
         super(myGCNmodule, self).__init__()
-        self.INattentionLayer = AttentionLayer(input_dim, n_heads=1)
-        self.OUTattentionLayer = AttentionLayer(input_dim, n_heads=1)
+        self.attentionLayer = AttentionLayer(input_dim)
 
         self.linearLayer = torch.nn.Linear(input_dim*2, input_dim)
 
@@ -58,12 +91,10 @@ class myGCNmodule(torch.nn.Module):
                 h_INneighbours = X[taskGraph['G'][node]['in'],:]
                 h_OUTneighbours = X[taskGraph['G'][node]['out'],:]
                 #attention with the in and out neighbours
-                attention_in = self.INattentionLayer(torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0))[0][0,:]
-                attention_out = self.OUTattentionLayer(torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0))[0][0, :]
+                attention_in = torch.concat((h_k.unsqueeze(0), h_INneighbours), dim=0)
+                attention_out = torch.concat((h_k.unsqueeze(0), h_OUTneighbours), dim=0)
                 
-                #concatenating the two resulting attentions from in an out neighbours into one vector
-                finalAttentionVector = torch.concat((attention_in, attention_out), dim=0)
-                H_kplus1[node] = torch.nn.functional.elu(self.linearLayer(finalAttentionVector), alpha=1.0, inplace=False)
+                H_kplus1[node] = self.attentionLayer(attention_in, attention_out)
 
             H_kplus1_batch[batch] = H_kplus1
 
@@ -83,8 +114,6 @@ class GCNAttention(torch.nn.Module):
         self.firstGCN  = myGCNmodule(embedding_dim)
         self.secondGCN  = myGCNmodule(embedding_dim)
         self.thirdGCN  = myGCNmodule(embedding_dim)
-
-        self.attentionLayer = AttentionLayer(embedding_dim, embedding_dim)
 
         self.ff4 = torch.nn.Linear(embedding_dim, embedding_dim)
         self.ff5 = torch.nn.Linear(embedding_dim, embedding_dim)
@@ -107,15 +136,11 @@ class GCNAttention(torch.nn.Module):
         
         if self.printForward:
            print("third: ", thirdLayer[0])
-        fourthLayer = self.firstGCN(X, taskGraphs)
+        fourthLayer = self.thirdGCN(self.secondGCN(self.firstGCN(X, taskGraphs), taskGraphs), taskGraphs)
 
         if self.printForward:
            print("fourth: ", fourthLayer[0])
-        attentionLayer = self.attentionLayer(fourthLayer)[0]
-
-        if self.printForward:
-           print("attention: ", attentionLayer[0])
-        fifthLayer = self.relu(self.ff4(attentionLayer))
+        fifthLayer = self.relu(self.ff4(fourthLayer))
 
         if self.printForward:
            print("fifth: ", fifthLayer[0])
@@ -123,7 +148,7 @@ class GCNAttention(torch.nn.Module):
 
         if self.printForward:
            print("sixth: ", sixthLayer[0])
-        finalLayer = self.sig(self.ff6(attentionLayer))
+        finalLayer = self.sig(self.ff6(fifthLayer))
 
         if self.printForward:
            print("final: ", finalLayer[0])
