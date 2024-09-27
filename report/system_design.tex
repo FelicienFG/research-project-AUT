@@ -91,9 +91,10 @@ as the predicted output matrix with the probabilities being 1 on the optimal pri
 The problem is being treated as a classification problem,
 hence the binary cross-entropy loss function will be used.
 This function is defined as follows :
-\[
-    loss(x, y) = \sum_{i=1}^{n} -y_i\log(x_i),
-\]
+\begin{equation}
+    loss(x, y) = \sum_{i=1}^{n} -y_i\log(x_i)
+\end{equation}
+    
 where $x$ is the flattened matrix representing the predicted output,
 $y$ is the flattened matrix representing the true output (ILP output),
 and $n$ is the number of element in $x$ and $y$.
@@ -113,3 +114,58 @@ Two feed forward networks and one attention-based graph convolutional network (s
     \label{fig:model_diagram}
 \end{figure}
 
+\subsubsection{Feed forward networks}
+~
+
+The two feed forward networks have 3 layers with each 
+layer $n$ producing the following output,
+where $W_n \in \mathbb{R}^{5\times5}$ is the matrix of trainable weights
+at layer $n$, $b_n \in \mathbb{R}^5$ is the bias and $X_n$ is either a node's vector representation
+or the output of the previous layer, and $ReLU(x) = max(0, x)$:
+\begin{equation}
+    o_{n} = ReLU(W_{n}X_{n} + b_n),\, n \in \{1,2,3\}
+\end{equation}
+There is an exception for the second feed forward network where the last 
+layer's output is computed using the following equation:
+\begin{equation}
+    o_{3} = \tanh(W_{3}X_{3} + b_3)
+\end{equation}
+where $W_3 \in \mathbb{R}^{nbPriorities \times 5}$,
+$b_3 \in \mathbb{R}^{nbPriorities}$ and $\tanh$ is the 
+hyperbolic tangent activation function.
+Also, $nbPriorities$ corresponds to the number of different priorities
+that can be assigned to each node.
+
+
+\subsubsection{Graph Convolutional Network}
+~
+
+
+For each gcn layer, the input vector $X_k$ 
+goes through an aggregation phase where,
+given the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
+$v_i$, and the set of outgoing neighbours $\mathcal{N}_{out}(v_i)$, which also includes $v_i$,
+the next vector representation $X_{k+1}$ is calculated by the following equations:
+
+$$
+\begin{array}{l}
+AttentionModule(X_i) = \sum_{j \in \mathcal{N}(v_i)} \alpha_{ij} X_j
+\end{array}
+$$
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/gcn_update_aggregate_diagram.png}
+    \caption{Diagram of the graph convolution network layer. $X_k$ is the transformed node vector representation
+    and ELU is the exponential linear unit function (see Equation \ref{eq:elu}).}
+    \label{fig:update_aggregate_diagram}
+\end{figure}
+
+\begin{equation}
+\text{ELU}(x) = 
+\begin{cases}
+x, & \text{if } x > 0 \\
+\exp(x) - 1, & \text{if } x \leq 0
+\end{cases}
+\label{eq:elu}
+\end{equation}
