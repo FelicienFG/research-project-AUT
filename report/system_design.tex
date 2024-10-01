@@ -169,3 +169,30 @@ x, & \text{if } x > 0 \\
 \end{cases}
 \label{eq:elu}
 \end{equation}
+
+
+% config for 20,30 nodes : 
+%  "dag_config": {
+%    "parallelism": 8,
+%    "layer_num_min": 5,
+%    "layer_num_max": 8,
+% config for 10 nodes :
+%"dag_config": {
+%    "parallelism": 8,
+%    "layer_num_min": 3,
+%    "layer_num_max": 8,
+% config for 40 nodes :
+%"dag_config": {
+%    "parallelism": 8,
+%    "layer_num_min": 7,
+%    "layer_num_max": 10,
+% config for 50 nodes :
+%"dag_config": {
+%    "parallelism": 8,
+%    "layer_num_min": 10,
+%    "layer_num_max": 15,
+%config for varying number of parallelism (n=30nodes)
+%"dag_config": {
+%    "parallelism": [4-6, 7],
+%    "layer_num_min": 8, (5 for p = 7)
+%    "layer_num_max": 13, (10 for p = 7)
