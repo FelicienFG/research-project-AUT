@@ -12,7 +12,7 @@ import os
 import json
 import networkx as nx
 from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
-import pygraphviz as pgv
+#import pygraphviz as pgv
 
 from random import seed, randint, random
 
@@ -367,19 +367,19 @@ class DAG:
 
     def save(self, basefolder="./data/"):
         # layout graph
-        A = nx.nx_agraph.to_agraph(self.G)
+        #A = nx.nx_agraph.to_agraph(self.G)
 
         #print("G", self.G.graph)
         #print(A)
 
-        A.layout(prog='dot')
+        #A.layout(prog='dot')
 
         # create basefolder (if not exists)
         if not os.path.exists(basefolder):
             os.makedirs(basefolder)
 
         # save graph (png)
-        A.draw(basefolder + self.name + '.png', format="png")
+        #A.draw(basefolder + self.name + '.png', format="png")
         
         # save graph (gpickle)
         with open(basefolder + self.name + '.gpickle', 'wb') as f:

@@ -196,7 +196,7 @@ def filledUpAdjaListAndWcets(adjalist, wcets, maxNodes):
     return filledUpAdjalist, filledUpWcets
 
 def outputAllILPSystemJSON(inputDataFolder, numCores):
-    numberOfTasks = len(os.listdir(inputDataFolder)) // 3
+    numberOfTasks = len(os.listdir(inputDataFolder)) // 2
 
     for id in range(numberOfTasks):
         G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
