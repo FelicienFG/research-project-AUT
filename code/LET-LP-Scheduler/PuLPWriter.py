@@ -5,8 +5,8 @@ class  PuLPWriter:
     
     def listAvalaibleSolvers(self):
         solver_list = pl.listSolvers(onlyAvailable=True)
-        print("Avaliable Solver on System:" + solver_list)
-        print("Supported Solvers: "+pl.listSolvers())
+        #print("Avaliable Solver on System:" + solver_list)
+        #print("Supported Solvers: "+pl.listSolvers())
 
     def __init__(self, filename, objectiveVariable, lpLargeConstant):
         self.prob = pl.LpProblem(filename, pl.LpMinimize)
@@ -323,7 +323,7 @@ class  PuLPWriter:
     def solve(self, solverName):
         solverDict = {#'keepFiles': 0,
                      'mip': True,
-                     'msg': True,
+                     'msg': False,
                      #'options': [],
                      'solver': solverName,
                      'timeLimit': None,

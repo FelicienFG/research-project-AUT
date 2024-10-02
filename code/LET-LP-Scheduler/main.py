@@ -166,8 +166,8 @@ def lpScheduler(system):
 
         
         while lookingForBetterSolution:
-            print()
-            print(f"Iteration {timesRan} ... {taskDependencyPair}")
+            #print()
+            #print(f"Iteration {timesRan} ... {taskDependencyPair}")
             timesRan += 1
             if (system.get("CoreStore") is None or len(system.get("CoreStore")) ==0 ):
                 system["CoreStore"] = [{'name': 'c1', 'speedup': 1}] #needed for old version of the exported file before multicore support
@@ -214,7 +214,7 @@ def lpScheduler(system):
                 for v in lp.prob.variables():
                     results[str(v.name)] = v.varValue
 
-            print("Results:")
+            #print("Results:")
             if len(results) == 0 :
                 # If there are no results, then the problem is infeasible
                 print("LetSynchronise system is unschedulable!")
@@ -225,8 +225,8 @@ def lpScheduler(system):
                 delayVariableUpperBounds = {}
             else:
                 # Problem is feasible
-                print("LetSynchronise system is schedulable")
-                print(f"Current summation of task dependency delays: {results[Config.objectiveVariable]} ns")
+                #print("LetSynchronise system is schedulable")
+                #print(f"Current summation of task dependency delays: {results[Config.objectiveVariable]} ns")
                 lastDelays = results[Config.objectiveVariable]
                 # Create the task schedule that is encoded in the LP solution
                 lastFeasibleSchedule = exportSchedule(system, lp, allTaskInstances, results, Config)
@@ -234,7 +234,7 @@ def lpScheduler(system):
                 # Determine upper bounds needed to tighten the dependency delays in the next iteration 
                 delayVariablesToTighten = lp.dependencyInstanceDelayVariables[taskDependencyPair]
                 delayVariableUpperBounds = tightenProblemSpace(lp, results)       
-            print("--------")
+            #print("--------")
                 
             # If all instances of a LET task share the same parameters, then no more improvements are possible.
             if not Config.individualLetInstanceParams:
@@ -243,8 +243,8 @@ def lpScheduler(system):
         if not Config.individualLetInstanceParams:
             break
             
-    print(f"Iterated a total of {timesRan} times")
-    print(f"Final summation of task dependency delays: {lastDelays} ns")
+    #print(f"Iterated a total of {timesRan} times")
+    #print(f"Final summation of task dependency delays: {lastDelays} ns")
     return lastFeasibleSchedule
 
 def tightenProblemSpace(lp, results):
@@ -329,10 +329,10 @@ def exportSchedule(system, lp, allTaskInstances, results, Config):
 
 if __name__ == '__main__':
     avaliableSolvers = pl.listSolvers(onlyAvailable=True)
-    print("LET-LP-Scheduler")
-    print("----------------")
-    print("Supported Solvers ['GLPK_CMD', 'PYGLPK', 'CPLEX_CMD', 'CPLEX_PY', 'CPLEX_DLL', 'GUROBI', 'GUROBI_CMD', 'MOSEK', 'XPRESS', 'PULP_CBC_CMD', 'COIN_CMD', 'COINMP_DLL', 'CHOCO_CMD', 'MIPCL_CMD', 'SCIP_CMD']")
-    print("Avaliable Solver on this PC: "+str(avaliableSolvers))
+    #print("LET-LP-Scheduler")
+    #print("----------------")
+    #print("Supported Solvers ['GLPK_CMD', 'PYGLPK', 'CPLEX_CMD', 'CPLEX_PY', 'CPLEX_DLL', 'GUROBI', 'GUROBI_CMD', 'MOSEK', 'XPRESS', 'PULP_CBC_CMD', 'COIN_CMD', 'COINMP_DLL', 'CHOCO_CMD', 'MIPCL_CMD', 'SCIP_CMD']")
+    #print("Avaliable Solver on this PC: "+str(avaliableSolvers))
     parser = argparse.ArgumentParser()
     parser.add_argument("--infile", type=str, default="")
     parser.add_argument("--outfile", type=str, default="")
@@ -356,7 +356,7 @@ if __name__ == '__main__':
     if args.solver in avaliableSolvers:
         Config.solverProg = args.solver
 
-    print(f"Solver: {Config.solverProg}")
+    #print(f"Solver: {Config.solverProg}")
 
     # Specify a LET system model file and create a schedule, or run in webserver mode for the LetSynchronise plugin.
     if len(args.infile) > 0 and len(args.outfile) > 0:
