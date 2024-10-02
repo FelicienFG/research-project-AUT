@@ -13,6 +13,7 @@ The formulation in this implementation supports multicores as well.
 # Import web server libraries
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import socketserver 
+import os
 
 # Import the required libraries
 import sys
@@ -342,6 +343,14 @@ if __name__ == '__main__':
     Config.os = sys.platform
     if Config.os == "win32":
         Config.exeSuffix = ".exe"
+
+    #create out file if it doesn't exist
+    src_path = os.path.abspath(os.path.dirname(__file__))
+    outdir = os.path.abspath(os.path.dirname(args.outfile))
+
+    outdir_path = os.path.join(src_path, outdir)
+    if not os.path.exists(outdir_path):
+        os.makedirs(outdir_path)
     
     # Set the LP solver
     if args.solver in avaliableSolvers:

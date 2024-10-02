@@ -1,0 +1,945 @@
+{
+    "CoreStore": [
+        {
+            "name": "c0",
+            "speedup": 1
+        },
+        {
+            "name": "c1",
+            "speedup": 1
+        },
+        {
+            "name": "c2",
+            "speedup": 1
+        },
+        {
+            "name": "c3",
+            "speedup": 1
+        }
+    ],
+    "TaskStore": [
+        {
+            "name": "task_0",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 94,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 94,
+            "acet": 94,
+            "bcet": 94,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_5",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 24,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 24,
+            "acet": 24,
+            "bcet": 24,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_1",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 14,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 14,
+            "acet": 14,
+            "bcet": 14,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_2",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 18,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 18,
+            "acet": 18,
+            "bcet": 18,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_3",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 89,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 89,
+            "acet": 89,
+            "bcet": 89,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_4",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 23,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 23,
+            "acet": 23,
+            "bcet": 23,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_6",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 35,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 35,
+            "acet": 35,
+            "bcet": 35,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_7",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 43,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 43,
+            "acet": 43,
+            "bcet": 43,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_8",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 67,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 67,
+            "acet": 67,
+            "bcet": 67,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_11",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 46,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 46,
+            "acet": 46,
+            "bcet": 46,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_9",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 14,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 14,
+            "acet": 14,
+            "bcet": 14,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_12",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 102,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 102,
+            "acet": 102,
+            "bcet": 102,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_10",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 83,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 83,
+            "acet": 83,
+            "bcet": 83,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_13",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 78,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 78,
+            "acet": 78,
+            "bcet": 78,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_15",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 5,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 5,
+            "acet": 5,
+            "bcet": 5,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_16",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 20,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 20,
+            "acet": 20,
+            "bcet": 20,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_14",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 116,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 116,
+            "acet": 116,
+            "bcet": 116,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_19",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 6,
+            "period": 1004004,
+            "is_sink": true,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 6,
+            "acet": 6,
+            "bcet": 6,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_18",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 60,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 60,
+            "acet": 60,
+            "bcet": 60,
+            "distribution": "Uniform"
+        },
+        {
+            "name": "task_17",
+            "initialOffset": 0,
+            "activationOffset": 0,
+            "duration": 65,
+            "period": 1004004,
+            "is_sink": false,
+            "inputs": [
+                "in"
+            ],
+            "outputs": [
+                "out"
+            ],
+            "wcet": 65,
+            "acet": 65,
+            "bcet": 65,
+            "distribution": "Uniform"
+        }
+    ],
+    "DependencyStore": [
+        {
+            "name": "v0v5",
+            "source": {
+                "task": "task_0",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_5",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v0v1",
+            "source": {
+                "task": "task_0",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_1",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v0v2",
+            "source": {
+                "task": "task_0",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_2",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v0v3",
+            "source": {
+                "task": "task_0",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_3",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v0v4",
+            "source": {
+                "task": "task_0",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_4",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v6",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_6",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v7",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_7",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v8",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_8",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v9",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_9",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v10",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_10",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v5v11",
+            "source": {
+                "task": "task_5",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_11",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v1v6",
+            "source": {
+                "task": "task_1",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_6",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v1v7",
+            "source": {
+                "task": "task_1",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_7",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v1v8",
+            "source": {
+                "task": "task_1",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_8",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v1v11",
+            "source": {
+                "task": "task_1",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_11",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v2v6",
+            "source": {
+                "task": "task_2",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_6",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v2v7",
+            "source": {
+                "task": "task_2",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_7",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v2v8",
+            "source": {
+                "task": "task_2",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_8",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v2v9",
+            "source": {
+                "task": "task_2",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_9",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v2v12",
+            "source": {
+                "task": "task_2",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_12",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v3v11",
+            "source": {
+                "task": "task_3",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_11",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v3v12",
+            "source": {
+                "task": "task_3",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_12",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v4v7",
+            "source": {
+                "task": "task_4",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_7",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v4v8",
+            "source": {
+                "task": "task_4",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_8",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v4v10",
+            "source": {
+                "task": "task_4",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_10",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v4v11",
+            "source": {
+                "task": "task_4",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_11",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v4v12",
+            "source": {
+                "task": "task_4",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_12",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v6v13",
+            "source": {
+                "task": "task_6",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v6v15",
+            "source": {
+                "task": "task_6",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_15",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v6v16",
+            "source": {
+                "task": "task_6",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_16",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v7v15",
+            "source": {
+                "task": "task_7",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_15",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v8v13",
+            "source": {
+                "task": "task_8",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v11v13",
+            "source": {
+                "task": "task_11",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v11v14",
+            "source": {
+                "task": "task_11",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_14",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v9v13",
+            "source": {
+                "task": "task_9",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v9v14",
+            "source": {
+                "task": "task_9",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_14",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v9v15",
+            "source": {
+                "task": "task_9",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_15",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v9v16",
+            "source": {
+                "task": "task_9",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_16",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v12v13",
+            "source": {
+                "task": "task_12",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v12v16",
+            "source": {
+                "task": "task_12",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_16",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v10v13",
+            "source": {
+                "task": "task_10",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_13",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v10v14",
+            "source": {
+                "task": "task_10",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_14",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v10v15",
+            "source": {
+                "task": "task_10",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_15",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v10v16",
+            "source": {
+                "task": "task_10",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_16",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v13v19",
+            "source": {
+                "task": "task_13",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_19",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v15v17",
+            "source": {
+                "task": "task_15",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_17",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v15v18",
+            "source": {
+                "task": "task_15",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_18",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v16v19",
+            "source": {
+                "task": "task_16",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_19",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v14v18",
+            "source": {
+                "task": "task_14",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_18",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v18v19",
+            "source": {
+                "task": "task_18",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_19",
+                "port": "in"
+            }
+        },
+        {
+            "name": "v17v19",
+            "source": {
+                "task": "task_17",
+                "port": "out"
+            },
+            "destination": {
+                "task": "task_19",
+                "port": "in"
+            }
+        }
+    ]
+}

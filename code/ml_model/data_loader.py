@@ -11,6 +11,7 @@ import json
 import parse
 import heapq
 import random as rand
+import sys
 import time
 
 def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
@@ -111,9 +112,9 @@ def test_makespan_compute():
 
     print(makespan)
 
-def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
+def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID, dag_file):
     outputJSON = {}
-    outputFile = '../LET-LP-Scheduler/dag_tasks_input_files/multicore_system_DAGtask_%i.json' % (dagTaskID)
+    outputFile = '../LET-LP-Scheduler/%s/multicore_system_DAGtask_%i.json' % (dag_file, dagTaskID)
 
     #first add the cores
     outputJSON['CoreStore'] = []
@@ -195,12 +196,20 @@ def filledUpAdjaListAndWcets(adjalist, wcets, maxNodes):
 
     return filledUpAdjalist, filledUpWcets
 
-def outputAllILPSystemJSON(inputDataFolder, numCores):
+def outputAllILPSystemJSON(inputDataFolder, numCores, dag_file):
     numberOfTasks = len(os.listdir(inputDataFolder)) // 2
+    #if the output folder doesn't exist, then create it first
+    src_path = os.path.abspath(os.path.dirname(__file__))
+    scheduler_path = os.path.abspath(os.path.join(src_path, os.pardir, 'LET-LP-Scheduler'))
+
+
+    dag_file_path = os.path.join(scheduler_path, dag_file)
+    if not os.path.exists(dag_file_path):
+        os.makedirs(dag_file_path)
 
     for id in range(numberOfTasks):
         G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
-        outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id)
+        outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id, dag_file)
 
 def getMaxNeighbours(adjaList):
     max_in = 0
@@ -301,13 +310,20 @@ class DataLoader:
 
         return self.taskFeatures[tasks_ids], tasks_ids
 
+
 if __name__ == "__main__":
 
-    #outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
+    data_file = sys.argv[1]
+    dag_file = sys.argv[2]
+    num_cores = int(sys.argv[3])
+    #print(sys.argv[3])
+    outputAllILPSystemJSON("../dag_generator/%s/" % (data_file), numCores=num_cores, dag_file=dag_file)
     
-    data_loader = DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
 
-    msSolver = ms.MakespanSolver(numberOfCores=2)
+    #test makespan calculation
+    #data_loader = DataLoader('../dag_generator/datap8n30/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
+
+    ''' msSolver = ms.MakespanSolver(numberOfCores=2)
     task_108 = data_loader.dagTasks[108]
     _, ilp_priolist = torch.max(data_loader.ilpOutputs[108], dim=1)
     ilp_priolist = ilp_priolist.tolist()
@@ -316,5 +332,5 @@ if __name__ == "__main__":
     ilpMakespan = msSolver.computeMakespan(ilp_priolist, task_108)
     modelMakespan = msSolver.computeMakespan(model_priolist, task_108)
 
-    print("ilp: ", ilpMakespan, "model: ", modelMakespan)
+    print("ilp: ", ilpMakespan, "model: ", modelMakespan) '''
 
