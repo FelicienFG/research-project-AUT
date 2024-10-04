@@ -3,7 +3,7 @@
 p=8
 n_list="10 20 30 40 50"
 m_list="2 4 6 7 8"
-total_cores=90
+total_cores=20
 
 compute_schedules_parallel()
 {
