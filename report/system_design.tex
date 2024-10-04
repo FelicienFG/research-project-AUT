@@ -145,13 +145,36 @@ For each gcn layer, the input vector $X_k$
 goes through an aggregation phase where,
 given the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
 $v_i$, and the set of outgoing neighbours $\mathcal{N}_{out}(v_i)$, which also includes $v_i$,
-the next vector representation $X_{k+1}$ is calculated by the following equations:
+the next vector representation $X_{k+1}$ is calculated by the following equation:
 
-$$
-\begin{array}{l}
-AttentionModule(X_i) = \sum_{j \in \mathcal{N}(v_i)} \alpha_{ij} X_j
-\end{array}
-$$
+\begin{equation}
+GCN(X) = AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i))
+\end{equation}
+
+where $AttentionModule$ is defined by the Equations \ref{eq:attention_module}--\ref{eq:elu}:
+
+\begin{multline}
+    AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i)) = \\
+    ELU\left( W \left( Att(X, \mathcal{N}_{in}(v_i)) \oplus Att(X, \mathcal{N}_{out}(v_i)) \right) + b \right)
+    \label{eq:attention_module}
+\end{multline}
+
+\begin{equation}
+Att(X, \mathcal{N}(v_i)) = W\sum_{j \in \mathcal{N}(v_i)} \alpha_{ij} X_j
+\label{eq:attention_submodule}
+\end{equation}
+Where 
+\begin{equation}
+    \alpha_{ij} = \frac{\exp \left ({ a ^{T} W X_{i} + b ^{T} W X_{j} }\right )}
+    {{\sum _{k \in \mathcal {N}(v_{i})}} \exp \left ({ a ^{T} W X_{i} + b ^{T} W X_{k} }\right )}
+\end{equation}
+
+are the attention coefficients
+which evaluates how important is $v_j$ to $v_i$'s vector 
+representation, similar to what is done in \citet{Lee2021GlobalDagSchedDRL}.
+
+Every $W$, $a$, and $b$ represent a different matrix of trainable parameters,
+and $\text{ELU}$ is the exponential linear unit activation function (Equation \ref{eq:elu}).
 
 \begin{figure}
     \centering
@@ -169,6 +192,44 @@ x, & \text{if } x > 0 \\
 \end{cases}
 \label{eq:elu}
 \end{equation}
+
+
+The idea behind using attention is to make the model 
+take into account the inner structure of the graph by 
+looking at the importance of each node
+compared to its neighbour nodes.
+The GCN layer can be repeated several times 
+to improve the model's capacity to better
+capture the complexity of the graph structure.
+Unfortunately, when testing with 3 GCN layers,
+we ran into an oversmoothing problem\cite{chen2020oversmoothing}, which lead us 
+to restrict the number of GCN layers to just one layer.
+
+\subsection{Computing the labels}
+~
+
+\citet{yip2023letsynchronise} proposed an ILP-based
+scheduling solver for event-chains of time-triggered tasks
+using the Logical Execution Time paradigm\cite{kirsch2012logical}.
+Their work aimed at minimizing the sum of dependency delays 
+between the job instances of each task and they have recently added
+support for multicore architectures\footnote{https://github.com/mkuo005/LET-LP-Scheduler}.
+It is this solver that will be slightly modified and used for computing the labels.
+The main modification is to replace the objective function,
+which initially was the sum of dependency delays (see the paper \cite{yip2023letsynchronise} for more details),
+ by the end execution time
+of the sink node (i.e., the makespan) of the graph.
+This effectively makes the program minimize the makespan for an input graph
+which is precisely what we want.
+The other modifications involve setting the configuration parameters $useOffset$,
+$useHeterogeneousCores$ and $restrictTaskInstancesToSameCore$ to
+$False$.
+
+To convert the input DAG task to an event-chain of LET task,
+each node of the graph is considered as a LET task with the 
+LET interval being the wcet of the node and every node of a DAG task
+have the same period which is two times the total workload of the DAG.
+
 
 
 % config for 20,30 nodes : 
