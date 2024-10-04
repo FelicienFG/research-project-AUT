@@ -2,12 +2,12 @@
 
 
 i=0
-#while :
-#do
+while :
+do
   #backup every half an hour
-  #sleep 1800;
+  sleep 900;
   git add . ;
   git commit -m "ILP schedules computation save number $i" ;
   git push ;
   i=$((i+1));
-#done
+done
