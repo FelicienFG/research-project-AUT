@@ -10,6 +10,7 @@ def getMissingFilesList():
 
     for n in n_list:
         for m in m_list:
+          if not (m == 2 and (n == 30 or n == 40 or n == 50)):
             folder = "dag_m%ip%in%i_input_files" % (m,p,n)
             folder_output = "dag_m%ip%in%i_output_schedules" % (m,p,n)
             with open("missing_file_ids_m%ip%in%i" % (m, p, n), 'r') as id_file:
@@ -34,7 +35,7 @@ def compute_schedules(start_id, end_id, files_list):
 def main():
 
     missingFilesList = getMissingFilesList()
-    numProcs = 8
+    numProcs = 90
     numTasks = len(missingFilesList)
 
     task_step = numTasks // numProcs
