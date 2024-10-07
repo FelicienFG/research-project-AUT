@@ -140,7 +140,6 @@ that can be assigned to each node.
 \subsubsection{Graph Convolutional Network}
 ~
 
-
 For each gcn layer, the input vector $X_k$ 
 goes through an aggregation phase where,
 given the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
@@ -173,7 +172,7 @@ are the attention coefficients
 which evaluates how important is $v_j$ to $v_i$'s vector 
 representation, similar to what is done in \citet{Lee2021GlobalDagSchedDRL}.
 
-Every $W$, $a$, and $b$ represent a different matrix of trainable parameters,
+Every $W$, $a$, and $b$ are different matrices of trainable parameters,
 and $\text{ELU}$ is the exponential linear unit activation function (Equation \ref{eq:elu}).
 
 \begin{figure}
@@ -208,29 +207,63 @@ to restrict the number of GCN layers to just one layer.
 \subsection{Computing the labels}
 ~
 
+\subsubsection{Computing the optimal schedule}
+
 \citet{yip2023letsynchronise} proposed an ILP-based
 scheduling solver for event-chains of time-triggered tasks
 using the Logical Execution Time paradigm\cite{kirsch2012logical}.
 Their work aimed at minimizing the sum of dependency delays 
 between the job instances of each task and they have recently added
 support for multicore architectures\footnote{https://github.com/mkuo005/LET-LP-Scheduler}.
-It is this solver that will be slightly modified and used for computing the labels.
-The main modification is to replace the objective function,
-which initially was the sum of dependency delays (see the paper \cite{yip2023letsynchronise} for more details),
- by the end execution time
-of the sink node (i.e., the makespan) of the graph.
-This effectively makes the program minimize the makespan for an input graph
-which is precisely what we want.
+
+Although their minimizing problem is slightly different from ours, 
+we can convert our minimizing problem and then use their LET solver by converting each DAG task 
+to an event-chain of LET task.
+To do this, each node needs to be converted to an LET task which 
+implies adding an initial offset, activation offset, LET interval duration and a period
+to every node.
+Hence, for each node, the initial offset and activation offset will
+be set to 0 and the LET interval duration will be set to the node's wcet.
+For the period, every node in a DAG will have the same period which will
+be equal to the total workload squared.
+The wcet of a node will be the wcet of its LET task version.
+Lastly, each path in the DAG will represent an even-chain of tasks.
+
+Unfortunately, minimzing the sum of dependency delays (i.e., Equation 6 in \citet{yip2023letsynchronise}) is not equivalent
+to minimizing the makespan of a DAG (see Figure \ref{fig:counter_example_minsumdep})
+but we can change the objective function to the end execution time
+of the sink node, i.e., the node which doesn't have any successors,
+which is the definition of the makespan.
+This effectively makes the solver minimize the makespan of DAG task
+which is precisely the problem at stakes.
 The other modifications involve setting the configuration parameters $useOffset$,
 $useHeterogeneousCores$ and $restrictTaskInstancesToSameCore$ to
-$False$.
+$False$\footnote{See the github repository for more details \url{https://github.com/FelicienFG/research-project-AUT/}.}.
 
-To convert the input DAG task to an event-chain of LET task,
-each node of the graph is considered as a LET task with the 
-LET interval being the wcet of the node and every node of a DAG task
-have the same period which is two times the total workload of the DAG.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/Tau_108.png}
+    \includegraphics[width=\linewidth]{images/schedule_example_ilpfail.png}
+    \includegraphics[width=\linewidth, height=50px]{images/schedule_example_ilpfail_better.png}
+    \caption{Example of a DAG task (very top image) where the schedule that the ILP solver outputs (the top schedule)
+    produces a longer makespan (64) but smaller sum of dependencies delays (400) than 
+    the schedule shown at the bottom with a makespan of 63 and a sum of dependencies delays of 427.}
+    \label{fig:counter_example_minsumdep}
+\end{figure}
 
+\subsubsection{Computing the optimal priority-list}
+~
 
+Once the optimal schedule (i.e., the schedule yielding the minimum makespan)
+is computed,
+the optimal priority-list can be obtained from the schedule 
+by looking at the start times of each node and increasing the priority 
+according to the node's start time.
+The sooner the start time, the higher the priority.
+
+For instance, for the non-optimal schedule shown in Figure \ref{fig:counter_example_minsumdep} (the one at the top),
+the corresponding priority-list would be 0 for node $\tau_1$, 1 for node $\tau_4$,
+etc, i.e., $[0, 3, 2, 1]$
 
 % config for 20,30 nodes : 
 %  "dag_config": {
