@@ -8,6 +8,6 @@ for m in $m_list ;
 do
     for n in $n_list ; 
     do
-        ./compute_missing_files.sh "dag_m${m}p${p}n${n}_input_files" "dag_m${m}${p}${n}_output_schedules" "missing_file_ids_m${m}p${p}n${n}" &
+        ./compute_missing_files.sh "dag_m${m}p${p}n${n}_input_files" "dag_m${m}p${p}n${n}_output_schedules" "missing_file_ids_m${m}p${p}n${n}" &
     done
 done

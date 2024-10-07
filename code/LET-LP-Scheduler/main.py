@@ -370,7 +370,7 @@ if __name__ == '__main__':
             scheduleFile.close()
             
         except FileNotFoundError as e:
-            print(f"Unable to open \"{args.file}\"!")
+            print(f"Unable to open \"{args.infile}\" or \"{args.outfile}\"!")
             print(e)
             traceback.print_exc()
             
