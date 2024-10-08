@@ -12,6 +12,12 @@ predicts an output (forward pass) and then computes the error between
 the predicted output and a known true output.
 The gradient of the error function is then propagated through the network to tweak the model's 
 trainable parameters, which is also called the backward pass (see Figure \ref{fig:supervised_learning}).
+The issue with the supervised method is that we need to have true labels,
+that is priority list that we know lead to the minimum makespan.
+However, the problem is NP-hard which makes the computation
+of those true labels expensive. The idea behind this supervised
+method is to leverage the amount of training time with the performance
+and scalability of the model, once it is trained.
 
 \begin{figure}
     \centering
@@ -60,7 +66,7 @@ An example of such a DAG task representation is shown in Figure \ref{fig:dag_tas
 
 \subsubsection{Output labels}
 ~
-
+\label{sec:output_labels}
 An Integer Linear Programming (ILP) solver will be used to compute
 the optimal (minimum makespan) schedule for each DAG task and then
 ordering the nodes according to their release time in the ILP schedule.
@@ -83,8 +89,18 @@ is shown in Figure \ref{fig:dag_output_matrix_example}.
 
 The ILP output matrix to compare the predicted output to is of the same shape
 as the predicted output matrix with the probabilities being 1 on the optimal priority for each row 
-, and 0 otherwise.
-
+, and 0 otherwise. For instance, if the optimal priority list for a DAG task of 3 nodes 
+is [$\tau_1$: 0, $\tau_2$: 2, $\tau_3$: 1],
+then the true label is the matrix :
+$$
+\begin{pmatrix}
+    1 & 0 & 0\\
+    0 & 0 & 1\\
+    0 & 1 & 0
+\end{pmatrix}
+$$
+With each row representing $\tau_1$, $\tau_2$ and $\tau_3$ respectively,
+and the column represent the priorities 0, 1 and 2 respectively.
 \subsubsection{Loss function}
 ~
 
@@ -243,11 +259,13 @@ $False$\footnote{See the github repository for more details \url{https://github.
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{images/Tau_108.png}
-    \includegraphics[width=\linewidth]{images/schedule_example_ilpfail.png}
-    \includegraphics[width=\linewidth, height=50px]{images/schedule_example_ilpfail_better.png}
-    \caption{Example of a DAG task (very top image) where the schedule that the ILP solver outputs (the top schedule)
+    \includegraphics[width=\linewidth, height=70px]{images/schedule_ilp_fail_correct.png}
+    \par Schedule a)
+    \includegraphics[width=\linewidth, height=55px]{images/schedule_example_ilpfail_better.png}
+    \par Schedule b)
+    \caption{Example of a DAG task (top image) where the schedule that the ILP solver outputs (the schedule a))
     produces a longer makespan (64) but smaller sum of dependencies delays (400) than 
-    the schedule shown at the bottom with a makespan of 63 and a sum of dependencies delays of 427.}
+    the schedule b) with a makespan of 63 and a sum of dependencies delays of 427.}
     \label{fig:counter_example_minsumdep}
 \end{figure}
 
@@ -261,9 +279,45 @@ by looking at the start times of each node and increasing the priority
 according to the node's start time.
 The sooner the start time, the higher the priority.
 
-For instance, for the non-optimal schedule shown in Figure \ref{fig:counter_example_minsumdep} (the one at the top),
+For instance, for the non-optimal schedule shown in Figure \ref{fig:counter_example_minsumdep} (schedule a)),
 the corresponding priority-list would be 0 for node $\tau_1$, 1 for node $\tau_4$,
-etc, i.e., $[0, 3, 2, 1]$
+etc, i.e., [$\tau_1$: 0, $\tau_2$: 3, $\tau_3$: 2, $\tau_4$: 1, $\tau_5$: 4, $\tau_6$: 6, $\tau_7$: 5, $\tau_8$: 8,
+ $\tau_9$: 10, $\tau_10$: 7, $\tau_11$: 9, $\tau_12$: 11, $\tau_13$: 13, $\tau_14$: 12, $\tau_15$: 14].
+This priority list is then converted to a matrix by the process described
+at the end of Section \ref{sec:output_labels}.
+
+\subsection{Makespan calculation}
+~
+
+The main performance metric that will be used in the evaluation
+is the makespan, i.e., the end execution time of the sink node of a DAG.
+The exact computation of the makespan is done by simulating a 
+simple non-preemptive global fixed-priority scheduler, for which the algorithm
+is described in the Figure \ref{fig:algo_makespan}.
+The basic idea is to have a ready queue that contains the nodes
+that have their precedence constraints met
+and the nodes still waiting to have their dependencies met 
+are in the waiting list. Each loop iteration, the waiting list and ready queue
+are updated and the first idle processor gets the node at the top of 
+the ready priority queue (see Figure \ref{fig:algo_makespan} and \ref{fig:algo_makespan_details}).
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/makespan_computation_algorithm_global.png}
+    \caption{Top view of the makespan computation algorithm.}
+    \label{fig:algo_makespan}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/makespan_computation_algorithm_assign.png}
+    \caption{Algorithms for assigning the highest priority node (or subtask) to a processor (top)
+    and for incrementing the timer to the next scheduling point (bottom).}
+    \label{fig:algo_makespan_details}
+\end{figure}
+
+The implementation will be done in C++ with bindings to python to make
+the makespan computation faster.
 
 % config for 20,30 nodes : 
 %  "dag_config": {
