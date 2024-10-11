@@ -136,7 +136,7 @@ class GCNAttention(torch.nn.Module):
         
         if self.printForward:
            print("third: ", thirdLayer[0])
-        fourthLayer = self.thirdGCN(self.secondGCN(self.firstGCN(X, taskGraphs), taskGraphs), taskGraphs)
+        fourthLayer = self.firstGCN(X, taskGraphs)
 
         if self.printForward:
            print("fourth: ", fourthLayer[0])
@@ -196,28 +196,34 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
     return running_loss / len(batches), avg_training_accu / len(batches)
 
 
-def evaluateTiming(model, data_loader, listsOfNumberOfTasks, epsilon):
+def evaluateTiming(model, numCores, listsOfNumberOfTasks, maxTasks=100):
     
+    p=8
+    m=numCores
     with open("results_time", "w") as result_file:
-        for numTasks in listsOfNumberOfTasks:
-            data, ids = data_loader.getTasksWithFixedNumNodes(numTasks, epsilon)
+        result_file.write("tasks, avgtime, samples\n")
+        for n in listsOfNumberOfTasks:
+            data_loader = dl.DataLoader('../dag_generator/data_p%in%i' % (p, n), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules' % (m,p,n), numCores, n, maxTasks)
+            data, ids = data_loader.getTasksWithFixedNumNodes(n, 0)
             start = time.time_ns()
             _ = model(data, [data_loader.tasksFilledUp[id] for id in ids])
             end = time.time_ns()
-            print(len(ids), numTasks)
-            result_file.write("%i tasks -- avg %fµs -- %i samples\n" 
-                              % (numTasks, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
+            print("eval timing for ", n, " tasks")
+            result_file.write("%i, %f, %i\n" 
+                              % (n, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
 
 def write_to_csv(opened_file, input_list):
     for i in range(len(input_list) - 1):
         opened_file.write("%f, " % (input_list[i]))
     opened_file.write("%f\n" % (input_list[len(input_list) - 1]))
 
-def training_and_eval(model, num_cores):
-    EPOCHS = 10
-    data_loader = dl.DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.8, batch_size=5)
+def training_and_eval(num_cores, numTasks, p=8, learn_rate=0.001, batch_size=250, epochs=10):
+    model = GCNAttention(embedding_dim=5, outDim=15)
+    EPOCHS = epochs
+    data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (p, numTasks), '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15, maxTasks=1400)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
+    #0.7145 to have 
+    trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7145, batch_size=batch_size)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
     train_loss_scores = []
@@ -249,14 +255,13 @@ def training_and_eval(model, num_cores):
         val_loss_scores.append(avg_vloss)
         val_accu_scores.append(avg_vaccu)
                     
-    with open("results_lossaccu", "w+") as result_file:
+    with open("results_lossaccu_m%ip%in%i_lr%f_bs%i_epochs%i" % (num_cores, p, numTasks, learn_rate, batch_size, epochs), "w+") as result_file:
         write_to_csv(result_file, train_loss_scores)
         write_to_csv(result_file, val_loss_scores)
         write_to_csv(result_file, train_accu_scores)
         write_to_csv(result_file, val_accu_scores)
 
-    evaluateTiming(model, data_loader, [15], 2)
-    evaluateMakespan(model, data_loader, data_loader.numCores)
+    torch.save(model.state_dict(), 'model_weights_m%ip%in%i_lr%f_bs%i_epochs%i.pth' % (num_cores, p, numTasks, learn_rate, batch_size, epochs))
 
 def evaluateMakespan(trained_model, data_loader, numcores):
     scheduler = ms.MakespanSolver(numcores)
@@ -283,8 +288,14 @@ def evaluateMakespan(trained_model, data_loader, numcores):
 
 if __name__ == "__main__":
 
-    model = GCNAttention(embedding_dim=5, outDim=15)
-    pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    print(pytorch_total_params)
-    training_and_eval(model, 2)
+    for n in [10,20]:
+        for lr in [10**(-i) for i in range(1, 10)]:
+            for bs in [10*x for x in range(1, 31)]:
+                training_and_eval(2, n, p=8, learn_rate=lr, batch_size=bs)
+
+    for m in [4,6,7,8]:
+        for n in [10,20,30]:
+            for lr in [10**(-i) for i in range(1, 10)]:
+                for bs in [10*x for x in range(1, 31)]:
+                    training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs)
 

@@ -228,8 +228,10 @@ def getMaxNeighbours(adjaList):
 
 class DataLoader:
 
-    def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30):
-        self.numberOfTasks = len(os.listdir(input_data_folder)) // 3
+    def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30, maxTasks = -1):
+        self.numberOfTasks = len(os.listdir(input_data_folder)) // 2
+        if maxTasks > 0:
+            self.numberOfTasks = maxTasks
         self.dataFolder = input_data_folder
         self.ilpSchedulesFolder = ilp_schedules_folder
         self.maxNodesPerDag = maxNodesPerDag
