@@ -218,11 +218,11 @@ def write_to_csv(opened_file, input_list):
     opened_file.write("%f\n" % (input_list[len(input_list) - 1]))
 
 def training_and_eval(num_cores, numTasks, p=8, learn_rate=0.001, batch_size=250, epochs=10):
-    model = GCNAttention(embedding_dim=5, outDim=15)
+    model = GCNAttention(embedding_dim=5, outDim=numTasks)
     EPOCHS = epochs
-    data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (p, numTasks), '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15, maxTasks=1400)
+    data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (p, numTasks), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules' % (num_cores, p, numTasks), numCores=num_cores, maxNodesPerDag=numTasks, maxTasks=1400)
     optimizer = torch.optim.SGD(model.parameters(), lr=learn_rate)
-    #0.7145 to have 
+    #0.7145 to have 1000 training 400 test
     trainDataBatches, (valTasks, valTaskFeatures, valILPoutputs) = data_loader.train_val_split(train_percentage=0.7145, batch_size=batch_size)
 
     loss_fn = makespan_loss.MakespanLoss(num_cores)
@@ -289,13 +289,15 @@ def evaluateMakespan(trained_model, data_loader, numcores):
 if __name__ == "__main__":
 
     for n in [10,20]:
+      for epochs in [10*epo for epo in range(1, 11)]:
         for lr in [10**(-i) for i in range(1, 10)]:
             for bs in [10*x for x in range(1, 31)]:
                 training_and_eval(2, n, p=8, learn_rate=lr, batch_size=bs)
 
     for m in [4,6,7,8]:
         for n in [10,20,30]:
-            for lr in [10**(-i) for i in range(1, 10)]:
-                for bs in [10*x for x in range(1, 31)]:
-                    training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs)
+          for epochs in [10*epo for epo in range(1, 11)]:
+              for lr in [10**(-i) for i in range(1, 10)]:
+                  for bs in [10*x for x in range(1, 31)]:
+                      training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs)
 
