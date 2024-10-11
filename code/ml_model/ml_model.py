@@ -7,6 +7,7 @@ import makespan_loss
 import random as rand
 import time
 import copy
+import sys
 
 #torch.autograd.set_detect_anomaly(True)
 
@@ -288,16 +289,11 @@ def evaluateMakespan(trained_model, data_loader, numcores):
 
 if __name__ == "__main__":
 
-    for n in [10,20]:
-      for epochs in [10*epo for epo in range(1, 11)]:
-        for lr in [10**(-i) for i in range(1, 10)]:
-            for bs in [10*x for x in range(1, 31)]:
-                training_and_eval(2, n, p=8, learn_rate=lr, batch_size=bs)
+  m=int(sys.argv[1])
+  n=int(sys.argv[2])
+  epochs=int(sys.argv[3])
 
-    for m in [4,6,7,8]:
-        for n in [10,20,30]:
-          for epochs in [10*epo for epo in range(1, 11)]:
-              for lr in [10**(-i) for i in range(1, 10)]:
-                  for bs in [10*x for x in range(1, 31)]:
-                      training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs)
+  for lr in [10**(-i) for i in range(1, 10)]:
+      for bs in [10*x for x in range(1, 31)]:
+          training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs, epochs=epochs)
 
