@@ -249,7 +249,7 @@ def getListOfValidFiles(input_folder, ilp_schedule_folder):
 
     listValidIDs = set(listIDs_data) & set(listIDs_ilp)
 
-    return listValidIDs
+    return list(listValidIDs)
 
 
     
@@ -275,7 +275,7 @@ class DataLoader:
         valid_ids = getListOfValidFiles(input_data_folder, ilp_schedules_folder)
         if len(valid_ids) > maxTasks:
             valid_ids = valid_ids[:maxTasks]
-        print("valid ids: ", len(valid_ids), "\n", valid_ids)
+        #print("valid ids: ", len(valid_ids), "\n", valid_ids)
         for id in valid_ids:
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
             self.tasks.append({'id': id,"G": G_adjaList, "C": C_dict, "T": T, "W": W})
@@ -355,8 +355,10 @@ if __name__ == "__main__":
     #outputAllILPSystemJSON("../dag_generator/%s/" % (data_file), numCores=num_cores, dag_file=dag_file)
     
 
-    #test makespan calculation
-    data_loader = DataLoader('../dag_generator/data_p8n30/', '../LET-LP-Scheduler/dag_m4p8n30_output_schedules', numCores=4, maxNodesPerDag=30, maxTasks=1600)
+    for m in [2]:
+      for n in [10]:
+        print("computing for m%in%i" % (m, n))
+        data_loader = DataLoader('../dag_generator/data_p8n%i/' % (n), '../LET-LP-Scheduler/dag_m%ip8n%i_output_schedules' % (m, n), numCores=m, maxNodesPerDag=n, maxTasks=1400)
 
     ''' msSolver = ms.MakespanSolver(numberOfCores=2)
     task_108 = data_loader.dagTasks[108]
