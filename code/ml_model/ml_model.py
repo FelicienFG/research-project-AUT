@@ -292,8 +292,8 @@ if __name__ == "__main__":
   m=int(sys.argv[1])
   n=int(sys.argv[2])
   epochs=int(sys.argv[3])
+  lr=float(sys.argv[4])
+  bs=int(sys.argv[5])
 
-  for lr in [10**(-i) for i in range(1, 10)]:
-      for bs in [10*x for x in range(1, 31)]:
-          training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs, epochs=epochs)
+  training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs, epochs=epochs)
 
