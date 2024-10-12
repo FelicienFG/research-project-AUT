@@ -17,7 +17,7 @@ do
     outputDir="dag_m${m}p${p}n${n}_output_schedules"
     for dag_task_id in $dag_ids ; 
     do
-            python3 main.py --infile "$inputDir/multicore_system_DAGtask_$dag_task_id.json" --outfile "$outputDir/schedule_dag_$dag_task_id.json" --solver GUROBI > /tmp/${outputDir}DAG_${dag_task_id}.log &
+            python3 main_ilp.py --infile "$inputDir/multicore_system_DAGtask_$dag_task_id.json" --outfile "$outputDir/schedule_dag_$dag_task_id.json" --solver GUROBI > /tmp/${outputDir}DAG_${dag_task_id}.log &
     done
   done
 done

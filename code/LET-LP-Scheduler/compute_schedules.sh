@@ -15,7 +15,7 @@ compute_schedules_parallel()
     for dag_task_id in `seq $id_start $(($id_end-1))` ; 
     do
         #echo "current start and current id: " $id_start $dag_task_id;
-        python3 main.py --infile "$inputDir/multicore_system_DAGtask_$dag_task_id.json" --outfile "$outputDir/schedule_dag_$dag_task_id.json" --solver GUROBI > /tmp/${outputDir}DAG_${dag_task_id}.log;
+        python3 main_ilp.py --infile "$inputDir/multicore_system_DAGtask_$dag_task_id.json" --outfile "$outputDir/schedule_dag_$dag_task_id.json" --solver GUROBI > /tmp/${outputDir}DAG_${dag_task_id}.log;
     done
 }
 

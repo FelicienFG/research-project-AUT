@@ -27,7 +27,7 @@ def compute_schedules(start_id, end_id, files_list):
     for id in range(start_id, end_id):
         input_file_name = files_list[id]['input_name']
         output_file_name = files_list[id]['output_name']
-        os.system("python3 main.py --infile \"%s\" --outfile \"%s\" --solver GUROBI > /tmp/%s.log" % (input_file_name, output_file_name, id))
+        os.system("python3 main_ilp.py --infile \"%s\" --outfile \"%s\" --solver GUROBI > /tmp/%s.log" % (input_file_name, output_file_name, id))
 
 
     return 0

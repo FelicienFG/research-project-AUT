@@ -325,7 +325,54 @@ def exportSchedule(system, lp, allTaskInstances, results, Config):
     return schedule
 
 
+def outsideCall(infile, outfile, solver='GUROBI'):
+  avaliableSolvers = pl.listSolvers(onlyAvailable=True)
+  Config.os = sys.platform
+  if Config.os == "win32":
+      Config.exeSuffix = ".exe"
 
+  #create out file if it doesn't exist
+  src_path = os.path.abspath(os.path.dirname(__file__))
+  outdir = os.path.abspath(os.path.dirname(outfile))
+
+  outdir_path = os.path.join(src_path, outdir)
+  if not os.path.exists(outdir_path):
+      os.makedirs(outdir_path)
+  
+  # Set the LP solver
+  if solver in avaliableSolvers:
+      Config.solverProg = solver
+
+  #print(f"Solver: {Config.solverProg}")
+
+  # Specify a LET system model file and create a schedule, or run in webserver mode for the LetSynchronise plugin.
+  if len(infile) > 0 and len(outfile) > 0:
+      try:
+          inputFile = open(infile)
+          system = json.load(inputFile)
+          system['PluginParameters'] = {'Makespan': 1} #make makespan equal to hyperperiod
+          schedule = lpScheduler(system)
+          scheduleFile = open(outfile, "w+")
+          scheduleFile.write(json.dumps(schedule, indent=2))
+          scheduleFile.close()
+          
+      except FileNotFoundError as e:
+          print(f"Unable to open \"{infile}\" or \"{outfile}\"!")
+          print(e)
+          traceback.print_exc()
+          
+  else:
+      webServer = ThreadingHTTPServer((Config.hostName, Config.serverPort), Server)
+      print(f"Server started at http://{Config.hostName}:{Config.serverPort}")
+      print()
+
+      try:
+          webServer.serve_forever()
+      except KeyboardInterrupt:
+          pass
+          
+      webServer.server_close()
+      print("Server stopped")
 
 if __name__ == '__main__':
     avaliableSolvers = pl.listSolvers(onlyAvailable=True)
