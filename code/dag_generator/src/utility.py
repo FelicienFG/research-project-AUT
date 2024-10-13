@@ -11,6 +11,7 @@
 import networkx as nx
 import pickle
 import os
+import sys
 
 def load_task(task_idx, dag_base_folder = "../data/"):
     # << load DAG task <<
@@ -62,21 +63,21 @@ def load_task(task_idx, dag_base_folder = "../data/"):
     return G_dict, V_array, C_dict, C_array, T, W
 
 
-def outputExceedingNodesDagTasks(maxNodes = 20):
-    numberOfTasks = len(os.listdir("data/")) // 3
+def outputExceedingNodesDagTasks(maxNodes = 20, data_file = "data/"):
+    numberOfTasks = len(os.listdir(data_file)) // 2
 
     with open("tasks_to_remove", "w+") as outputFile:
         for id in range(numberOfTasks):
-            _, V, _, _, _, _ = load_task(id, dag_base_folder="data/")
+            _, V, _, _, _, _ = load_task(id, dag_base_folder=data_file)
             if len(V) > maxNodes:
                 outputFile.write("%i\n" % (id))
 
-def outputLowNodesDagTasks(minNodes = 20):
-    numberOfTasks = len(os.listdir("data/")) // 3
+def outputLowNodesDagTasks(minNodes = 20, data_file = "data/"):
+    numberOfTasks = len(os.listdir(data_file)) // 2
 
     with open("tasks_to_remove", "a") as outputFile:
         for id in range(numberOfTasks):
-            _, V, _, _, _, _ = load_task(id, dag_base_folder="data/")
+            _, V, _, _, _, _ = load_task(id, dag_base_folder=data_file)
             if len(V) < minNodes:
                 outputFile.write("%i\n" % (id))
 
@@ -89,5 +90,7 @@ if __name__ == "__main__":
     #print("T: ", T)
     #print("C: ", C)
     #print("W: ", W)
-    outputExceedingNodesDagTasks(15)
-    outputLowNodesDagTasks(15)
+    numNodes = int(sys.argv[1])
+    data_file = sys.argv[2]
+    outputExceedingNodesDagTasks(numNodes, data_file)
+    outputLowNodesDagTasks(numNodes, data_file)

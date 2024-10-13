@@ -11,27 +11,32 @@ import json
 import parse
 import heapq
 import random as rand
+import sys
 import time
 
-def getOptimalPriorityListFromILPscheduleFile(scheduleFileName):
+def getOptimalPriorityListFromILPscheduleFile(scheduleFileName, m, n, p):
     priorityList = []
     with open(scheduleFileName, "r") as scheduleFile:
         scheduleJSON = json.load(scheduleFile)
-        scheduledTasks = scheduleJSON['TaskInstancesStore']
-        taskList = []
+        if scheduleJSON is None:
+            with open('null_jsons_m%ip%in%i' % (m, p, n), 'a') as null_file:
+                null_file.write(scheduleFileName + '\n')
+        else:
+            scheduledTasks = scheduleJSON['TaskInstancesStore']
+            taskList = []
 
-        for taskJSON in scheduledTasks:
-            subtaskID = parse.parse("task_{}", taskJSON['name'])
-            subtaskID = int(subtaskID[0])
-            subTaskStartTime = taskJSON['value'][0]['executionIntervals'][0]['startTime']
-            heapq.heappush(taskList, (subTaskStartTime, subtaskID))
-        
-        priority = 0
-        priorityList = [0 for i in range(len(scheduledTasks))]
-        while taskList:
-            (_, subtaskID) = heapq.heappop(taskList)
-            priorityList[subtaskID] = priority
-            priority += 1
+            for taskJSON in scheduledTasks:
+                subtaskID = parse.parse("task_{}", taskJSON['name'])
+                subtaskID = int(subtaskID[0])
+                subTaskStartTime = taskJSON['value'][0]['executionIntervals'][0]['startTime']
+                heapq.heappush(taskList, (subTaskStartTime, subtaskID))
+            
+            priority = 0
+            priorityList = [0 for i in range(len(scheduledTasks))]
+            while taskList:
+                (_, subtaskID) = heapq.heappop(taskList)
+                priorityList[subtaskID] = priority
+                priority += 1
 
     return priorityList
 
@@ -111,9 +116,9 @@ def test_makespan_compute():
 
     print(makespan)
 
-def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID):
+def outputILPSystemJSON(graph, start, wcets, totalW, numCores, dagTaskID, dag_file):
     outputJSON = {}
-    outputFile = '../LET-LP-Scheduler/dag_tasks_input_files/multicore_system_DAGtask_%i.json' % (dagTaskID)
+    outputFile = '../LET-LP-Scheduler/%s/multicore_system_DAGtask_%i.json' % (dag_file, dagTaskID)
 
     #first add the cores
     outputJSON['CoreStore'] = []
@@ -195,12 +200,20 @@ def filledUpAdjaListAndWcets(adjalist, wcets, maxNodes):
 
     return filledUpAdjalist, filledUpWcets
 
-def outputAllILPSystemJSON(inputDataFolder, numCores):
-    numberOfTasks = len(os.listdir(inputDataFolder)) // 3
+def outputAllILPSystemJSON(inputDataFolder, numCores, dag_file):
+    numberOfTasks = len(os.listdir(inputDataFolder)) // 2
+    #if the output folder doesn't exist, then create it first
+    src_path = os.path.abspath(os.path.dirname(__file__))
+    scheduler_path = os.path.abspath(os.path.join(src_path, os.pardir, 'LET-LP-Scheduler'))
+
+
+    dag_file_path = os.path.join(scheduler_path, dag_file)
+    if not os.path.exists(dag_file_path):
+        os.makedirs(dag_file_path)
 
     for id in range(numberOfTasks):
         G_adjaList, C_dict , T, W = load_task(inputDataFolder, id)
-        outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id)
+        outputILPSystemJSON(G_adjaList, 0, C_dict, W, numCores, id, dag_file)
 
 def getMaxNeighbours(adjaList):
     max_in = 0
@@ -217,14 +230,41 @@ def getMaxNeighbours(adjaList):
 
     return max_in, max_out
 
+
+def getListOfValidFiles(input_folder, ilp_schedule_folder):
+
+    listFiles = [file for file in os.listdir(input_folder) if file.endswith('.gpickle')]
+    listIDs_data = []
+
+    for file in listFiles:
+        file_id = file.split('_')[1].split('.')[0]  # Extract the id
+        listIDs_data.append(int(file_id))
+
+    listFiles = os.listdir(ilp_schedule_folder)
+    listIDs_ilp = []
+
+    for file in listFiles:
+        file_id = file.split('_')[2].split('.')[0]  # Extract the id
+        listIDs_ilp.append(int(file_id))
+
+    listValidIDs = set(listIDs_data) & set(listIDs_ilp)
+
+    return list(listValidIDs)
+
+
+    
+
 class DataLoader:
 
-    def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30):
-        self.numberOfTasks = len(os.listdir(input_data_folder)) // 3
+    def __init__(self, input_data_folder, ilp_schedules_folder, numCores = 2, maxNodesPerDag = 30, maxTasks = -1,p=8):
+        self.numberOfTasks = len(os.listdir(input_data_folder)) // 2
+        if maxTasks > 0:
+            self.numberOfTasks = maxTasks
         self.dataFolder = input_data_folder
         self.ilpSchedulesFolder = ilp_schedules_folder
         self.maxNodesPerDag = maxNodesPerDag
         self.tasks = []
+        self.p = p
         self.tasksFilledUp = []
         self.numCores = numCores
         #node features : C_i / W , deg_in, deg_out, is_source_or_sink, is_in_critical_path
@@ -232,20 +272,24 @@ class DataLoader:
         self.dagTasks = []
         self.ilpOutputs = []
 
-        for id in range(self.numberOfTasks):
+        valid_ids = getListOfValidFiles(input_data_folder, ilp_schedules_folder)
+        if len(valid_ids) > maxTasks:
+            valid_ids = valid_ids[:maxTasks]
+        #print("valid ids: ", len(valid_ids), "\n", valid_ids)
+        for id in valid_ids:
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
-            self.tasks.append({"G": G_adjaList, "C": C_dict, "T": T, "W": W})
+            self.tasks.append({'id': id,"G": G_adjaList, "C": C_dict, "T": T, "W": W})
             filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(copy.deepcopy(G_adjaList), copy.deepcopy(C_dict), self.maxNodesPerDag)
             self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
             self.dagTasks.append(getDagTask(G_adjaList, C_dict))
-            self.addTaskFeatureMatrix(id, G_adjaList, C_dict, W)
+            self.addTaskFeatureMatrix(G_adjaList, C_dict, W)
             self.addILPoutput(id)
 
         self.taskFeatures = torch.Tensor(self.taskFeatures)
         self.ilpOutputs = torch.Tensor(self.ilpOutputs)
 
     def addILPoutput(self, taskID):
-        prioList = getOptimalPriorityListFromILPscheduleFile("%s/schedule_dag_%i.json" % (self.ilpSchedulesFolder, taskID))
+        prioList = getOptimalPriorityListFromILPscheduleFile("%s/schedule_dag_%i.json" % (self.ilpSchedulesFolder, taskID), self.numCores, self.maxNodesPerDag, self.p)
 
         if len(prioList) > self.maxNodesPerDag:
             raise RuntimeError("DataLoader: ILP schedule priorirty list has more priorities than what is permitted (%i > max = %i)" % (len(prioList), self.maxNodesPerDag))
@@ -262,15 +306,15 @@ class DataLoader:
                     prioMatrix[task][prio] = 0
         self.ilpOutputs.append(prioMatrix)
 
-    def addTaskFeatureMatrix(self, id, adjaList, wcets, totalW):
+    def addTaskFeatureMatrix(self, adjaList, wcets, totalW):
         self.taskFeatures.append([])
         crit_path, crit_length = criticalPath(adjaList, 0, wcets)
         #max_in_neighbours, max_out_neighbours = getMaxNeighbours(adjaList)
         for node in adjaList:
             is_source_sink = int(len(adjaList[node]['in']) == 0 or len(adjaList[node]['out']) == 0)
             is_in_critical_path = int(node in crit_path)
-            self.taskFeatures[id].append([wcets[node] / totalW, len(adjaList[node]['in']), len(adjaList[node]['out']), is_source_sink, is_in_critical_path])
-        self.fillZerosTaskFeatureMatrix(id)
+            self.taskFeatures[-1].append([wcets[node] / totalW, len(adjaList[node]['in']), len(adjaList[node]['out']), is_source_sink, is_in_critical_path])
+        self.fillZerosTaskFeatureMatrix(-1)
         
     def fillZerosTaskFeatureMatrix(self, taskID):
         if len(self.taskFeatures[taskID]) > self.maxNodesPerDag:
@@ -301,13 +345,22 @@ class DataLoader:
 
         return self.taskFeatures[tasks_ids], tasks_ids
 
+
 if __name__ == "__main__":
 
-    #outputAllILPSystemJSON("../dag_generator/data/", numCores=2)
+    #data_file = sys.argv[1]
+    #dag_file = sys.argv[2]
+    #num_cores = int(sys.argv[3])
+    #print(sys.argv[3])
+    #outputAllILPSystemJSON("../dag_generator/%s/" % (data_file), numCores=num_cores, dag_file=dag_file)
     
-    data_loader = DataLoader('../dag_generator/data/', '../LET-LP-Scheduler/dag_tasks_output_schedules', numCores=2, maxNodesPerDag=15)
 
-    msSolver = ms.MakespanSolver(numberOfCores=2)
+    for m in [2]:
+      for n in [10]:
+        print("computing for m%in%i" % (m, n))
+        data_loader = DataLoader('../dag_generator/data_p8n%i/' % (n), '../LET-LP-Scheduler/dag_m%ip8n%i_output_schedules' % (m, n), numCores=m, maxNodesPerDag=n, maxTasks=1400)
+
+    ''' msSolver = ms.MakespanSolver(numberOfCores=2)
     task_108 = data_loader.dagTasks[108]
     _, ilp_priolist = torch.max(data_loader.ilpOutputs[108], dim=1)
     ilp_priolist = ilp_priolist.tolist()
@@ -316,5 +369,5 @@ if __name__ == "__main__":
     ilpMakespan = msSolver.computeMakespan(ilp_priolist, task_108)
     modelMakespan = msSolver.computeMakespan(model_priolist, task_108)
 
-    print("ilp: ", ilpMakespan, "model: ", modelMakespan)
+    print("ilp: ", ilpMakespan, "model: ", modelMakespan) '''
 

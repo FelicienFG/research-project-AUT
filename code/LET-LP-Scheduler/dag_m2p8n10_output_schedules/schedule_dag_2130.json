@@ -1,0 +1,254 @@
+{
+  "TaskInstancesStore": [
+    {
+      "name": "task_0",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 0,
+          "letEndTime": 30,
+          "periodEndTime": 998001,
+          "executionTime": 30,
+          "executionIntervals": [
+            {
+              "startTime": 0,
+              "endTime": 30,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_1",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 30,
+          "letEndTime": 186,
+          "periodEndTime": 998001,
+          "executionTime": 156,
+          "executionIntervals": [
+            {
+              "startTime": 30,
+              "endTime": 186,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_3",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 180,
+          "letEndTime": 244,
+          "periodEndTime": 998001,
+          "executionTime": 64,
+          "executionIntervals": [
+            {
+              "startTime": 180,
+              "endTime": 244,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_6",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 244,
+          "letEndTime": 349,
+          "periodEndTime": 998001,
+          "executionTime": 105,
+          "executionIntervals": [
+            {
+              "startTime": 244,
+              "endTime": 349,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_8",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 349,
+          "letEndTime": 442,
+          "periodEndTime": 998001,
+          "executionTime": 93,
+          "executionIntervals": [
+            {
+              "startTime": 349,
+              "endTime": 442,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_2",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 297,
+          "letEndTime": 442,
+          "periodEndTime": 998001,
+          "executionTime": 145,
+          "executionIntervals": [
+            {
+              "startTime": 297,
+              "endTime": 442,
+              "core": "c0"
+            }
+          ],
+          "currentCore": {
+            "name": "c0",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_4",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 90,
+          "letEndTime": 215,
+          "periodEndTime": 998001,
+          "executionTime": 125,
+          "executionIntervals": [
+            {
+              "startTime": 90,
+              "endTime": 215,
+              "core": "c0"
+            }
+          ],
+          "currentCore": {
+            "name": "c0",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_5",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 215,
+          "letEndTime": 297,
+          "periodEndTime": 998001,
+          "executionTime": 82,
+          "executionIntervals": [
+            {
+              "startTime": 215,
+              "endTime": 297,
+              "core": "c0"
+            }
+          ],
+          "currentCore": {
+            "name": "c0",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_7",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 30,
+          "letEndTime": 90,
+          "periodEndTime": 998001,
+          "executionTime": 60,
+          "executionIntervals": [
+            {
+              "startTime": 30,
+              "endTime": 90,
+              "core": "c0"
+            }
+          ],
+          "currentCore": {
+            "name": "c0",
+            "speedup": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "task_9",
+      "initialOffset": 0,
+      "value": [
+        {
+          "instance": 0,
+          "periodStartTime": 0,
+          "letStartTime": 442,
+          "letEndTime": 581,
+          "periodEndTime": 998001,
+          "executionTime": 139,
+          "executionIntervals": [
+            {
+              "startTime": 442,
+              "endTime": 581,
+              "core": "c1"
+            }
+          ],
+          "currentCore": {
+            "name": "c1",
+            "speedup": 1
+          }
+        }
+      ]
+    }
+  ]
+}

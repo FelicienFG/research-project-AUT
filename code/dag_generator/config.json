@@ -15,13 +15,13 @@
   },
   "single_task": {
     "multi-DAG": false,
-    "set_number": 2000,
-    "workload": 100
+    "set_number": 50000,
+    "workload": 1000
   },
   "dag_config": {
-    "parallelism": 4,
-    "layer_num_min": 3,
-    "layer_num_max": 8,
+    "parallelism": 7,
+    "layer_num_min": 5,
+    "layer_num_max": 10,
     "connect_prob": 0.5
   }
 }

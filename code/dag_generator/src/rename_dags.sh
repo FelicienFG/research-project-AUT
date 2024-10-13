@@ -1,15 +1,12 @@
 #!/bin/bash
 
-data_folder="data"
+data_folder=$1
 
 gml_files="$(find $data_folder -type f -name "*.gml")"
 gml_files=$(echo $gml_files | xargs -n1 | sort -V | xargs)
 
 pickle_files="$(find $data_folder -type f -name "*.gpickle")"
 pickle_files=$(echo $pickle_files | xargs -n1 | sort -V | xargs)
-
-png_files="$(find $data_folder -type f -name "*.png")"
-png_files=$(echo $png_files | xargs -n1 | sort -V | xargs)
 
 
 
@@ -27,4 +24,3 @@ rename_files() {
 
 rename_files "$gml_files"
 rename_files "$pickle_files"
-rename_files "$png_files"
