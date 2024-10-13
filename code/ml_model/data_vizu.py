@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 # Function to read data from file and return two lists of values
 def read_data_from_file(filename):
@@ -7,35 +8,40 @@ def read_data_from_file(filename):
         # Reading lines from the file
         lines = file.readlines()
 
-        # Assuming the file has exactly two lines of comma-separated values
-        list1 = list(map(float, lines[2].strip().split(',')))
-        list2 = list(map(float, lines[3].strip().split(',')))
+        list_nums = list(map(float, lines[0].strip().split(',')[:-1]))
 
-    return list1, list2
+    return list_nums
+    
+def plot_barchart(data, m_labels, n_labels):
 
-def plot_barchart(csv_file):
+    # Number of groups
+    n_groups = len(m_labels)
 
-    # Read the CSV file
-    df = pd.read_csv(csv_file)
-    print(df)
-    # Assuming the first two columns are the ones to be used for the bars
-    first_column = df.columns[0]
-    second_column = df.columns[1]
+    # Set the bar width
+    bar_width = 0.1
 
-    # Create the bar chart
-    plt.bar([first_column, second_column], [df[first_column].mean(), df[second_column].mean()], width=0.4, label=[first_column, second_column], color=['blue', 'red'], align='center')
-    #plt.bar([first_column, second_column], df[second_column].mean(), width=0.4, label=second_column, align='center')
+    # Set the positions of the bars on the x-axis
+    index = np.arange(n_groups)
 
-    # Add labels and title
-    plt.xlabel('Index')
-    plt.ylabel('Makespan')
-    plt.title('Average makespan for the Model and ILP methods')
+    # Create the figure and axes
+    fig, ax = plt.subplots()
 
-    # Show legend
-    plt.legend()
+    # Plot bars for each group
+    for i in range(len(m_labels)):
+        bar = ax.bar(index + i * bar_width, data[i], bar_width, label=n_labels[i])
+
+    # Add labels, title, and legend
+    ax.set_xlabel('number of cores')
+    ax.set_ylabel('Average computing time (minutes)')
+    ax.set_title('Average computing time according to the number of cores')
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(m_labels)
+    ax.legend()
 
     # Display the plot
+    plt.tight_layout()
     plt.show()
+
 
 
 # Function to plot two lists as curves
@@ -62,10 +68,22 @@ def plot_curves(list1, list2):
 
 # Main function to execute the program
 def main():
-    filename = 'results_makespan'  # Change this to your file's path
-    #list1, list2 = read_data_from_file(filename)
+    m_labels = ['2', '4', '6', '7', '8']
+    n_labels = ['10 nodes', '20 nodes', '30 nodes', '40 nodes', '50 nodes']
+    data = []
+    for n in range(len(n_labels)):
+        data.append([])
+        for m in range(len(m_labels)):
+            if m_labels[m] == '2' and n >= 2:
+                data[n].append(60)#one hour in minutes
+            else:
+                filename = '../LET-LP-Scheduler/time_results_m%sp8n%s' % (m_labels[m], n_labels[n].split(' ')[0])  
+                time_list = np.array(read_data_from_file(filename))
+                time_list *= 1.0e-6 / 60.0
+                data[n].append(np.mean(time_list))
+    
     #plot_curves(list1, list2)
-    plot_barchart(filename)
+    plot_barchart(data, m_labels, n_labels)
 
 # Execute the main function
 if __name__ == '__main__':
