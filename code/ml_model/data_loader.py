@@ -280,7 +280,7 @@ class DataLoader:
             G_adjaList, C_dict , T, W = load_task(self.dataFolder, id)
             self.tasks.append({'id': id,"G": G_adjaList, "C": C_dict, "T": T, "W": W})
             filledUpAdjaList, filledUpWcets = filledUpAdjaListAndWcets(copy.deepcopy(G_adjaList), copy.deepcopy(C_dict), self.maxNodesPerDag)
-            self.tasksFilledUp.append({"G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
+            self.tasksFilledUp.append({'id': id, "G": filledUpAdjaList, "C": filledUpWcets, "T": T, "W": W})
             self.dagTasks.append(getDagTask(G_adjaList, C_dict))
             self.addTaskFeatureMatrix(G_adjaList, C_dict, W)
             self.addILPoutput(id)

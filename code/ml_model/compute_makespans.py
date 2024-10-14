@@ -5,9 +5,20 @@ from rta_alphabeta_new import Eligiblity_Ordering_PA, TPDS_Ordering_PA
 import os
 import pandas as pd
 
+def load_all_tasks_zhao(customTasksWithIDs, inputDataFolder):
+    listOfDags = []
+
+    for task in customTasksWithIDs:
+        #print(task)
+        id = task['id']
+        G_adjaList, C_dict, _, _, _ , _, _ = load_task(inputDataFolder, id)
+        listOfDags.append({"G": G_adjaList, "C": C_dict})
+
+    return listOfDags
+
 
 def load_all_tasks(inputDataFolder):
-    numberOfTasks = len(os.listdir(inputDataFolder)) // 3
+    numberOfTasks = len(os.listdir(inputDataFolder)) // 2
     listOfDags = []
     listOfCustomDags = []
 

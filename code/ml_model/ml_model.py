@@ -6,6 +6,8 @@ import data_loader as dl
 import makespan_loss
 import random as rand
 import time
+from compute_makespans import load_all_tasks_zhao, convertDictPrioritiesToIntVector
+from rta_alphabeta_new import Eligiblity_Ordering_PA
 import copy
 import sys
 
@@ -197,21 +199,26 @@ def train_one_epoch(model, epoch_num, batches, dataLoader, optimizer, loss_fn):
     return running_loss / len(batches), avg_training_accu / len(batches)
 
 
-def evaluateTiming(model, numCores, listsOfNumberOfTasks, maxTasks=100):
+def evaluateTiming(numCores, listsOfNumberOfTasks, maxTasks=100):
     
     p=8
     m=numCores
-    with open("results_time", "w") as result_file:
-        result_file.write("tasks, avgtime, samples\n")
+    with open("results_time_model_m%i" % (m), "w") as result_file:
+        result_file.write("tasks,avgtime,samples\n")
         for n in listsOfNumberOfTasks:
-            data_loader = dl.DataLoader('../dag_generator/data_p%in%i' % (p, n), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules' % (m,p,n), numCores, n, maxTasks)
+            trained_model = GCNAttention(embedding_dim=5, outDim=n)
+            state_dict = torch.load('model_weights_m%ip8n%i_lr0.001000_bs250_epochs10.pth' % (m, n))
+            trained_model.load_state_dict(state_dict)
+            trained_model.eval()
+            data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (p, n), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules/' % (m,p,n), numCores, n, maxTasks)
             data, ids = data_loader.getTasksWithFixedNumNodes(n, 0)
-            start = time.time_ns()
-            _ = model(data, [data_loader.tasksFilledUp[id] for id in ids])
-            end = time.time_ns()
-            print("eval timing for ", n, " tasks")
-            result_file.write("%i, %f, %i\n" 
-                              % (n, (end - start) * 1.0e-3 / (data.shape[0]), (data.shape[0])))
+            with torch.no_grad():
+                start = time.time_ns()
+                _ = trained_model(data, [data_loader.tasksFilledUp[id] for id in ids])
+                end = time.time_ns()
+                print("eval timing for ", n, " tasks")
+                result_file.write("%i, %f, %i\n" 
+                                % (n, (end - start) * 1.0e-6 / (data.shape[0]), (data.shape[0])))
 
 def write_to_csv(opened_file, input_list):
     for i in range(len(input_list) - 1):
@@ -264,36 +271,61 @@ def training_and_eval(num_cores, numTasks, p=8, learn_rate=0.001, batch_size=250
 
     torch.save(model.state_dict(), 'model_weights_m%ip%in%i_lr%f_bs%i_epochs%i.pth' % (num_cores, p, numTasks, learn_rate, batch_size, epochs))
 
-def evaluateMakespan(trained_model, data_loader, numcores):
+def computeMakespan(model_output, ilp_output, dags, tasks, dags_zhao, numcores, numTasks):
     scheduler = ms.MakespanSolver(numcores)
-    train_threshold, total_size, (valTasks, valTaskFeatures, valILPoutputs), dags = data_loader.train_val_split(train_percentage=0.9, batch_size=5, return_dags=True)
 
-    outputs = trained_model(valTaskFeatures, valTasks)
-    print(train_threshold, total_size)
-    with open("results_makespan", "w+") as result_file:
-        result_file.write("model, ilp\n")
-        for id in range(outputs.shape[0]):
+    with open("results_makespan_m%ip8n%i" % (numcores, numTasks), "w+") as result_file:
+        result_file.write("random, model, zhao2020, ilp\n")
+        for id in range(model_output.shape[0]):
             #extract priority lists
-            _, model_priorities = torch.max(outputs[id], dim=1)
-            _, ilp_priorities = torch.max(valILPoutputs[id], dim=1)
-            #drop out the excess priorities from dummy nodes added beforehand
-            model_priorities = (model_priorities[:len(dags[id])]).tolist()
-            ilp_priorities = (ilp_priorities[:len(dags[id])]).tolist()
-            print("priorities: ", model_priorities, ilp_priorities)
+            _, model_priorities = torch.max(model_output[id], dim=1)
+            _, ilp_priorities = torch.max(ilp_output[id], dim=1)
+            prio_zhao2020 = convertDictPrioritiesToIntVector(Eligiblity_Ordering_PA(dags_zhao[id]['G'], dags_zhao[id]['C']))
+            rand_priorities = [rand.randint(0, numTasks-1) for _ in range(numTasks)]#random prioriy list
             #compute makespans
-            makespan_model = scheduler.computeMakespan(ms.IntVector(model_priorities), dags[id])
-            makespan_ilp = scheduler.computeMakespan(ms.IntVector(ilp_priorities), dags[id])
-
-            result_file.write("%i, %i\n" % (makespan_model, makespan_ilp))
+            makespan_model = scheduler.computeMakespan(ms.IntVector(model_priorities.tolist()), dags[id])
+            makespan_ilp = scheduler.computeMakespan(ms.IntVector(ilp_priorities.tolist()), dags[id])
+            makespan_random = scheduler.computeMakespan(ms.IntVector(rand_priorities), dags[id])
+            makespan_zhao = scheduler.computeMakespan(prio_zhao2020, dags[id], -1)
+            _, crit_length = dl.criticalPath(tasks[id]['G'], 0, tasks[id]['C'])
+            
+            result_file.write("%f, %f, %f, %f\n" % (makespan_random / float(crit_length), makespan_model / float(crit_length), makespan_zhao / float(crit_length), makespan_ilp / float(crit_length)))
     
 
+def eval_timings():
+    m_list = [6,7,8]
+    n_list = [10,20,30]
+
+    for m in m_list:
+        evaluateTiming(m, n_list)
+
+    
+def eval_makespans():
+    
+    m_list = [6,7,8]
+    n_list = [10,20,30]
+
+    for m in m_list:
+        for n in n_list:
+            trained_model = GCNAttention(embedding_dim=5, outDim=n)
+            state_dict = torch.load('model_weights_m%ip8n%i_lr0.001000_bs250_epochs10.pth' % (m, n))
+            trained_model.load_state_dict(state_dict)
+            trained_model.eval()
+            data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (8, n), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules' % (m, 8, n), numCores=m, maxNodesPerDag=n, maxTasks=1400)
+            _, _, (valTasks, valTaskFeatures, valILPoutputs), dags = data_loader.train_val_split(train_percentage=0.7145, batch_size=250, return_dags=True)
+            zhaoDAGs = load_all_tasks_zhao(valTasks, data_loader.dataFolder)
+            with torch.no_grad():
+                model_output = trained_model(valTaskFeatures, valTasks)
+                computeMakespan(model_output, valILPoutputs, dags, valTasks, zhaoDAGs, m, n)
+
 if __name__ == "__main__":
-
-  m=int(sys.argv[1])
-  n=int(sys.argv[2])
-  epochs=int(sys.argv[3])
-  lr=float(sys.argv[4])
-  bs=int(sys.argv[5])
-
-  training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs, epochs=epochs)
-
+#  m=int(sys.argv[1])
+#  n=int(sys.argv[2])
+#  epochs=int(sys.argv[3])
+#  lr=float(sys.argv[4])
+#  bs=int(sys.argv[5])
+#
+#  training_and_eval(m, n, p=8, learn_rate=lr, batch_size=bs, epochs=epochs)
+    rand.seed = 42
+    #eval_makespans()
+    eval_timings()

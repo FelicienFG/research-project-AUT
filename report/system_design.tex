@@ -5,15 +5,20 @@
 No supervised learning model has been found in the literature to 
 tackle the non-preemptive, global fixed-priority scheduling problem 
 for single DAG tasks.
-Therefore, we must first design a supervised learning model.
+Therefore, we must first design a supervised learning model
+that is able to approximate the computation of a priority-list for a single DAG task
+that leads to the minimum makespan.
 
-In supervised learning, the machine learning model 
+In order to have a supervised model, we need
+to train the model on a set of already solved DAGs 
+so that the model can learn how to approximate those solutions in a reasonable time.
+Indeed, in supervised learning, the machine learning model 
 predicts an output (forward pass) and then computes the error between
 the predicted output and a known true output.
 The gradient of the error function is then propagated through the network to tweak the model's 
 trainable parameters, which is also called the backward pass (see Figure \ref{fig:supervised_learning}).
-The issue with the supervised method is that we need to have true labels,
-that is priority list that we know lead to the minimum makespan.
+The issue with the supervised method is that we need to have true outputs,
+that is priority lists that we know lead to the minimum makespan.
 However, the problem is NP-hard which makes the computation
 of those true labels expensive. The idea behind this supervised
 method is to leverage the amount of training time with the performance
@@ -32,6 +37,11 @@ and scalability of the model, once it is trained.
 \subsubsection{Input DAGs}
 ~
 
+In machine learning, the input that we give to the model
+needs to be in a matrix representation which the model can 
+then process. Therefore, every DAG task needs to have
+a matrix representation that encompasses the information 
+required to make decisions about its execution priority order.  
 Each input DAG  task will be represented using 
 a matrix of numbers with each row being a node
 and each column being a raw feature of a node.

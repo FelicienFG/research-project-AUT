@@ -11,8 +11,10 @@ def read_data_from_file(filename):
         list_nums = list(map(float, lines[0].strip().split(',')[:-1]))
 
     return list_nums
-    
-def plot_barchart(data, m_labels, n_labels):
+
+
+
+def plot_barchart_ilp_times(data, m_labels, n_labels):
 
     # Number of groups
     n_groups = len(m_labels)
@@ -43,6 +45,59 @@ def plot_barchart(data, m_labels, n_labels):
     plt.show()
 
 
+def plot_curves_from_csv(file_path, m):
+    # Load the CSV file into a DataFrame
+    data = pd.read_csv(file_path, header=0)
+    #print(data)
+    # Plot the curves
+    plt.figure(figsize=(10, 6))
+    plt.plot(data['tasks'], data['avgtime'], marker='o')
+    
+    plt.xticks(data['tasks'].unique())
+    # Add labels, title, and legend
+    plt.xlabel('Number of nodes')
+    plt.ylabel('Average computing time in ms')
+    plt.title('Average (over %i samples) model computing time for 10, 20 and 30 nodes per graph on %i cores' % (data['samples'][0], m))
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_barchart_makespans(m, n):
+
+    data = pd.read_csv('results_makespan_m%ip8n%i' % (m,n))
+    labels = data.columns.to_list()
+
+    # Set the bar width
+    bar_width = 0.2
+
+    # Set the positions of the bars on the x-axis
+    index = np.arange(len(labels))
+
+    # Create the figure and axes
+    fig, ax = plt.subplots()
+
+    # Plot bars for each group
+    for i in range(len(labels)):
+        mean_value = data.iloc[:, i].mean()
+        bar = ax.bar(index[i] + bar_width, mean_value, bar_width, label=labels[i])
+        ax.text(index[i] + bar_width, mean_value, f'{mean_value:.4f}', 
+                ha='center', va='bottom')
+
+    # Add labels, title, and legend
+    ax.set_ylim(bottom=1.0)
+    ax.set_xlabel('method')
+    ax.set_ylabel('Average makespan')
+    ax.set_title('Average makespan with different methods, with m=%i and n=%i' % (m, n))
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(labels)
+    #ax.legend()
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()
+
 
 # Function to plot two lists as curves
 def plot_curves(list1, list2):
@@ -66,8 +121,7 @@ def plot_curves(list1, list2):
     plt.grid(True)
     plt.show()
 
-# Main function to execute the program
-def main():
+def plot_computing_time_ilp():
     m_labels = ['2', '4', '6', '7', '8']
     n_labels = ['10 nodes', '20 nodes', '30 nodes', '40 nodes', '50 nodes']
     data = []
@@ -83,8 +137,23 @@ def main():
                 data[n].append(np.mean(time_list))
     
     #plot_curves(list1, list2)
-    plot_barchart(data, m_labels, n_labels)
+    plot_barchart_ilp_times(data, m_labels, n_labels)
+
+def plot_makespans():
+    m_list = [6,7,8]
+    n_list = [10,20,30]
+
+    for m in m_list:
+        for n in n_list:
+            plot_barchart_makespans(m, n)
+
+def plot_model_compute_time():
+    m_list = [6,7,8]
+
+    for m in m_list:
+        plot_curves_from_csv('results_time_model_m%i' % (m), m)
+    
 
 # Execute the main function
 if __name__ == '__main__':
-    main()
+    plot_model_compute_time()
