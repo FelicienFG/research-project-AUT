@@ -3,26 +3,38 @@
 ~
 
 No supervised learning model has been found in the literature to 
-tackle the non-preemptive, global fixed-priority scheduling problem 
-for single DAG tasks.
-Therefore, we must first design a supervised learning model
-that is able to approximate the computation of a priority-list for a single DAG task
+tackle the non-preemptive, global fixed-priority scheduling problem of a single DAG task.
+That is because supervised learning is most often used for problems
+that we, humans, know how to solve, but don't have an algorithm for it,
+such as image classification or text classification.
+In this case, there are ways to compute solutions to the problem
+using linear programming, but it is costly and doesn't scale well 
+when inreasing the number of nodes per DAG.
+Hence, in the literature, only reinforcement learning has been
+used to tackle this problem, a machine learning method that 
+doesn't need to know the true solution but 
+can instead approximate the solution by maximizing a reward function.
+Still, supervised learning is a widely used machine learning method
+and can provide good interpretations when the model is not too deep.
+Also, once trained, the supervised machine learning model can be 
+fast and scalable in terms of computing time, unlike the ILP method.
+Therefore, the supervised learning model's purpose will be to
+approximate the computation of a priority-list for a single DAG task
 that leads to the minimum makespan.
 
-In order to have a supervised model, we need
-to train the model on a set of already solved DAGs 
-so that the model can learn how to approximate those solutions in a reasonable time.
-Indeed, in supervised learning, the machine learning model 
-predicts an output (forward pass) and then computes the error between
-the predicted output and a known true output.
-The gradient of the error function is then propagated through the network to tweak the model's 
-trainable parameters, which is also called the backward pass (see Figure \ref{fig:supervised_learning}).
-The issue with the supervised method is that we need to have true outputs,
-that is priority lists that we know lead to the minimum makespan.
-However, the problem is NP-hard which makes the computation
-of those true labels expensive. The idea behind this supervised
-method is to leverage the amount of training time with the performance
-and scalability of the model, once it is trained.
+\subsection{Supervised design}
+~
+
+In supervised learning, 
+the model predicts a value (forward pass) that is then compared to the known-to-be-true value using a
+specific error-function, often called the loss function,
+and the error is then propagated through the model to tweaks its parameter, minimizing the loss function
+(Figure \ref{fig:supervised_learning}).
+The idea is, then, to treat the problem as a classification problem,
+where each node of a DAG needs to be 'classified' in a specific priority.
+ILP will be used to compute the optimal\footnote{Here and in the following paragraphs, 'optimal' means 'yielding the minimum makespan'.}
+priority-lists, and use them as the known-to-be-true values to compare the model-predicted values with.
+
 
 \begin{figure}
     \centering
@@ -31,18 +43,17 @@ and scalability of the model, once it is trained.
     \label{fig:supervised_learning}
 \end{figure}
 
-\subsection{Supervised design}
-~
+
 
 \subsubsection{Input DAGs}
 ~
 
 In machine learning, the input that we give to the model
-needs to be in a matrix representation which the model can 
-then process. Therefore, every DAG task needs to have
+needs to be in a matrix representation so that the model can 
+then process it. Therefore, every DAG task needs to have
 a matrix representation that encompasses the information 
 required to make decisions about its execution priority order.  
-Each input DAG  task will be represented using 
+Each input DAG task will be represented using 
 a matrix of numbers with each row being a node
 and each column being a raw feature of a node.
 The list of raw features is similar to what is proposed by \citet{Lee2021GlobalDagSchedDRL},
@@ -77,7 +88,13 @@ An example of such a DAG task representation is shown in Figure \ref{fig:dag_tas
 \subsubsection{Output labels}
 ~
 \label{sec:output_labels}
-An Integer Linear Programming (ILP) solver will be used to compute
+
+In order for the supervised model to learn, it needs to 
+compare its predicted output against a known-to-be-true output, also 
+called an output label. In this case,
+the output label is supposed to be an optimal priority-list
+
+Therefore, an Integer Linear Programming (ILP) solver will be used to compute
 the optimal (minimum makespan) schedule for each DAG task and then
 ordering the nodes according to their release time in the ILP schedule.
 

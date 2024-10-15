@@ -126,6 +126,26 @@ the use of the case study methology not relevant in this research's context and 
 the SOTA papers. 
 
 
+\section{Problem definition}
+~
+
+The problem to be tackled is the problem of scheduling a single DAG task with a non-preemptive, global and fixed-priority scheduler (GFPS),
+on a multicore system. That is, the problem of computing a priority for each node for a DAG task so that it minimizes, 
+using a non-preemptive GFPS, the makespan of the DAG.
+
+More precisely, given a DAG task $\tau = G = (V, E)$ and $n = \left\lvert V \right\rvert$, the designed machine learning model 
+idealy needs to compute a list of priorities $p^* \in \llbracket 0, n-1 \rrbracket^{n}$
+so that 
+$$
+    \text{AFT}(v_{\text{sink}}, p^*) = \min_{p \in \llbracket 0, n-1 \rrbracket^{n}} \text{AFT}(v_{\text{sink}}, p)
+$$
+
+with $\text{AFT}(v_{\text{sink}}, p)$ being the actual finish time of the
+sink node of $\tau$, i.e., the makespan of the DAG task $\tau$,
+calculated using a non-preemptive GFPS. Note that $p^*$ is not necessarily unique.
+In this paper, the priorities will be higher when having a lower value,
+that is, the highest priority given to a node is 0 and the lowest is $n-1$.
+
 %\subsection{Hyper Parameters}
 %~
 %
