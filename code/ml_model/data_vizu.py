@@ -2,15 +2,30 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# Function to read data from file and return two lists of values
-def read_data_from_file(filename):
+def read_data_from_file(filename, last_comma=True):
+    list_nums = []
     with open(filename, 'r') as file:
         # Reading lines from the file
         lines = file.readlines()
-
-        list_nums = list(map(float, lines[0].strip().split(',')[:-1]))
+        if last_comma:
+            list_nums = list(map(float, lines[0].strip().split(',')[:-1]))
+        else:
+            list_nums = list(map(float, lines[0].strip().split(',')))
 
     return list_nums
+
+def read_data_from_lossaccu_file(filename):
+    with open(filename, 'r') as file:
+        # Reading lines from the file
+        lines = file.readlines()
+        
+        list_loss_train = list(map(float, lines[0].strip().split(',')))
+        list_loss_val = list(map(float, lines[1].strip().split(',')))
+
+        list_accu_train = list(map(float, lines[2].strip().split(',')))
+        list_accu_val = list(map(float, lines[3].strip().split(',')))
+
+    return list_loss_train, list_loss_val, list_accu_train, list_accu_val
 
 
 
@@ -45,19 +60,23 @@ def plot_barchart_ilp_times(data, m_labels, n_labels):
     plt.show()
 
 
-def plot_curves_from_csv(file_path, m):
+def plot_curves_from_csv(file_path, ilp_filepath, m):
     # Load the CSV file into a DataFrame
-    data = pd.read_csv(file_path, header=0)
+    data_model = pd.read_csv(file_path, header=0)
+    data_ilp = pd.read_csv(ilp_filepath, header=0)
+    data_ilp = data_ilp.iloc[:3, :]
     #print(data)
     # Plot the curves
     plt.figure(figsize=(10, 6))
-    plt.plot(data['tasks'], data['avgtime'], marker='o')
+    #plt.plot(data_model['tasks'], data_model['avgtime'], label='model', marker='o')
+    plt.plot(data_ilp['tasks'], data_ilp['avgtime'] * 1.0e-3 / 60.0, label='ilp', marker='x')
     
-    plt.xticks(data['tasks'].unique())
+    plt.xticks(data_model['tasks'].unique())
     # Add labels, title, and legend
     plt.xlabel('Number of nodes')
-    plt.ylabel('Average computing time in ms')
-    plt.title('Average (over %i samples) model computing time for 10, 20 and 30 nodes per graph on %i cores' % (data['samples'][0], m))
+    plt.ylabel('Average computing time in minutes')
+    plt.title('Average (over %i samples) computing time for 10, 20 and 30 nodes per graph on %i cores' % (data_model['samples'][0], m))
+    plt.legend()
 
     # Display the plot
     plt.tight_layout()
@@ -100,19 +119,20 @@ def plot_barchart_makespans(m, n):
 
 
 # Function to plot two lists as curves
-def plot_curves(list1, list2):
+def plot_curves(list_loss_train, list_loss_val, list_accu_train, list_accu_val, m, n, epochs):
     plt.figure(figsize=(10, 5))
     
     # Plotting the first list with label 'train'
-    plt.plot(list1, label='training', marker='o', linestyle='-')
-    
-    # Plotting the second list with label 'validation'
-    plt.plot(list2, label='validation', marker='x', linestyle='--')
+    plt.plot(list_loss_train, label='train loss', marker='o', linestyle='-', color='red')
+    plt.plot(list_loss_val, label='validation loss', marker='x', linestyle='--', color='red')
+
+    plt.plot(list_accu_train, label='train accuracy', marker='o', linestyle='-', color='blue')
+    plt.plot(list_accu_val, label='validation accuracy', marker='x', linestyle='--', color='blue')
     
     # Adding titles and labels
-    plt.title('Training vs. Validation Curves on 10 epochs')
+    plt.title('Training vs. Validation Curves on %i cores with %i nodes per graph and on %i epochs' % (m, n, epochs))
     plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.ylabel('Loss/Accuracy')
     plt.ylim(bottom=0)  # Setting the y-axis to start at 0
     plt.ylim(top=1)
     plt.legend()
@@ -151,9 +171,30 @@ def plot_model_compute_time():
     m_list = [6,7,8]
 
     for m in m_list:
-        plot_curves_from_csv('results_time_model_m%i' % (m), m)
+        plot_curves_from_csv('results_time_model_m%i' % (m), 'time_results_ilp_m%i' % (m), m)
     
+def compute_mean_time_results_ILP():
+    for m in [2,4,6,7,8]:
+        with open('time_results_ilp_m%i' % (m), 'w+') as newFile:
+            newFile.write('tasks,avgtime\n')
+            for n in [10,20,30,40,50]:
+                filename = '../LET-LP-Scheduler/time_results_m%ip8n%i' % (m,n)
+                if m != 2 or n <= 20:
+                    timings = np.array(read_data_from_file(filename))
+                    timings *= 1.0e-3# / 60.0
+                    newFile.write('%i,%f\n' % (n,np.mean(timings)))
+                else:
+                    newFile.write('%i,%f\n' % (n, 60.0))
 
+def plot_lossaccu_curves():
+    for m in [6,7,8]:
+        for n in [10,20,30]:
+            for epochs in [10,20]:
+                loss_train, loss_val, accu_train, accu_val = read_data_from_lossaccu_file('results_lossaccu_m%ip8n%i_lr0.001000_bs250_epochs%i' % (m,n,epochs))
+                plot_curves(loss_train, loss_val, accu_train, accu_val, m, n, epochs)
+            
 # Execute the main function
 if __name__ == '__main__':
-    plot_model_compute_time()
+    #compute_mean_time_results_ILP()
+    #plot_model_compute_time()
+    plot_lossaccu_curves()
