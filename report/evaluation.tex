@@ -12,7 +12,7 @@ The stochastic gradient descent is used for training with a learning rate of $0.
 During the initial evaluation, an oversmoothing problem occured which lead to reducing the number of GCN layers to 1(see Section \ref{sec:model_design}).
 Unfortunately reducing the number of GCN layers wasn't enough which lead 
 to adding a regularization term to the loss function.
-The idea is to tackle the oversmoothing probblem by forcing the model
+The idea is to tackle the over-smoothing probblem by forcing the model
 to differentiate between the nodes' representation.
 Hence, the regularization term is the squared inverse of the average euclidian distance 
 between each of the nodes' latent representation, i.e., 
@@ -82,43 +82,43 @@ and 100 of them were used to measure the computing time
 for both the ILP and the supervised ML methods.
 
 
-\subsection{ILP computing time results}
+\subsection{Computing time results}
 ~
 
-The computing time for each parameter set is shown 
+The computing time for the ILP method is shown 
 in Figure \ref{fig:ilp_compute_time}.
 The ILP solver was timed out whenever the computing time exceeded 1 hour
-and the average computing time has been calculated using 100 DAG tasks for each instance.
+and it did time out when considering systems of 2 and 4 cores, when the number of nodes
+exceeded 20 nodes (i.e., 30, 40 and 50 nodes) per DAG task.
+Hence, in the next sections, only 6 and 8 cores will be considered,
+with the number of nodes not exceeding 30 nodes, to have enough
+ILP solved DAGs for training the model. 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/result_computing_time_ilp.png}
+    \includegraphics[width=\linewidth]{images/result_computing_time_ilp_m6.png}
     \caption{Average computing time for computing the optimal schedule
     of a single DAG task using the ILP method, in minutes, according to 
-    the number of cores on the system as well as the number of nodes in the DAG.}
+    the number of nodes in the DAG, on a system with 6 cores.}
     \label{fig:ilp_compute_time}
 \end{figure}
 
-As you can see, the more cores there are on the system, 
-the shorter the computing time gets.
-Also, the time it takes to compute DAGs with more than 30 nodes
-exceed a few minutes, is more than 10 minutes for $m=4$ and 
-even more than an hour for $m=2$.
-Figure \ref{fig:ilp_compute_time} shows how non-scalable
-the ILP method is, when fixing the number of cores,
-as it takes a few milliseconds to compute a solution for 10 nodes
-, at least a few seconds for 20 nodes,
-but takes atleast more than 5 minutes for 50 nodes.
-The notable difference when increasing the amount of cores
-stems from the fact that the parallelism parameter $p = 8$ which 
-means that when  $m=8$ each layer can potentially be fully parallelized
-because there can only be up to 8 nodes per layer within a DAG,
-thus making the scheduling problem simpler.
-When $m=2$ however, there are a lot more layers that cannot 
-be fully parallelized because there can only be up to 2 nodes
-executing at the same time, thus making the scheduling problem more complex.
+As you can see from Figure \ref{fig:ilp_compute_time}, the more nodes there are on the system, 
+the more time it takes for the ILP solver to compute the optimal schedule,
+and it does so in, what it seems to be, an exponential growth.
+Figure \ref{fig:ilp_compute_time} thus shows the non-scalability
+of the ILP method, with the number of nodes per DAG increasing.
 
-The fact that it takes several minutes to compute only 1 DAG task 
-, coupled with time constraints, is why 
-the focus will only be on DAGs with 10, 20 or 30 nodes when $m \in \{6,7,8\}$,
-DAGs with 10 and 20 nodes when $m=4$ and DAGs with 10 nodes when $m=2$.
+When comparing to the ML model's computing time (Figure \ref{fig:compute_time_ilp_model}),
+you can see how 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/result_computing_time_ilp_m8.png}
+    \includegraphics[width=\linewidth]{images/result_computing_time_model_m8.png}
+    \caption{Average computing time for computing the optimal schedule
+    of a single DAG task using the ILP method (top), in minutes,
+    and using the ML model (bottom) according to 
+    the number of nodes in the DAG, on a system with 8 cores.}
+    \label{fig:compute_time_ilp_model}
+\end{figure}

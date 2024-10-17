@@ -64,18 +64,18 @@ def plot_curves_from_csv(file_path, ilp_filepath, m):
     # Load the CSV file into a DataFrame
     data_model = pd.read_csv(file_path, header=0)
     data_ilp = pd.read_csv(ilp_filepath, header=0)
-    data_ilp = data_ilp.iloc[:3, :]
+    #data_ilp = data_ilp.iloc[:3, :]
     #print(data)
     # Plot the curves
     plt.figure(figsize=(10, 6))
     #plt.plot(data_model['tasks'], data_model['avgtime'], label='model', marker='o')
     plt.plot(data_ilp['tasks'], data_ilp['avgtime'] * 1.0e-3 / 60.0, label='ilp', marker='x')
     
-    plt.xticks(data_model['tasks'].unique())
+    plt.xticks(data_ilp['tasks'].unique())
     # Add labels, title, and legend
     plt.xlabel('Number of nodes')
     plt.ylabel('Average computing time in minutes')
-    plt.title('Average (over %i samples) computing time for 10, 20 and 30 nodes per graph on %i cores' % (data_model['samples'][0], m))
+    plt.title('Average (over %i samples) computing time for 10, 20, 30, 40 and 50 nodes per graph on %i cores' % (data_model['samples'][0], m))
     plt.legend()
 
     # Display the plot
@@ -105,10 +105,10 @@ def plot_barchart_makespans(m, n):
                 ha='center', va='bottom')
 
     # Add labels, title, and legend
-    ax.set_ylim(bottom=1.0)
-    ax.set_xlabel('method')
-    ax.set_ylabel('Average makespan')
-    ax.set_title('Average makespan with different methods, with m=%i and n=%i' % (m, n))
+    ax.set_ylim(bottom=1.0, top=1.005)
+    ax.set_xlabel('method (model is untrained)')
+    ax.set_ylabel('Average reduced makespan')
+    ax.set_title('Average reduced makespan with different methods, with m=%i and n=%i' % (m, n))
     ax.set_xticks(index + bar_width)
     ax.set_xticklabels(labels)
     #ax.legend()
@@ -197,4 +197,5 @@ def plot_lossaccu_curves():
 if __name__ == '__main__':
     #compute_mean_time_results_ILP()
     #plot_model_compute_time()
-    plot_lossaccu_curves()
+    #plot_lossaccu_curves()
+    plot_makespans()

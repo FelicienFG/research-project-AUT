@@ -51,9 +51,9 @@ priority-lists, and use them as the known-to-be-true values to compare the model
 In machine learning, the input that we give to the model
 needs to be in a matrix representation so that the model can 
 then process it. Therefore, every DAG task needs to have
-a matrix representation that encompasses the information 
-required to make decisions about its execution priority order.  
-Each input DAG task will be represented using 
+a matrix representation that encompasses information 
+about its internal structure as well as its global attributes.  
+Each input DAG task will, thus, be represented using 
 a matrix of numbers with each row being a node
 and each column being a raw feature of a node.
 The list of raw features is similar to what is proposed by \citet{Lee2021GlobalDagSchedDRL},
@@ -85,26 +85,63 @@ An example of such a DAG task representation is shown in Figure \ref{fig:dag_tas
     \label{fig:dag_task_matrix_example}
 \end{figure}
 
-\subsubsection{Output labels}
+\subsubsection{Output priorities}
 ~
 \label{sec:output_labels}
 
 In order for the supervised model to learn, it needs to 
 compare its predicted output against a known-to-be-true output, also 
 called an output label. In this case,
-the output label is supposed to be an optimal priority-list
+the problem is treated as a classification problem which means 
+that for each node of a DAG, the model needs to output the probability
+of this node being classified as a specific priority.
+Therefore, for a DAG task with $n$ nodes,
+each node must have a list of $n$ probabilities,
+with each one being the probability of the node being 
+assigned the priority corresponding to the position of the probability in the list
+of probabilities, starting from 0.
+For instance, if $n = 3$, 
+a possible output for a node $\tau_i$ would be
+$\text{model}(\tau_i) = [0.2,0.5,0.3]$ which means that according to the model,
+the node $\tau_i$ has a probability to be assigned priority 0 of $0.2$,
+priority 1 of $0.5$ and priority 2 of $0.3$.
+As a consequence, the priority chosen for node $\tau_i$ will be 
+the one that has the maximum probability a-posteriori,
+in the example above, it is priority 1.
+
+This must be the case for every node and as the input 
+is a matrix representing the whole graph, 
+the output then also needs to be a matrix with 
+each row corresponding to each node and the columns
+correspond to the priorities, e.g., Figure \ref{fig:dag_output_matrix_example}.
+\\
+
+The model output needs to be compared to the known-to-be-true output or label,
+which means we need a way of calculating the optimal priority list.
+The idea is to use an ILP solver to compute the optimal schedule 
+of a dag task, and then use this optimal schedule to retrieve 
+the optimal priorities for each node, according to their start time
+in the computed schedule.
+Each node will be sorted according to their start time in increasing order
+and the priority value will then be the position of each node in the sorted list.
+As a consequence, the nodes with the lowest start time will
+have the highest priority.
+
+The makespan calculation is done using a non-preemptive GFPS,
+with a first fit core assigning strategy (see Section \ref{sec:makespan_calculation}). Hence,
+the retrieved optimal priority list can sometimes 
+lead to a different schedule than what the ILP solver computed.
+Fortunately, because we're on a homogeneous system,
+as long as the priorities are respected, the core assignment 
+doesn't matter and would just lead to having a symmetric schedule
+compared to the ILP schedule,
+that is swapping cores in the ILP schedule, which doesn't change the makespan.
 
 Therefore, an Integer Linear Programming (ILP) solver will be used to compute
-the optimal (minimum makespan) schedule for each DAG task and then
-ordering the nodes according to their release time in the ILP schedule.
-
-The output of the model will be a matrix of probabilities,
-with each row being the index of a node and each column being the index of the priority.
-There are as many priorities as there are nodes and 
-the priority list of each DAG is then retrieved using the column
-index of the maximum probability as the assigned probability, for each row.
-Matrix output example for the DAG task shown in Figure \ref{fig:dag_task_matrix_example}
-is shown in Figure \ref{fig:dag_output_matrix_example}.
+the optimal schedule for each DAG task (see Section \ref{sec:ilp_calculation}) and then
+ordering the nodes according to their start time in the ILP schedule,
+thus having an optimal list of priorities for the nodes that can then be compared to
+the predicted model output list.
 
 \begin{figure}
     \centering
@@ -114,9 +151,31 @@ is shown in Figure \ref{fig:dag_output_matrix_example}.
     \label{fig:dag_output_matrix_example}
 \end{figure}
 
-The ILP output matrix to compare the predicted output to is of the same shape
-as the predicted output matrix with the probabilities being 1 on the optimal priority for each row 
-, and 0 otherwise. For instance, if the optimal priority list for a DAG task of 3 nodes 
+\subsubsection{Loss function}
+~
+\label{sec:loss_design}
+
+Although the problem is being treated as a classification problem,
+the goal still is to compute a priority list that minimizes the makespan
+of the DAG.
+Therefore, the idea was, initially, to compare the makespan
+produced by the predicted priority-list with the makespan
+produced by the ILP schedule, using a simple difference operator.
+Unfortunately, the non-preemptive GFPS which is used to compute the makespan,
+isn't differentiable for the priority-list given to it,
+which lead to segfaults in the training phase.
+Thus, instead of looking at the makespans,
+the idea is to look at the priority matrix 
+and compare the one predicted by the model to
+the ILP priority matrix that is retrieved from the priority-list.
+Indeed, an ILP output matrix to compare the predicted output to
+can be calculated using the previously retrieved priority-list.
+Like the model-predicted output matrix,
+the ILP matrix output will represent the probabilities
+of each node being assigned a specific priority, using the 
+same process described in the previous section but in reverse, with a probability of 1 
+on the optimal priority value, and 0 otherwise. 
+For instance, if the optimal priority list for a DAG task of 3 nodes 
 is [$\tau_1$: 0, $\tau_2$: 2, $\tau_3$: 1],
 then the true label is the matrix :
 $$
@@ -128,13 +187,13 @@ $$
 $$
 With each row representing $\tau_1$, $\tau_2$ and $\tau_3$ respectively,
 and the column represent the priorities 0, 1 and 2 respectively.
-\subsubsection{Loss function}
-~
-\label{sec:loss_design}
 
-The problem is being treated as a classification problem,
-hence the binary cross-entropy loss function will be used.
-This function is defined as follows :
+Once we have the two matrices, 
+it is then possible to use the binary cross-entropy loss function,
+widely used for classification problem,
+to compare the predicted output to the optimal ILP matrix.
+
+More specifically, the binary cross-entropy loss function is defined as :
 \begin{equation}
     loss(x, y) = \sum_{i=1}^{n} -y_i\log(x_i)
 \end{equation}
@@ -148,9 +207,36 @@ and $n$ is the number of element in $x$ and $y$.
 ~
 \label{sec:model_design}
 
-The model's architecture is very similar to the proposed encoder in \citet{Lee2021GlobalDagSchedDRL},
-that is, the model is comprised of three modules.
-Two feed forward networks and one attention-based graph convolutional network (see Figure \ref{fig:model_diagram}).
+The main idea for designing the architecture of the model is 
+to leverage the structural information of the DAG.
+That is, it needs to learn the relationships and connections
+between the nodes to correctly classify the nodes into the right priorities.
+In machine learning a prevalent architecture when dealing with graphs
+is the graph neural network architecture.
+The idea is, instead of treating each node as independent vectors, like 
+in a traditional feed-forward network, 
+a graph neural network gathers information of each node and its neighbours 
+and passes it to the next layer.
+One way to do that is to aggregate the neighbours' information of a node
+and use this aggregation to compute the next representation vector of the node.
+
+Unfortunately, this kind of aggregation also means that a node will have similar 
+attributes to its neighbours, when passing through multiple layers of a graph neural network (GNN).
+This problem can lead to groups of neighbours having very similar vector representation
+and can cause an over-smoothing problem\cite{chen2020oversmoothing}.
+The two main ways to fix this kind of problem is either to reduce the amount of GNN layers 
+or/and use the attention-mechanism to give a notion of importance to a node's neighours,
+thus reducing impact a less important neighbour can have on the aggregation phase.
+Of course, reducing the number of GNN layers also means less complexity which can decrease the performance of the model,
+thus, a balance between having complexity and limiting the over-smoothing problem is often done to maximize performance.
+This is exactly what they do in the literature\cite{Lee2021GlobalDagSchedDRL}\cite{Zhao2024GATDRLmodel}.
+More specifically, \citet{Lee2021GlobalDagSchedDRL} designed a Graph Convolutional Network (GCN) based on the attention-mechanism
+to encode the nodes' feature vectors in their reinforcement learning model, performing slightly better than the state-of-the-Art
+heuristics from \citet{zhao2020DAGsched}.
+
+Therefore, the model's architecture will be based on the proposed encoder in \citet{Lee2021GlobalDagSchedDRL},
+and it will be comprised of three modules :
+two feed forward networks and one attention-based graph convolutional network (GCN) (see Figure \ref{fig:model_diagram}).
 
 \begin{figure}
     \centering
@@ -161,15 +247,24 @@ Two feed forward networks and one attention-based graph convolutional network (s
 
 \subsubsection{Feed forward networks}
 ~
+Using a feed-forward network (FFN) before the GCN can help at pre-encoding the feature vectors of the nodes
+so that the GCN can better work on those feature vectors.
+Also, a feed-forward network (FFN) at the end of the model is needed to make 
+the final classification decision about each node, once the feature vectors have
+all the graph structural information encoded into them.
+Of course, the more layers in the FFN, the more complexity
+is encoded in the feature vectors, but it can also potentially lead to an over-fitting
+problem with the model being too complex and taking the noise into account,
+decreasing its generalization power and its overall performance.
 
-The two feed forward networks have 3 layers with each 
+Therefore, the two feed forward networks will have 3 layers with each 
 layer $n$ producing the following output,
-where $W_n \in \mathbb{R}^{5\times5}$ is the matrix of trainable weights
-at layer $n$, $b_n \in \mathbb{R}^5$ is the bias and $X_n$ is either a node's vector representation
-or the output of the previous layer, and $ReLU(x) = max(0, x)$:
 \begin{equation}
     o_{n} = ReLU(W_{n}X_{n} + b_n),\, n \in \{1,2,3\}
 \end{equation}
+where $W_n \in \mathbb{R}^{5\times5}$ is the matrix of trainable weights
+at layer $n$, $b_n \in \mathbb{R}^5$ is the bias and $X_n$ is either a node's vector representation
+or the output of the previous layer, and $ReLU(x) = max(0, x)$.
 There is an exception for the second feed forward network where the last 
 layer's output is computed using the following equation:
 \begin{equation}
@@ -179,13 +274,26 @@ where $W_3 \in \mathbb{R}^{nbPriorities \times 5}$,
 $b_3 \in \mathbb{R}^{nbPriorities}$ and $\tanh$ is the 
 hyperbolic tangent activation function.
 Also, $nbPriorities$ corresponds to the number of different priorities
-that can be assigned to each node.
+that can be assigned to each node, which in this case is going to be the same as the number of nodes in the DAG.
 
 
 \subsubsection{Graph Convolutional Network}
 ~
 
-For each gcn layer, the input vector $X_k$ 
+The GCN layer needs to aggregate the information 
+of the neighbours of a node and use that information
+to compute the next representation vector of the node.
+To do that, we utilize both the incoming and outgoing neighbours
+of a node and compute their attention scores to then aggregate
+that information to pass it through an activation 
+function, thus updating the representation vector of the node (see Figure \ref{fig:update_aggregate_diagram})
+Considering both in and out neighbours enables the encoding
+of more of the structural complexity of the graph, and also
+using the directed aspect of the DAGs.
+The Figure \ref{fig:update_aggregate_diagram} represents
+one GCN layer.
+
+To be more specific, for each GCN layer, the input vector $X_k$ 
 goes through an aggregation phase where,
 given the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
 $v_i$, and the set of outgoing neighbours $\mathcal{N}_{out}(v_i)$, which also includes $v_i$,
@@ -195,7 +303,8 @@ the next vector representation $X_{k+1}$ is calculated by the following equation
 GCN(X) = AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i))
 \end{equation}
 
-where $AttentionModule$ is defined by the Equations \ref{eq:attention_module}--\ref{eq:elu}:
+where $AttentionModule$ is defined by the Equations \ref{eq:attention_module}--\ref{eq:elu}
+and computes the importance scores of each neighbour, in each set of neighbours:
 
 \begin{multline}
     AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i)) = \\
@@ -216,7 +325,11 @@ Where
 are the attention coefficients
 which evaluates how important is $v_j$ to $v_i$'s vector 
 representation, similar to what is done in \citet{Lee2021GlobalDagSchedDRL}.
-
+Equation \ref{eq:attention_submodule} computes the attention scores
+for each neighbours of node $v_i$, 
+scores that are then used in Equation \ref{eq:attention_module}
+to aggregate the scores information and pass it through 
+the ELU activation function.
 Every $W$, $a$, and $b$ are different matrices of trainable parameters,
 and $\text{ELU}$ is the exponential linear unit activation function (Equation \ref{eq:elu}).
 
@@ -238,22 +351,24 @@ x, & \text{if } x > 0 \\
 \end{equation}
 
 
-The idea behind using attention is to make the model 
-take into account the inner structure of the graph by 
-looking at the importance of each node
-compared to its neighbour nodes.
 The GCN layer can be repeated several times 
 to improve the model's capacity to better
 capture the complexity of the graph structure.
 Unfortunately, when testing with 3 GCN layers,
-we ran into an oversmoothing problem\cite{chen2020oversmoothing}, which lead us 
-to restrict the number of GCN layers to just one layer.
+the over-smoothing problem
+still happened with the model outputing
+the same priority for every node in a DAG, which lead 
+to restricting the number of GCN layers to just one layer.
 
 \subsection{Computing the labels}
 ~
+\label{sec:ilp_calculation}
 
 \subsubsection{Computing the optimal schedule}
 
+ILP will be used to compute the optimal schedule,
+hence the need to have an ILP solver.
+Fortunately, 
 \citet{yip2023letsynchronise} proposed an ILP-based
 scheduling solver for event-chains of time-triggered tasks
 using the Logical Execution Time paradigm\cite{kirsch2012logical}.
@@ -274,7 +389,7 @@ be equal to the total workload squared.
 The wcet of a node will be the wcet of its LET task version.
 Lastly, each path in the DAG will represent an even-chain of tasks.
 
-Unfortunately, minimzing the sum of dependency delays (i.e., Equation 6 in \citet{yip2023letsynchronise}) is not equivalent
+Unfortunately, minimizing the sum of dependency delays (i.e., Equation 6 in \citet{yip2023letsynchronise}) is not equivalent
 to minimizing the makespan of a DAG (see Figure \ref{fig:counter_example_minsumdep})
 but we can change the objective function to the end execution time
 of the sink node, i.e., the node which doesn't have any successors,
@@ -317,6 +432,7 @@ at the end of Section \ref{sec:output_labels}.
 
 \subsection{Makespan calculation}
 ~
+\label{sec:makespan_calculation}
 
 The main performance metric that will be used in the evaluation
 is the makespan, i.e., the end execution time of the sink node of a DAG.
