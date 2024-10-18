@@ -109,9 +109,6 @@ and it does so in, what it seems to be, an exponential growth.
 Figure \ref{fig:ilp_compute_time} thus shows the non-scalability
 of the ILP method, with the number of nodes per DAG increasing.
 
-When comparing to the ML model's computing time (Figure \ref{fig:compute_time_ilp_model}),
-you can see how 
-
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/result_computing_time_ilp_m8.png}
@@ -122,3 +119,210 @@ you can see how
     the number of nodes in the DAG, on a system with 8 cores.}
     \label{fig:compute_time_ilp_model}
 \end{figure}
+
+When comparing to the ML model's computing time (Figure \ref{fig:compute_time_ilp_model}),
+you can see how, unlike ILP, the model seems to be a lot more scalable
+than ILP, as shown by the linearity of the computing time curve (bottom graph of Figure \ref{fig:compute_time_ilp_model}).
+The linearity is of course not a true linearity as the theoretical complexity,
+in terms of operations on the nodes' vector representation,
+of the model can be calculated to be $O(n^2)$ according to Section \ref{sec:model_design},
+but the curve is linear because of how short the X axis is,
+the polynomial curve is zoomed in which explains why the curve seems linear.
+
+This difference in scalability is expected as the problem is NP-hard,
+which means that the ILP solution, calculating optimal solutions,
+has to be at least of exponential complexity, hence the non-scalability of the ILP method.
+The model's scalability is also expected as the theoritacl complexity
+is polynomial.
+
+
+\subsection{Performance comparison}
+~
+
+Two performance metrics will be used for the model.
+The makespan which will be compared to the ILP solution, the heuristic
+from \citet{zhao2020DAGsched} and a random method where each priority is assigned at random,
+and the accuracy / loss of the model.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/avg_makespan_m8n30.png}
+    \caption{Average reduced makespan (makespan divided by the critical path length) on the test set (400 DAGs) using the four different methods
+    on 8 cores with 30 nodes per DAG,
+    with 'random' being the method of randomly assigning priorities to nodes of a DAG.}
+    \label{fig:avg_makespan_comparison_trained}
+\end{figure}
+
+Figure \ref{fig:avg_makespan_comparison_trained} shows the average
+reduced makespan, which is the makespan divided by the length of the critical path,
+computed with each method on 400 DAGs from the test set.
+Not only does the model perform worse than the heuristic from \citet{zhao2020DAGsched},
+the model performs worse than the random method.
+Also, the heuristic is very close to matching the ILP method,
+performing even greater than expected.
+
+When not-trained (Figure \ref{fig:avg_makespan_comparison_untrained}), the model performs 
+about the same as randomly, which is expected
+given the initialization of trainable weights is done randomly,
+confirming the fact that the model's learning decreases its makespan performance.
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/avg_makespan_m8n30_untrained.png}
+    \caption{Average reduced makespan (makespan divided by the critical path length) on the test set (400 DAGs) using the four different methods
+    on 8 cores with 30 nodes per DAG,
+    with 'random' being the method of randomly assigning priorities to nodes of a DAG,
+    and the model not being trained.}
+    \label{fig:avg_makespan_comparison_untrained}
+\end{figure}
+
+
+In terms of accuracy and loss, the results are shown in Figure \ref{fig:accu_loss_model}.
+The accuracy is, in this case, how well the resulting priority list 
+from the model matches the ILP priority list.
+Unfortunately, the accuracy is stagnant at less than 10\%
+and doesn't get better when increasing the number of epochs to train on. 
+Also, the accuracy doesn't change between the training and testinng phase
+which further confirms that the model doesn't learn at all.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/train_val_curves_m8n30epo10.png}
+    \includegraphics[width=\linewidth]{images/train_val_curves_m8n30epo20.png}
+    \caption{Accuracy (in blue) and loss (in red) values for training (circles) and testing (crosses),
+    accross the epochs. The top graph shows results for 10 epochs
+    and the bottom one for 20 epochs. The results are shown on 8 cores with 30 nodes per DAGs,
+    with a training batch size of 250 and a learning rate of $0.001$.}
+    \label{fig:accu_loss_model}
+\end{figure}
+
+Furthermore,
+when looking at the output of the model (Table \ref{tab:similarity_percentages}),
+we can see that in most cases,
+the priority lists predicted by the model are, on average, more than 90\% 
+made out of the same value, i.e., for 10 nodes : [1, 1, 1, 1, 1, 1, 1, 1, 2, 1] for instance.
+This shows that the over-smoothing of the DAGs is still an issue for the model and explains
+the low accuracy.
+
+\begin{table}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{number of nodes per DAG/number of cores} & \textbf{6} & \textbf{7} & \textbf{8}\\
+        \hline
+        \textbf{10} & 94\% & 99\% & 94\%\\
+        \hline
+        \textbf{20} & 91\% & 60\% & 90\%\\
+        \hline
+        \textbf{30} & 100\% & 99\% & 98\%\\
+        \hline
+    \end{tabular}
+    \caption{Average percentage of the number of priority slots that have the same value
+    in a priority-list outputed by the model.}
+    \label{tab:similarity_percentages}
+\end{table}
+
+
+Although the makespan and accuracy results shown here are only 
+in the case of 8 cores and 30 nodes per DAG,
+the other cases, i.e., for 6, 7 cores and with 10,20 and 30 nodes per DAG,
+display very similar results and lead to the same conclusions as those
+shown here.
+
+\subsection{Discussions}
+~
+
+There are several reasons why a machine learning model
+sub-performs.
+The issue can be because of an overfitting problem,
+meaning that the model is too complex and learns the noise / bias
+that comes with the dataset.
+It can also be the opposite, under-fitting, 
+which is due to a model that is too simple for the task at stake,
+lacking the architecture to capture the complex information and 
+relationships
+in the data.
+It can be because of the nature of the dataset that is too biased
+or too noisy which makes it impossible for the model to learn from it.
+Finally, it can be because the model didn't train on enough data 
+or on enough epochs, which would mean that the model didn't have
+the time to converge and need more data samples to do so.
+
+Let's tackle these different problems and see why 
+the problem is the fact that supervised-learning isn't fit for this kind of problem,
+that is the single DAG task scheduling problem.
+
+
+\subsubsection{Biased data and amount of data}
+~
+
+Data is always bias and the amount of dataset bias\cite{torralba2011biasdataset}
+can have a huge impact on the performance of a model.
+Although the number of training samples (1000) is not a lot 
+compared to what \citet{Lee2021GlobalDagSchedDRL} have generated (8000),
+the dataset generation procedure is the same as the one 
+in both \citet{zhao2020DAGsched} and \citet{Lee2021GlobalDagSchedDRL}.
+The latter specifically, got more than promising results with their machine learning model,
+outperforming the heuristic in \citet{zhao2020DAGsched} by up to 3\% in terms of makespan,
+ when using the same data generation procedure as here.
+Furthermore, the loss is extremely stable and doesn't go down
+during training, even when training on 20 epochs (Figure \ref{fig:accu_loss_model}).
+This means that even if there is bias in the data, the fact that others have used
+the same data generation procedure and got great results shows that the
+dataset bias cannot explain the low performance of the model.
+Also, the fact that the model doesn't seem to learn at all with 
+its loss being stagnant accross the epochs, removes the 
+idea of the model performing badly because there is not enough data to learn on.
+
+
+\subsubsection{Over-fitting or under-fitting}
+~
+
+The reason why the model is performing this badly is probably
+not over-fitting.
+This is because over-fitting is characterized
+by the model learning the noise in the training set and performing\cite{jabbar2015overfitting_underfitting}.
+Hence, if it were the case, there would be a noticable gap
+between the training and validation accuracy in Figure \ref{fig:accu_loss_model},
+which there isn't.
+Also, the over-smoothing problem, which is causing the model to sub-perform,
+ doesn't come from the noise
+in the data but rather from the architecture of the model itself\cite{chen2020oversmoothing}.
+Hence the problem might rather be that the model is under-fit for this problem.
+
+Indeed, as mentioned before, what the model is learning is 
+to assign the same priority at every node, which also means
+that it doesn't learn to approximate the output given by the ILP priority-lists,
+as shown by the accuracy and loss values not notably decreasing during
+training (Figure \ref{fig:accu_loss_model}).
+The issue here is that the model resembles very closely the 
+encoder in \citet{Lee2021GlobalDagSchedDRL} which didn't 
+have the over-smoothing problem.
+The attention-mechanism used is also close to what is done in \citet{Zhao2024GATDRLmodel}
+which also didn't have an over-smoothing problem.
+
+The fact that The over-smoothing is very strong (see Table \ref{tab:similarity_percentages})
+and that the model is close to what has been done in the reinforcement learning models\cite{Lee2021GlobalDagSchedDRL}\cite{Zhao2024GATDRLmodel},
+lead us to conclude that the problem might be the learning method, 
+that is the supervised learning method.
+
+\subsubsection{the supervised learning problem}
+~
+
+In supervised learning, the problem is either going to be a
+regression problem, when dealing with real numbers as the target variable
+such as predicting the price of a product or the rate of infection in an epidemic, etc.
+Or the problem is going to be interpreted as a classification problem.
+In our case, the numbers are discrete and the set of priorities is finite
+which is why the problem was treated as a classification problem.
+However, usually, for supervised learning, the predicted output 
+aim at mathing a ground truth, known beforehand, that is unique.
+Although the ILP method permitted us to have a priority list that
+effectively yields the minimum makespan,
+that priority list is not unique.
+
+Indeed, not only is the minimum makespan schedule not necessarily unique
+(see Figure \ref{fig:not_unique_schedules}),
+but even if the schedule is unique, there can be multiple ways of 
+retrieving a priority-list which gives the minimum makespan (see Figure \ref{fig:multi_priolist_example}).
+

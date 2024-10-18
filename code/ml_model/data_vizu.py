@@ -193,9 +193,18 @@ def plot_lossaccu_curves():
                 loss_train, loss_val, accu_train, accu_val = read_data_from_lossaccu_file('results_lossaccu_m%ip8n%i_lr0.001000_bs250_epochs%i' % (m,n,epochs))
                 plot_curves(loss_train, loss_val, accu_train, accu_val, m, n, epochs)
             
+
+def print_avg_similarity():
+    for m in [6,7,8]:
+        for n in [10,20,30]:
+            with open('results_similarityOutput_m%ip8n%i' % (m, n), 'r+') as sim_file:
+                sim_list = sim_file.readlines()
+                sim_list = list(map(lambda x : float(x), sim_list))
+                print("m: %i n: %i, sim: %f" % (m, n, np.mean(sim_list)))
 # Execute the main function
 if __name__ == '__main__':
     #compute_mean_time_results_ILP()
     #plot_model_compute_time()
     #plot_lossaccu_curves()
-    plot_makespans()
+    #plot_makespans()
+    print_avg_similarity()
