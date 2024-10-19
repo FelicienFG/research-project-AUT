@@ -322,14 +322,14 @@ def eval_makespans():
         for n in n_list:
             trained_model = GCNAttention(embedding_dim=5, outDim=n)
             state_dict = torch.load('model_weights_m%ip8n%i_lr0.001000_bs250_epochs10.pth' % (m, n))
-            trained_model.load_state_dict(state_dict)
-            trained_model.eval()
+            #trained_model.load_state_dict(state_dict)
+            #trained_model.eval()
             data_loader = dl.DataLoader('../dag_generator/data_p%in%i/' % (8, n), '../LET-LP-Scheduler/dag_m%ip%in%i_output_schedules' % (m, 8, n), numCores=m, maxNodesPerDag=n, maxTasks=1400)
             _, _, (valTasks, valTaskFeatures, valILPoutputs), dags = data_loader.train_val_split(train_percentage=0.7145, batch_size=250, return_dags=True)
             zhaoDAGs = load_all_tasks_zhao(valTasks, data_loader.dataFolder)
             with torch.no_grad():
                 model_output = trained_model(valTaskFeatures, valTasks)
-                computeMakespan(model_output, valILPoutputs, dags, valTasks, zhaoDAGs, m, n, is_trained=True, compute_similarity_output=True)
+                computeMakespan(model_output, valILPoutputs, dags, valTasks, zhaoDAGs, m, n, is_trained=False)
 
 if __name__ == "__main__":
 #  m=int(sys.argv[1])

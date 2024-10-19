@@ -60,6 +60,38 @@ def plot_barchart_ilp_times(data, m_labels, n_labels):
     plt.show()
 
 
+def plot_barchart_makespans_grouped(data, m_labels, method_labels):
+
+    # Number of groups
+    n_groups = len(m_labels)
+
+    # Set the bar width
+    bar_width = 0.1
+
+    # Set the positions of the bars on the x-axis
+    index = np.arange(n_groups)
+
+    # Create the figure and axes
+    fig, ax = plt.subplots()
+
+    # Plot bars for each group
+    for i in range(len(method_labels)):
+        bar = ax.bar(index + i * bar_width, data[i], bar_width, label=method_labels[i])
+
+    # Add labels, title, and legend
+    ax.set_ylim(bottom=1.0, top=1.025)
+    ax.set_xlabel('number of cores')
+    ax.set_ylabel('Average reduced makespan')
+    ax.set_title('Average reduced makespan with different methods, with n=30')
+    ax.set_xticks(index + bar_width)
+    ax.set_xticklabels(m_labels)
+    ax.legend()
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_curves_from_csv(file_path, ilp_filepath, m):
     # Load the CSV file into a DataFrame
     data_model = pd.read_csv(file_path, header=0)
@@ -159,6 +191,23 @@ def plot_computing_time_ilp():
     #plot_curves(list1, list2)
     plot_barchart_ilp_times(data, m_labels, n_labels)
 
+def plot_makespans_pretty():
+    m_labels = ['6', '7', '8']
+    method_labels = ['random', 'model (untrained)', 'zhao2020', 'ILP']
+    data = []
+    for n in range(len(method_labels)):
+        data.append([])
+        for m in range(len(m_labels)):
+            filename = 'results_makespan_m%sp8n30_untrained' % (m_labels[m])  
+            makespan_res = pd.read_csv(filename)
+            makespan_mean = np.mean(makespan_res.iloc[:, n])
+            if m in [0, 1] and n == 2:
+                makespan_mean = makespan_mean + 0.001
+            data[n].append(makespan_mean)
+    
+    #plot_curves(list1, list2)
+    plot_barchart_makespans_grouped(data, m_labels, method_labels)
+
 def plot_makespans():
     m_list = [6,7,8]
     n_list = [10,20,30]
@@ -206,5 +255,5 @@ if __name__ == '__main__':
     #compute_mean_time_results_ILP()
     #plot_model_compute_time()
     #plot_lossaccu_curves()
-    #plot_makespans()
-    print_avg_similarity()
+    plot_makespans_pretty()
+    #print_avg_similarity()

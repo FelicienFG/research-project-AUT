@@ -146,9 +146,9 @@ and the accuracy / loss of the model.
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/avg_makespan_m8n30.png}
+    \includegraphics[width=\linewidth]{images/avg_makespan_n30.png}
     \caption{Average reduced makespan (makespan divided by the critical path length) on the test set (400 DAGs) using the four different methods
-    on 8 cores with 30 nodes per DAG,
+    on 6, 7 and 8 cores with 30 nodes per DAG,
     with 'random' being the method of randomly assigning priorities to nodes of a DAG.}
     \label{fig:avg_makespan_comparison_trained}
 \end{figure}
@@ -157,21 +157,21 @@ Figure \ref{fig:avg_makespan_comparison_trained} shows the average
 reduced makespan, which is the makespan divided by the length of the critical path,
 computed with each method on 400 DAGs from the test set.
 Not only does the model perform worse than the heuristic from \citet{zhao2020DAGsched},
-the model performs worse than the random method.
+the model performs generally worse than the random method.
 Also, the heuristic is very close to matching the ILP method,
 performing even greater than expected.
 
 When not-trained (Figure \ref{fig:avg_makespan_comparison_untrained}), the model performs 
-about the same as randomly, which is expected
+about the same or slightly worse than randomly, which is expected
 given the initialization of trainable weights is done randomly,
 confirming the fact that the model's learning decreases its makespan performance.
 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/avg_makespan_m8n30_untrained.png}
+    \includegraphics[width=\linewidth]{images/avg_makespan_n30_untrained.png}
     \caption{Average reduced makespan (makespan divided by the critical path length) on the test set (400 DAGs) using the four different methods
-    on 8 cores with 30 nodes per DAG,
+    on 6, 7 and 8 cores with 30 nodes per DAG,
     with 'random' being the method of randomly assigning priorities to nodes of a DAG,
     and the model not being trained.}
     \label{fig:avg_makespan_comparison_untrained}
@@ -183,7 +183,7 @@ The accuracy is, in this case, how well the resulting priority list
 from the model matches the ILP priority list.
 Unfortunately, the accuracy is stagnant at less than 10\%
 and doesn't get better when increasing the number of epochs to train on. 
-Also, the accuracy doesn't change between the training and testinng phase
+Also, the accuracy doesn't change between the training and testing phase
 which further confirms that the model doesn't learn at all.
 
 \begin{figure}
@@ -223,7 +223,7 @@ the low accuracy.
 \end{table}
 
 
-Although the makespan and accuracy results shown here are only 
+Although the accuracy results shown here are only 
 in the case of 8 cores and 30 nodes per DAG,
 the other cases, i.e., for 6, 7 cores and with 10,20 and 30 nodes per DAG,
 display very similar results and lead to the same conclusions as those
@@ -323,6 +323,56 @@ that priority list is not unique.
 
 Indeed, not only is the minimum makespan schedule not necessarily unique
 (see Figure \ref{fig:not_unique_schedules}),
-but even if the schedule is unique, there can be multiple ways of 
-retrieving a priority-list which gives the minimum makespan (see Figure \ref{fig:multi_priolist_example}).
+which means that the optimal priority-list is not unique
+(in Figure \ref{fig:not_unique_schedules}, schedule a) gives 
+[0, 1, 2, 3, 4, 5] but schedule b) gives [0, 1, 2, 4, 3, 5]).
+But even if the schedule might be unique, when the start time
+of nodes are the same, multiple priorities
+can be assigned to those nodes.
+For instance, in schedule a) of Figure \ref{fig:not_unique_schedules},
+the  two priority-lists [0, 1, 2, 3, 4, 5] and [0, 2, 1, 3, 4, 5]
+are valid for minimizing the makespan of the DAG.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/dag_same_makespan_diff_scheds.png}
+    \par a)
+    \includegraphics[width=\linewidth]{images/first_samemakespan_diff_sched.png}
+    \par b)
+    \includegraphics[width=\linewidth]{images/second_samemakespan_diff_sched.png}
+    \par c)
+    \caption{Example of DAG task (a) for which two schedules (b and c) leading to different
+    priority lists are shown, both schedules giving the minimum makespan.}
+    \label{fig:not_unique_schedules}    
+\end{figure}
+
+
+This complete lack of uniqueness in the true labels 
+renders the ILP priority-lists almost useless
+for the model to learn on, because those lists
+don't show the difference between a node having 
+a specific priority because it lengthen the makespan otherwise (e.g.,
+priority of $v_8$ in the last two schedule scenarios in Figure \ref{fig:dag_schedule_example}),
+and a node having a specific priority when it could have 
+other potential priority values and it wouldn't change the makespan (e.g.,
+the example in Figure \ref{fig:not_unique_schedules}).
+Thus, the model can't learn to assign different priorities
+to the nodes but rather to smooth out the priorities and give
+the same one to most of the nodes of a DAG,
+hence the over-smoothing problem.\\\\
+
+The evaluation results show that the supervised learning model
+doesn't learn correctly, leading to an over-smoothing and under-fitting problem
+which makes the model perform very poorly (accuracy $<10$\%)
+and having an even worse makespan performance than random priority assignment.
+Analysis of the results showed how the model performance problem
+is due to the learning method and supervised design being unfit for
+the single DAG task fixed-priority scheduling problem.
+Thus, relating to RQ3, although the reinforcement learning
+method has shown great performance compared to ILP\cite{Zhao2024GATDRLmodel}
+and state-of-the-Art heuristics\cite{Lee2021GlobalDagSchedDRL},
+the supervised learning model presented here 
+clearly cannot compare at all to either SOTA heuristics
+or ILP, even though it is more scalable than ILP, 
+mostly because of the supervised learning method being unsuited 
+for DAG task fixed-priority scheduling.
