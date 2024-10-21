@@ -9,9 +9,11 @@ For the implementation of the model, python 3.10.12 with the PyTorch 2.4.1 libra
 with 90 TPU cores.
 The stochastic gradient descent is used for training with a learning rate of $0.001$ and a batch size of 250.
 
-During the initial evaluation, an oversmoothing problem occured which lead to reducing the number of GCN layers to 1(see Section \ref{sec:model_design}).
-Unfortunately reducing the number of GCN layers wasn't enough which lead 
-to adding a regularization term to the loss function.
+During the initial evaluation, an over-smoothing problem\cite{chen2020oversmoothing} occured which lead to 
+the model smoothing out the priorities and assigning the same priority to all the nodes.
+To try to solve this, reducing the number of GCN layers to 1 was done,
+which unfortunately didn't fix the problem, leading to the addition
+of a regularization term to the loss function.
 The idea is to tackle the over-smoothing probblem by forcing the model
 to differentiate between the nodes' representation.
 Hence, the regularization term is the squared inverse of the average euclidian distance 
@@ -27,10 +29,20 @@ and the loss function then becomes
 with $x_i$ being the elements in $x$, the flattened matrix representation of $X$
 and $y$ the true output (see Section \ref{sec:loss_design}).
 
+Although those modifications didn't seem to improve on the initial results,
+the evaluation of the model has been done with these modifications
+to establish why the over-smoothing problem was happening(see Section \ref{sec:discussion}).
+
 \subsection{Dataset generation}
 ~
 
-To generate the DAG tasks, the generator from \citet{zhao2020DAGsched} is used, which is also the one used in \citet{Lee2021GlobalDagSchedDRL}.
+To generate the DAG tasks, the generator from \citet{zhao2020DAGsched} is used, which is also used by 
+\citet{Lee2021GlobalDagSchedDRL} and \cite{Zhao2022DAGsched}, to generate
+random DAGs.
+Apart from it being used by state-of-the-Art papers, which my results will be compared to,
+and providing a qualitative and diverse dataset,
+this generator has great modularity and the open-source git repository\footnote{https://github.com/automaticdai/dag-gen-rnd} 
+makes it easy-to-use.
 The random DAGs are generated using the following process :
 The generator starts at a source node and expands outward, 
 creating nodes in successive layers. The total number of layers, 
@@ -44,7 +56,8 @@ are generated, any terminal nodes are linked to a final sink node.
 Both the source and sink nodes are used to structure the graph and 
 have a fixed execution time of one unit each. Lastly, 
 execution times are assigned randomly to all nodes while ensuring 
-that the total workload sums up to $W = 1000$\cite{zhao2020DAGsched}.
+that the total workload sums up to $W = 1000$\cite{zhao2020DAGsched},
+that is, the fully sequential execution time of each DAG task is set to 1000 time units (i.e., the sum of each node's wcet).
 
 To generate DAGs with a fixed number of nodes $n$, 
 the generator is first used to generate 50000 DAG tasks
@@ -156,15 +169,21 @@ and the accuracy / loss of the model.
 Figure \ref{fig:avg_makespan_comparison_trained} shows the average
 reduced makespan, which is the makespan divided by the length of the critical path,
 computed with each method on 400 DAGs from the test set.
+Therefore, the closer to 1 it is, the better it performs.
+
 Not only does the model perform worse than the heuristic from \citet{zhao2020DAGsched},
 the model performs generally worse than the random method.
 Also, the heuristic is very close to matching the ILP method,
 performing even greater than expected.
 
 When not-trained (Figure \ref{fig:avg_makespan_comparison_untrained}), the model performs 
-about the same or slightly worse than randomly, which is expected
-given the initialization of trainable weights is done randomly,
-confirming the fact that the model's learning decreases its makespan performance.
+about the same or worse than randomly.
+This is because although the weights are initialized randomly,
+the similarity between the nodes' vector representation
+makes the model, even when untrained, 
+compute the same priority for different nodes, which 
+is exacerbated with training, leading to the over-smoothing
+issue (see Table \ref{tab:similarity_percentages}).
 
 
 \begin{figure}
@@ -231,6 +250,7 @@ shown here.
 
 \subsection{Discussions}
 ~
+\label{sec:discussion}
 
 There are several reasons why a machine learning model
 sub-performs.
@@ -359,7 +379,29 @@ the example in Figure \ref{fig:not_unique_schedules}).
 Thus, the model can't learn to assign different priorities
 to the nodes but rather to smooth out the priorities and give
 the same one to most of the nodes of a DAG,
-hence the over-smoothing problem.\\\\
+hence the over-smoothing problem.
+Furthermore, the non-uniqueness in the nodes' vector representations
+also contributes to the model struggling to learn.
+Indeed, 
+if two nodes have the same number of in and out neighbours,
+are neither a sink nor a source node, their respective
+vector representation will be very similar.
+For instance, in the DAG shown in Figure \ref{fig:dag_same_representation_vector},
+the vector representation of nodes $\tau_2$ and $\tau_3$ are the same,
+i.e., $(0.067, 1, 1, 0, 0)$, and although those nodes having different priorities
+doesn't impact the final makespan, they do have different priority values
+with the ILP priority-list, which contributes to the over-smoothing problem.
+Changing the nodes vector representation, or adding  more information in them,
+might be a way to lower the impact of the over-smoothing problem,
+a way which should potentially be investigated in future works.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/dag_similarity_representation.png}
+    \caption{Example of a DAG task where two different nodes have the
+    exact same vector representation.}
+    \label{fig:dag_same_representation_vector}
+\end{figure}
+\\\\
 
 The evaluation results show that the supervised learning model
 doesn't learn correctly, leading to an over-smoothing and under-fitting problem

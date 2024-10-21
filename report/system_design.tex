@@ -354,11 +354,7 @@ x, & \text{if } x > 0 \\
 The GCN layer can be repeated several times 
 to improve the model's capacity to better
 capture the complexity of the graph structure.
-Unfortunately, when testing with 3 GCN layers,
-the over-smoothing problem
-still happened with the model outputing
-the same priority for every node in a DAG, which lead 
-to restricting the number of GCN layers to just one layer.
+In this case, the number of GCN layers was set to 3.
 
 \subsection{Computing the labels}
 ~
