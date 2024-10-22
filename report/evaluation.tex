@@ -390,10 +390,7 @@ For instance, in the DAG shown in Figure \ref{fig:dag_same_representation_vector
 the vector representation of nodes $\tau_2$ and $\tau_3$ are the same,
 i.e., $(0.067, 1, 1, 0, 0)$, and although those nodes having different priorities
 doesn't impact the final makespan, they do have different priority values
-with the ILP priority-list, which contributes to the over-smoothing problem.
-Changing the nodes vector representation, or adding  more information in them,
-might be a way to lower the impact of the over-smoothing problem,
-a way which should potentially be investigated in future works.
+with the ILP priority-list, which contributes to the over-smoothing problem. 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{images/dag_similarity_representation.png}
@@ -401,6 +398,14 @@ a way which should potentially be investigated in future works.
     exact same vector representation.}
     \label{fig:dag_same_representation_vector}
 \end{figure}
+
+One potential solution to explore might be to generate
+, for each DAG, all the different schedules that lead to the minimum
+makespan and from them, retrieve a single, unique priority list
+not only containing the information about which nodes need to be
+executed first, but also having the information of which nodes
+have interchangeable execution ordering 
+(e.g., the two nodes in the example above, Figure \ref{fig:dag_same_representation_vector}).
 \\\\
 
 The evaluation results show that the supervised learning model

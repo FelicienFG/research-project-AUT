@@ -36,24 +36,32 @@ felicien.fgay@gmail.com}
 \thispagestyle{plain}
 
 \begin{abstract}
-\textit{Background}: Previous research and/or rationale for performing the study.
-
-\textit{Aims}: Hypotheses/propositions to be tested, or goal of the study.
-
-\textit{Method}: Description of the type of study, treatments, number and nature of
-experimental units (people, teams, algorithms, programs, tasks etc.), experimental
-design, outcome being measured.
-
-
-
-\textit{Results}: Treatment outcome values, level of significance.
-
-
-\textit{Conclusions}: Limitations of the study, implications of the results, and further work
+Tasks on real-time systems are becoming more and more complex and
+those system are becoming more and more multicore, complexifying
+the scheduling of such time-triggered tasks.
+To tackle this growth, the Directed Acyclic Graph (DAG) task model has been introduced and
+research has been done on designing heuristics
+to address the scheduling of DAGs on a multicore platform,
+but very few papers used machine learning for this problem.  
+In this paper, the real-time DAG task scheduling literature is analyzed 
+and a supervised machine learning model is designed
+using a graph convolutional network and evaluated 
+for scheduling a single DAG task with the goal of minimizing its makespan 
+using non-preemptive, global fixed-priority scheduling.
+The Integer Linear Programming method has been 
+used to compute the output labels for the supervised model to learn on
+and a non-preemptive global and fixed-priority scheduler 
+has been implemented to compute the exact makespan of a DAG task.
+The results showed that the supervised model doesn't learn
+and that the supervised learning method seems unfit 
+for this kind of problem.
+The performance problem is mainly caused by the computation of 
+the output label that could be and should be 
+investigated further in the future.
 \end{abstract}
 
 \begin{IEEEkeywords}
-real-time system, scheduling, time-triggered tasks, DAG, multicore
+real-time system, scheduling, time-triggered tasks, DAG, multicore, machine learning, supervised learning
 \end{IEEEkeywords}
 
 
@@ -67,6 +75,29 @@ real-time system, scheduling, time-triggered tasks, DAG, multicore
 
 
 \section{Conclusions and Future Works}
+
+
+In this paper, the DAG task scheduling on multicore systems problem
+has been addressed, especially looking at the machine learning
+techniques used to tackle this problem.
+It has been found that very few papers use machine learning
+for this kind of problem and no paper has been found using 
+supervised learning for the single DAG multicore scheduling problem.
+Hence, a supervised learning model has been designed and evaluated.
+Unfortunately, the performance results 
+showed how the supervised learning method seems unfit for this kind of 
+problem, with the main problem being the computation of the output labels,
+and reinforcement learning appears to yield much better results, comparable
+to state-of-the-Art heuristics and the optimal Integer Linear Programming method.
+
+Future works should be done on computing unique and more informative output labels,
+to expand on the results discussion,
+and, if successful, expand the model to treat multi-DAGs scheduling as well. 
+One could also work on using reinforcement learning for 
+multi-rate DAGs, or chain of time-triggered tasks, and potentially
+extend the task model to include other types of tasks,
+such as Logical Execution Time tasks.
+
 
 
 
