@@ -7,7 +7,8 @@ Although the DAG generator used is indeed used in the literature\cite{Lee2021Glo
 the generator is not made for generating a number of DAG tasks
 with a fixed number of nodes. Hence, 
 using the generator as it has been used might not
-lead to a dataset as diverse as what is done by \citet{Zhao2024GATDRLmodel} for instance.
+lead to a dataset as diverse as what is done by \citet{Zhao2024GATDRLmodel} for instance,
+and it might not be as qualitative as the authors of the generator claim it to be.
 Also, no evaluation of the model using multiple values of the parallelism
 parameter $p$ has been done, which could've been interesting 
 to look at to see the impact of this parameter, and of how parallelizable 
@@ -15,7 +16,7 @@ a DAG task is, on the performance.
 The amount of DAG tasks used as a test set is 400 which 
 is lower than what the other papers used, 600 in \citet{Zhao2024GATDRLmodel}
 and 1000 in \citet{Lee2021GlobalDagSchedDRL}, which makes randomness
-have a bigger influence than in those papers.
+and dataset bias have a bigger influence than in those papers.
 
 For the evaluation, 
 it has only been done using a train set and test set,
@@ -29,5 +30,6 @@ for this kind of problem, as the main problem isn't the supervised
 learning method per se, but rather the computation of the output labels. 
 Also, although the ILP method computes
 optimal schedules, it does take a long time to do so and is not scalable,
-making the model training not scalable which can if we want to train the model
+making the model training not scalable which can
+become problematic if we want to train the model
 on DAGs with 100, 500 or 1000 nodes.

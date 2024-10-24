@@ -5,7 +5,8 @@
 No supervised learning model has been found in the literature to 
 tackle the non-preemptive, global fixed-priority scheduling problem of a single DAG task.
 That is because supervised learning is most often used for problems
-that we, humans, know how to solve, but don't have an algorithm for it,
+that we, humans, know how to solve, but don't have an algorithm for it
+and don't want to waste time solving it ourselves,
 such as image classification or text classification.
 In this case, there are ways to compute solutions to the problem
 using linear programming, but it is costly and doesn't scale well 
@@ -20,7 +21,7 @@ Also, once trained, the supervised machine learning model can be
 fast and scalable in terms of computing time, unlike the ILP method.
 Therefore, the supervised learning model's purpose will be to
 approximate the computation of a priority-list for a single DAG task
-that leads to the minimum makespan.
+, that leads to the minimum makespan.
 
 \subsection{Supervised design}
 ~
@@ -28,7 +29,7 @@ that leads to the minimum makespan.
 In supervised learning, 
 the model predicts a value (forward pass) that is then compared to the known-to-be-true value using a
 specific error-function, often called the loss function,
-and the error is then propagated through the model to tweaks its parameter, minimizing the loss function
+and the error is then propagated through the model to tweak its parameters, minimizing the loss function
 (Figure \ref{fig:supervised_learning}).
 The idea is, then, to treat the problem as a classification problem,
 where each node of a DAG needs to be 'classified' in a specific priority.
@@ -59,9 +60,9 @@ and each column being a raw feature of a node.
 The list of raw features is similar to what is proposed by \citet{Lee2021GlobalDagSchedDRL},
 that is :
 \begin{list}{}{}
-    \item - the normalized wcet of the node, i.e., $C_i / L$ for node $i$ with $L$ being the total workload ;
-    \item - the number of incoming neighbours ;
-    \item - the number of outgoing neighbours ;
+    \item - the normalized wcet of the node, i.e., $C_i / vol(G)$ for node $i$ ;
+    \item - the number of incoming neighbours, i.e., predecessors ;
+    \item - the number of outgoing neighbours, i.e., successors ;
     \item - a boolean value of whether the node is the source or sink node ;
     \item - a boolean value of whether the node is part of the critical path of the DAG.
 \end{list}
@@ -72,7 +73,7 @@ The number of incoming and outgoing neighbours makes it possible
 to take into account the inner structure of the graph to compute the execution order.
 The source and sink nodes are particular nodes in that their priority
 is not important because they will respectively execute first and last due to their dependency constraints.
-Finally, the critical path plays a huge role in state-of-the-art heuristics\cite{He2019DagIntra}\cite{zhao2020DAGsched},
+Finally, the critical path plays a huge role in state-of-the-Art heuristics\cite{He2019DagIntra}\cite{zhao2020DAGsched},
 with nodes in the critical path often having higher priorities than those
 that aren't.
 An example of such a DAG task representation is shown in Figure \ref{fig:dag_task_matrix_example}.
@@ -80,8 +81,8 @@ An example of such a DAG task representation is shown in Figure \ref{fig:dag_tas
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/dag_matrix_example.drawio.png}
-    \caption{Example dag task with 5 nodes a total workload of 12
-    and the matrix representation of each node with the column respectively being the above list of features.}
+    \caption{Example dag task with 5 nodes, a total workload of 12
+    and the matrix representation of each node with the columns respectively respresenting the above list of features.}
     \label{fig:dag_task_matrix_example}
 \end{figure}
 
@@ -106,7 +107,7 @@ $\text{model}(\tau_i) = [0.2,0.5,0.3]$ which means that according to the model,
 the node $\tau_i$ has a probability to be assigned priority 0 of $0.2$,
 priority 1 of $0.5$ and priority 2 of $0.3$.
 As a consequence, the priority chosen for node $\tau_i$ will be 
-the one that has the maximum probability a-posteriori,
+the one that has the maximum probability a-posteriori (MAP strategy),
 in the example above, it is priority 1.
 
 This must be the case for every node and as the input 
@@ -122,7 +123,7 @@ The idea is to use an ILP solver to compute the optimal schedule
 of a dag task, and then use this optimal schedule to retrieve 
 the optimal priorities for each node, according to their start time
 in the computed schedule.
-Each node will be sorted according to their start time in increasing order
+Each node will be sorted according to their start time, in increasing order,
 and the priority value will then be the position of each node in the sorted list.
 As a consequence, the nodes with the lowest start time will
 have the highest priority.
@@ -147,7 +148,7 @@ the predicted model output list.
     \centering
     \includegraphics[width=\linewidth]{images/output_matrix_example.drawio.png}
     \caption{Example of an matrix output from the model, the predicted list of priorities (on the right)
-    is retrieved from the probabilities.}
+    is retrieved from the probabilities using the maximum-a-posteriori (MAP) strategy.}
     \label{fig:dag_output_matrix_example}
 \end{figure}
 
@@ -161,6 +162,7 @@ of the DAG.
 Therefore, the idea was, initially, to compare the makespan
 produced by the predicted priority-list with the makespan
 produced by the ILP schedule, using a simple difference operator.
+This difference would have been the loss function of the model.
 Unfortunately, the non-preemptive GFPS which is used to compute the makespan,
 isn't differentiable for the priority-list given to it,
 which lead to segfaults in the training phase.
@@ -186,11 +188,11 @@ $$
 \end{pmatrix}
 $$
 With each row representing $\tau_1$, $\tau_2$ and $\tau_3$ respectively,
-and the column represent the priorities 0, 1 and 2 respectively.
+and the column representing the priorities 0, 1 and 2 respectively.
 
 Once we have the two matrices, 
 it is then possible to use the binary cross-entropy loss function,
-widely used for classification problem,
+widely used for classification problems,
 to compare the predicted output to the optimal ILP matrix.
 
 More specifically, the binary cross-entropy loss function is defined as :
@@ -200,7 +202,7 @@ More specifically, the binary cross-entropy loss function is defined as :
     
 where $x$ is the flattened matrix representing the predicted output,
 $y$ is the flattened matrix representing the true output (ILP output),
-and $n$ is the number of element in $x$ and $y$.
+and $n$ is the number of elements in $x$ and $y$.
 
 
 \subsection{Model design}
@@ -220,13 +222,13 @@ and passes it to the next layer.
 One way to do that is to aggregate the neighbours' information of a node
 and use this aggregation to compute the next representation vector of the node.
 
-Unfortunately, this kind of aggregation also means that a node will have similar 
-attributes to its neighbours, when passing through multiple layers of a graph neural network (GNN).
-This problem can lead to groups of neighbours having very similar vector representation
+Unfortunately, this kind of aggregation also means that a node will have a 
+vector representation similar to its neighbours, when passing through multiple layers of a graph neural network (GNN).
+This problem can lead to groups of neighbours having very similar vector representations
 and can cause an over-smoothing problem\cite{chen2020oversmoothing}.
 The two main ways to fix this kind of problem is either to reduce the amount of GNN layers 
 or/and use the attention-mechanism to give a notion of importance to a node's neighours,
-thus reducing impact a less important neighbour can have on the aggregation phase.
+thus reducing the impact a less important neighbour can have on the aggregation phase.
 Of course, reducing the number of GNN layers also means less complexity which can decrease the performance of the model,
 thus, a balance between having complexity and limiting the over-smoothing problem is often done to maximize performance.
 This is exactly what they do in the literature\cite{Lee2021GlobalDagSchedDRL}\cite{Zhao2024GATDRLmodel}.
@@ -247,6 +249,7 @@ two feed forward networks and one attention-based graph convolutional network (G
 
 \subsubsection{Feed forward networks}
 ~
+
 Using a feed-forward network (FFN) before the GCN can help at pre-encoding the feature vectors of the nodes
 so that the GCN can better work on those feature vectors.
 Also, a feed-forward network (FFN) at the end of the model is needed to make 
@@ -254,7 +257,7 @@ the final classification decision about each node, once the feature vectors have
 all the graph structural information encoded into them.
 Of course, the more layers in the FFN, the more complexity
 is encoded in the feature vectors, but it can also potentially lead to an over-fitting
-problem with the model being too complex and taking the noise into account,
+problem with the model being too complex and taking noise information into account,
 decreasing its generalization power and its overall performance.
 
 Therefore, the two feed forward networks will have 3 layers with each 
@@ -263,18 +266,18 @@ layer $n$ producing the following output,
     o_{n} = ReLU(W_{n}X_{n} + b_n),\, n \in \{1,2,3\}
 \end{equation}
 where $W_n \in \mathbb{R}^{5\times5}$ is the matrix of trainable weights
-at layer $n$, $b_n \in \mathbb{R}^5$ is the bias and $X_n$ is either a node's vector representation
+at layer $n$, $b_n \in \mathbb{R}^5$ is the bias, $X_n$ is either a node's vector representation
 or the output of the previous layer, and $ReLU(x) = max(0, x)$.
 There is an exception for the second feed forward network where the last 
 layer's output is computed using the following equation:
 \begin{equation}
-    o_{3} = \tanh(W_{3}X_{3} + b_3)
+    o_{3} = \sigma(W_{3}X_{3} + b_3)
 \end{equation}
 where $W_3 \in \mathbb{R}^{nbPriorities \times 5}$,
-$b_3 \in \mathbb{R}^{nbPriorities}$ and $\tanh$ is the 
-hyperbolic tangent activation function.
+$b_3 \in \mathbb{R}^{nbPriorities}$ and $\sigma$ is the 
+sigmoïd activation function.
 Also, $nbPriorities$ corresponds to the number of different priorities
-that can be assigned to each node, which in this case is going to be the same as the number of nodes in the DAG.
+that can be assigned to each node, which in this case is going to be the same as the number of nodes in the input DAG.
 
 
 \subsubsection{Graph Convolutional Network}
@@ -285,11 +288,11 @@ of the neighbours of a node and use that information
 to compute the next representation vector of the node.
 To do that, we utilize both the incoming and outgoing neighbours
 of a node and compute their attention scores to then aggregate
-that information to pass it through an activation 
+that information and pass it through an activation 
 function, thus updating the representation vector of the node (see Figure \ref{fig:update_aggregate_diagram})
-Considering both in and out neighbours enables the encoding
-of more of the structural complexity of the graph, and also
-using the directed aspect of the DAGs.
+Considering both in and out neighbours enables the structural complexity 
+of the graph to be better encoded, and also
+uses the directed aspect of the DAGs.
 The Figure \ref{fig:update_aggregate_diagram} represents
 one GCN layer.
 
@@ -412,7 +415,7 @@ which is precisely the problem at stakes\footnote{See the github repository for 
 Once the optimal schedule (i.e., the schedule yielding the minimum makespan)
 is computed,
 the optimal priority-list can be obtained from the schedule 
-by looking at the start times of each node and increasing the priority 
+by looking at the start times of each node and incrementing the priority value
 according to the node's start time.
 The sooner the start time, the higher the priority.
 
@@ -435,7 +438,7 @@ is described in the Figure \ref{fig:algo_makespan}.
 The basic idea is to have a ready queue that contains the nodes
 that have their precedence constraints met
 and the nodes still waiting to have their dependencies met 
-are in the waiting list. Each loop iteration, the waiting list and ready queue
+are in the waiting list. At each loop iteration, the waiting list and ready queue
 are updated and the first idle processor gets the node at the top of 
 the ready priority queue (see Figure \ref{fig:algo_makespan} and \ref{fig:algo_makespan_details}).
 
@@ -454,7 +457,7 @@ the ready priority queue (see Figure \ref{fig:algo_makespan} and \ref{fig:algo_m
     \label{fig:algo_makespan_details}
 \end{figure}
 
-The implementation will be done in C++ with bindings to python to make
+The implementation will be done in C++ with bindings to Python to make
 the makespan computation faster.
 
 % config for 20,30 nodes : 

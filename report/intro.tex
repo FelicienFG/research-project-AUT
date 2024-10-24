@@ -27,7 +27,7 @@ frameworks such as OpenMP
 \footnote{OpenMP (2011) OpenMP Application Program Interface v3.1. 
 \url{http://www.openmp.org/mp-documents/OpenMP3.1.pdf}} to do so. 
 Unfortunately, in most real-life scenarios, the number of available 
-processors/cores is fewer than the number of tasks/subtasks that 
+processors/cores is fewer than the number of tasks that 
 can be executed in parallel (i.e., independent tasks). This means 
 that not all independent tasks can be executed simultaneously on 
 the system, raising the question: which task should be executed first?
@@ -55,10 +55,10 @@ be considered.
 A prevalent task model when considering periodic tasks that can be parallelized is the 
 Directed Acyclic Graph (DAG) task model which arises when a time-triggered task
 can be parallelized into subtasks which are the nodes of the graph,
-thus reducing the worst-case execution time of the reccurent task when executed on a designated set of cores.
+thus reducing the worst-case execution time of the reccurent DAG task when executed on a designated set of cores.
 Those nodes have dependency constraints which are modeled by the directed edges between the nodes.
 The DAG task model is used to model tasks that are parallelizable\cite{baruah2012DAGdef},
-fitting the ever-increasing multicore architectures found in today's real-time system architectures. 
+fitting the ever-increasing multicore architectures found in today's real-time systems. 
 
 Given that the problem of scheduling independent tasks or dependency-constrained groups of jobs (i.e., DAGs) is NP-hard\footnote{If a problem is 
 NP-hard, it means that it is impossible to find a solution in 
@@ -69,8 +69,9 @@ to partially solve the problem,
 or the optimal but not scalable Integer Linear Programming
 (ILP) method.
 
-Consequently, machine learning will be considered here as it can 
-better approximate the unattainable perfect solution while being 
+Consequently, machine learning will be considered here as 
+a machine learning model can 
+approximate a perfect solution while being 
 scalable in terms of computing time after the training phase\cite{Zhao2024GATDRLmodel}\cite{Lee2021GlobalDagSchedDRL}. 
 More specifically, the research questions are the following:
 
@@ -85,13 +86,17 @@ More specifically, the research questions are the following:
 \end{itemize}
 
 To achieve this, the background section will introduce various 
-technical terms, concepts, and fundamental algorithms. 
-Following this, a systematic literature review will be conducted to address RQ1 and RQ2, 
-and finally, the artifact and experimental design, results, and conclusion will 
+technical terms, concepts, and fundamental algorithms, and
+a systematic literature review will be conducted to address RQ1 and RQ2. 
+Finally, the artifact and evaluation design, results, and conclusion will 
 be presented to answer RQ3.
 
-
-
-\paraheading{The solution we propose has the following features..}
-
-\paraheading{The primary contributions of this paper are:}
+The primary contributions of this paper are: 
+\begin{list}{}{}
+    \item - The systematic literature review of the real-time DAG task scheduling
+    literature and synthesis of state-of-the-Art machine learning and heuristic solutions 
+    for real-time DAG task scheduling on multicore systems (RQ1, RQ2, RQ3).
+    \item - The opensource\footnote{https://github.com/FelicienFG/research-project-AUT} design and evaluation of a supervised machine learning model
+    that, given a DAG task, predicts a list of priorities for ordering the execution
+    of the nodes, on a non-preemptive, global fixed-priority scheduler (RQ3).
+\end{list}

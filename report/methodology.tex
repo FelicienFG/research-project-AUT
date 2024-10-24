@@ -5,19 +5,19 @@
 To answer the research questions defined in section \ref{sec:intro},
 the right research methodology needs to be selected to conduct 
 systematic research.
-Multiple such methodologies exists but the following four will be evaluated
+Multiple such methodologies exists but the following four will be presented
 and the ones which fit best to this research will be selected.
 
 \subsection{Systematic Literature Review}
 
 The systematic literature review (SLR) methodology aims at
-looking at the current state-of-the art in a specific domain by selecting a range 
+looking at the current state-of-the-Art in a specific domain by selecting a range 
 of articles in the scientific literature\cite{KITCHENHAM2009SLR}.
 The main difference between a simple literature review is that the results need to be reproducable,
 that is, one can get the exact same results by simply following the different steps described by the one writing the SLR.
 This is done by first defining a set of keywords to search for, i.e., a search string, 
 and then identifying the databases to search on.
-The resulting articles are then filtered out using exclusion and/or inclusion criteria
+The resulting articles are then filtered out using exclusion and/or inclusion criterias
 to narrow down the number of papers to review.
 Examples of such criterias are restricting the publication year-range,
 excluding certain types of articles (i.e., conferences, early-access, etc.), etc.
@@ -28,7 +28,7 @@ This process gives a final list of papers to review and compare against each oth
 to correctly answer the research questions. 
 It is especially useful to answer research questions such as RQ1 and RQ2
 and to have a good representation of the state-of-the-Art
-but often will show the research gaps that exists in the literature,
+but it will often show the research gaps that exists in the literature,
 thus not fully answering a specific research question.
 To address these gaps, other research methods need to be considered.
 
@@ -51,7 +51,8 @@ In our case, the problem of scheduling DAG tasks
 has important practical applications and according to the SLR, 
 no one looked at supervised learning as a solution to generating priority-lists for 
 global fixed-priority scheduling.
-The non-existence of a supervised learning model implies it needs to be created, or designed,
+The non-existence of a supervised learning model implies it must be created, or designed,
+if we want to evaluate such a model,
 which is exactly the purpose of the design science methodology.
 Hence, RQ3 will be answered by designing a supervised learning model and evaluating this potential solution to the fixed-priority DAG task scheduling problem.
 
@@ -88,7 +89,7 @@ chains by defining hypotheses and control variables on a specific system,
 and running multiple tests or experiments while having fixed and varying variables to assert 
 their role in the system's behaviour\cite{basili2007controlledExperiment}.
 The controlled experiment approach 
-can provide insights on relationships between the controlled variables and the system
+can provide insights on the relationships between the controlled variables and the system
 which contributes to the body of knowledge of the specific system.
 This can be used, for instance, to observe and explain the impact of hyperparameters of a machine learning
 model on its performance.
@@ -100,10 +101,13 @@ to take into account controlled variables that impact the results
 of the experiment, which is why great care needs to be taken 
 for the design phase of the experiment(s).
 Although, the controlled experiment approach could be used in this research to validate or invalidate hypotheses
-about the designed AI model performances, especially when compared to the ILP method by
-experimenting with different values and parameters for the model and the dataset generation,
-the time constraints as well as evaluation problems made possible only the model's evaluation.
-Hence, the controlled experiment will not be used in this paper.
+about the impact of hyperparameters in the AI model's performance,
+experimenting with different values and hyperparameters for the model and the dataset generation,
+the time-consuming aspect of such experiments
+combined with the fact that 
+the focus of this study is more on the design and evaluation of the model rather than 
+experimenting with its hyperparameters,
+is the reason why the controlled experiment methodology will not be used in this paper.
 \\
 
 The SLR can answer research questions 1 and 2,
@@ -113,25 +117,23 @@ but also the machine learning techniques that are currently used in the literatu
 The fact that only very few papers use machine learning to tackle the problem of real-time DAG task scheduling
 motivates the design of a new machine learning model to better answer RQ3 which implies 
 applying the design science methodology to provide a more complete answer as to how a supervised machine learning model 
-can compare to reinforcement learning models, heuristics, and also the ILP method.
-In addition, the controlled experiment approach can help interpret the evaluation results of the designed model by 
-playing with different hyperparameter sets and also  
- providing an answer to the scalability aspect in RQ3.2.
-The time limitations of this study as well as the fact that the identified SOTA papers
+can compare to heuristics and also the ILP method.
+The time limitations as well as the focus of this research being on the evaluation of the model
+justifies the controlled experiment methodology not being necessary to answer RQ3, and thus not considered here. 
+Furthermore, the time-consuming aspect of the case-study approach as well as the fact that the identified SOTA papers
 use a dag task generation script and not real-life dag tasks datasets, makes
 the use of the case study methology not relevant in this research's context and not able to correctly compare the results with 
-the SOTA papers. 
-
+the SOTA papers.
 
 \section{Problem definition}
 ~
 
 The problem to be tackled is the problem of scheduling a single DAG task with a non-preemptive, global and fixed-priority scheduler (GFPS),
-on a multicore system. That is, the problem of computing a priority for each node for a DAG task so that it minimizes, 
+on a multicore system. That is, the problem of computing an execution priority for each node of a DAG task so that it minimizes, 
 using a non-preemptive GFPS, the makespan of the DAG.
 
 More precisely, given a DAG task $\tau = G = (V, E)$ and $n = \left\lvert V \right\rvert$, the designed machine learning model 
-idealy needs to compute a list of priorities $p^* \in \llbracket 0, n-1 \rrbracket^{n}$
+ideally needs to compute a list of priorities $p^* \in \llbracket 0, n-1 \rrbracket^{n}$
 so that 
 $$
     \text{AFT}(v_{\text{sink}}, p^*) = \min_{p \in \llbracket 0, n-1 \rrbracket^{n}} \text{AFT}(v_{\text{sink}}, p)

@@ -5,12 +5,12 @@
 ~
 
 The evaluation of the model is focused on two metrics : the makespan and the computing time once trained.
-For the implementation of the model, python 3.10.12 with the PyTorch 2.4.1 library is used and runs on a google collab runtime
+For the implementation of the model, Python 3.10.12 with the PyTorch 2.4.1 library is used and runs on a Google Colab runtime
 with 90 TPU cores.
 The stochastic gradient descent is used for training with a learning rate of $0.001$ and a batch size of 250.
 
-During the initial evaluation, an over-smoothing problem\cite{chen2020oversmoothing} occured which lead to 
-the model smoothing out the priorities and assigning the same priority to all the nodes.
+During the initial evaluation, an over-smoothing problem\cite{chen2020oversmoothing} occured which caused 
+the model to smooth out the priorities and assigning the same priority to all the nodes.
 To try to solve this, reducing the number of GCN layers to 1 was done,
 which unfortunately didn't fix the problem, leading to the addition
 of a regularization term to the loss function.
@@ -37,7 +37,7 @@ to establish why the over-smoothing problem was happening(see Section \ref{sec:d
 ~
 
 To generate the DAG tasks, the generator from \citet{zhao2020DAGsched} is used, which is also used by 
-\citet{Lee2021GlobalDagSchedDRL} and \cite{Zhao2022DAGsched}, to generate
+\citet{Lee2021GlobalDagSchedDRL} and \citet{Zhao2022DAGsched}, to generate
 random DAGs.
 Apart from it being used by state-of-the-Art papers, which my results will be compared to,
 and providing a qualitative and diverse dataset,
@@ -52,16 +52,15 @@ ranging from 2 up to the parallelism parameter, $p$ which in this case,
 is fixed at $p=8$. Nodes that do 
 not already have connections can randomly connect to other nodes in 
 the previous layer with a probability of $p_c=0.5$. After all layers 
-are generated, any terminal nodes are linked to a final sink node. 
-Both the source and sink nodes are used to structure the graph and 
-have a fixed execution time of one unit each. Lastly, 
+are generated, any terminal nodes are linked to a final sink node.
+Lastly, 
 execution times are assigned randomly to all nodes while ensuring 
 that the total workload sums up to $W = 1000$\cite{zhao2020DAGsched},
 that is, the fully sequential execution time of each DAG task is set to 1000 time units (i.e., the sum of each node's wcet).
 
 To generate DAGs with a fixed number of nodes $n$, 
 the generator is first used to generate 50000 DAG tasks
-with different values for $a$ and $b$ depdending on what 
+with different values for $a$ and $b$ depending on what 
 the value of $n$ is. Then, the generated DAGs with 
 the specified number of nodes are retrieved from the dataset.
 Specifically, Table \ref{tab:layer_num_minmax} 
@@ -88,11 +87,11 @@ shows the different $a$ and $b$ values according to $n$.
     \label{tab:layer_num_minmax}
 \end{table}
 
-Using those values, 1400 DAG tasks were retrieved and used for 
+Using those values, 1400 DAG tasks with exactly $n$ nodes were retrieved and used for 
 evaluation, for each value of $n$.
-1000 of them were used for training the model, 400 for testing
-and 100 of them were used to measure the computing time 
-for both the ILP and the supervised ML methods.
+1000 of them were used for training the model, 400 for testing,
+and 100 of those 1400 were used to measure the computing time 
+for both the ILP and the supervised machine learning methods.
 
 
 \subsection{Computing time results}
@@ -105,7 +104,7 @@ and it did time out when considering systems of 2 and 4 cores, when the number o
 exceeded 20 nodes (i.e., 30, 40 and 50 nodes) per DAG task.
 Hence, in the next sections, only 6 and 8 cores will be considered,
 with the number of nodes not exceeding 30 nodes, to have enough
-ILP solved DAGs for training the model. 
+ILP solved DAGs for the model to train on. 
 
 \begin{figure}
     \centering
@@ -120,7 +119,7 @@ As you can see from Figure \ref{fig:ilp_compute_time}, the more nodes there are 
 the more time it takes for the ILP solver to compute the optimal schedule,
 and it does so in, what it seems to be, an exponential growth.
 Figure \ref{fig:ilp_compute_time} thus shows the non-scalability
-of the ILP method, with the number of nodes per DAG increasing.
+of the ILP method, when the number of nodes per DAG increases.
 
 \begin{figure}
     \centering
@@ -138,14 +137,14 @@ you can see how, unlike ILP, the model seems to be a lot more scalable
 than ILP, as shown by the linearity of the computing time curve (bottom graph of Figure \ref{fig:compute_time_ilp_model}).
 The linearity is of course not a true linearity as the theoretical complexity,
 in terms of operations on the nodes' vector representation,
-of the model can be calculated to be $O(n^2)$ according to Section \ref{sec:model_design},
-but the curve is linear because of how short the X axis is,
+of the model can be calculated to be $O(n^{\alpha}),\, \alpha > 1$ according to Section \ref{sec:model_design},
+but the curve is linear because of how short the X axis is, i.e.,
 the polynomial curve is zoomed in which explains why the curve seems linear.
 
 This difference in scalability is expected as the problem is NP-hard,
 which means that the ILP solution, calculating optimal solutions,
 has to be at least of exponential complexity, hence the non-scalability of the ILP method.
-The model's scalability is also expected as the theoritacl complexity
+The model's scalability is also expected as the theoretical complexity
 is polynomial.
 
 
@@ -169,7 +168,7 @@ and the accuracy / loss of the model.
 Figure \ref{fig:avg_makespan_comparison_trained} shows the average
 reduced makespan, which is the makespan divided by the length of the critical path,
 computed with each method on 400 DAGs from the test set.
-Therefore, the closer to 1 it is, the better it performs.
+Therefore, the closer it is to 1, the better it performs.
 
 Not only does the model perform worse than the heuristic from \citet{zhao2020DAGsched},
 the model performs generally worse than the random method.
@@ -185,6 +184,11 @@ compute the same priority for different nodes, which
 is exacerbated with training, leading to the over-smoothing
 issue (see Table \ref{tab:similarity_percentages}).
 
+Another observation from Figures \ref{fig:avg_makespan_comparison_trained}
+and \ref{fig:avg_makespan_comparison_untrained} is that 
+the more cores there are, the smaller the makespan.
+This is expected as having more cores implies having more 
+computing resources, and thus more parallelization is possible.
 
 \begin{figure}
     \centering
@@ -192,7 +196,7 @@ issue (see Table \ref{tab:similarity_percentages}).
     \caption{Average reduced makespan (makespan divided by the critical path length) on the test set (400 DAGs) using the four different methods
     on 6, 7 and 8 cores with 30 nodes per DAG,
     with 'random' being the method of randomly assigning priorities to nodes of a DAG,
-    and the model not being trained.}
+    and the model being not trained.}
     \label{fig:avg_makespan_comparison_untrained}
 \end{figure}
 
@@ -253,8 +257,8 @@ shown here.
 \label{sec:discussion}
 
 There are several reasons why a machine learning model
-sub-performs.
-The issue can be because of an overfitting problem,
+under-performs.
+The issue can be because of an over-fitting problem,
 meaning that the model is too complex and learns the noise / bias
 that comes with the dataset.
 It can also be the opposite, under-fitting, 
@@ -269,27 +273,29 @@ or on enough epochs, which would mean that the model didn't have
 the time to converge and need more data samples to do so.
 
 Let's tackle these different problems and see why 
-the problem is the fact that supervised-learning isn't fit for this kind of problem,
+the problem is the fact that 
+the computations of the labels, i.e., the supervised-learning design, isn't fit for this kind of problem,
 that is the single DAG task scheduling problem.
 
 
 \subsubsection{Biased data and amount of data}
 ~
 
-Data is always bias and the amount of dataset bias\cite{torralba2011biasdataset}
+Data is always biased and the amount of dataset bias\cite{torralba2011biasdataset}
 can have a huge impact on the performance of a model.
 Although the number of training samples (1000) is not a lot 
 compared to what \citet{Lee2021GlobalDagSchedDRL} have generated (8000),
-the dataset generation procedure is the same as the one 
-in both \citet{zhao2020DAGsched} and \citet{Lee2021GlobalDagSchedDRL}.
+the dataset generation procedure is very similar to the one 
+in both \citet{zhao2020DAGsched} and \citet{Lee2021GlobalDagSchedDRL}
+as they both used the same dataset generator.
 The latter specifically, got more than promising results with their machine learning model,
 outperforming the heuristic in \citet{zhao2020DAGsched} by up to 3\% in terms of makespan,
- when using the same data generation procedure as here.
+ while using the same dataset generator as here.
 Furthermore, the loss is extremely stable and doesn't go down
 during training, even when training on 20 epochs (Figure \ref{fig:accu_loss_model}).
-This means that even if there is bias in the data, the fact that others have used
-the same data generation procedure and got great results shows that the
-dataset bias cannot explain the low performance of the model.
+Hence, even if there is bias in the data, the fact that others have used
+the same data generator and got great results shows that the
+dataset bias cannot solely explain the very low performance of the model.
 Also, the fact that the model doesn't seem to learn at all with 
 its loss being stagnant accross the epochs, removes the 
 idea of the model performing badly because there is not enough data to learn on.
@@ -299,44 +305,45 @@ idea of the model performing badly because there is not enough data to learn on.
 ~
 
 The reason why the model is performing this badly is probably
-not over-fitting.
+not over-fitting either.
 This is because over-fitting is characterized
-by the model learning the noise in the training set and performing\cite{jabbar2015overfitting_underfitting}.
-Hence, if it were the case, there would be a noticable gap
+by the model learning the noise in the training set and performing
+notably worse in the test set than in the training set\cite{jabbar2015overfitting_underfitting}.
+Hence, if it was the case, there would be a noticable gap
 between the training and validation accuracy in Figure \ref{fig:accu_loss_model},
 which there isn't.
 Also, the over-smoothing problem, which is causing the model to sub-perform,
- doesn't come from the noise
+ doesn't usually come from the noise
 in the data but rather from the architecture of the model itself\cite{chen2020oversmoothing}.
-Hence the problem might rather be that the model is under-fit for this problem.
+Hence the problem might rather be that the model is under-fitted for this problem.
 
 Indeed, as mentioned before, what the model is learning is 
-to assign the same priority at every node, which also means
+to assign the same priority to every node, which also means
 that it doesn't learn to approximate the output given by the ILP priority-lists,
 as shown by the accuracy and loss values not notably decreasing during
 training (Figure \ref{fig:accu_loss_model}).
 The issue here is that the model resembles very closely the 
-encoder in \citet{Lee2021GlobalDagSchedDRL} which didn't 
-have the over-smoothing problem.
-The attention-mechanism used is also close to what is done in \citet{Zhao2024GATDRLmodel}
-which also didn't have an over-smoothing problem.
+encoder in \citet{Lee2021GlobalDagSchedDRL} which doesn't 
+have an over-smoothing problem.
+The attention-mechanism used is also similar to what is done in \citet{Zhao2024GATDRLmodel}
+which doesn't have an over-smoothing problem either.
 
 The fact that The over-smoothing is very strong (see Table \ref{tab:similarity_percentages})
 and that the model is close to what has been done in the reinforcement learning models\cite{Lee2021GlobalDagSchedDRL}\cite{Zhao2024GATDRLmodel},
 lead us to conclude that the problem might be the learning method, 
-that is the supervised learning method.
+that is the supervised learning design.
 
-\subsubsection{the supervised learning problem}
+\subsubsection{The supervised learning problem}
 ~
 
 In supervised learning, the problem is either going to be a
 regression problem, when dealing with real numbers as the target variable
-such as predicting the price of a product or the rate of infection in an epidemic, etc.
+such as predicting the price of a product or the rate of infection in an epidemic,
 Or the problem is going to be interpreted as a classification problem.
 In our case, the numbers are discrete and the set of priorities is finite
 which is why the problem was treated as a classification problem.
 However, usually, for supervised learning, the predicted output 
-aim at mathing a ground truth, known beforehand, that is unique.
+aim at matching a ground truth, known beforehand, that is unique.
 Although the ILP method permitted us to have a priority list that
 effectively yields the minimum makespan,
 that priority list is not unique.
@@ -344,8 +351,8 @@ that priority list is not unique.
 Indeed, not only is the minimum makespan schedule not necessarily unique
 (see Figure \ref{fig:not_unique_schedules}),
 which means that the optimal priority-list is not unique
-(in Figure \ref{fig:not_unique_schedules}, schedule a) gives 
-[0, 1, 2, 3, 4, 5] but schedule b) gives [0, 1, 2, 4, 3, 5]).
+(in Figure \ref{fig:not_unique_schedules}, schedule a gives 
+[0, 1, 2, 3, 4, 5] but schedule b gives [0, 1, 2, 4, 3, 5]).
 But even if the schedule might be unique, when the start time
 of nodes are the same, multiple priorities
 can be assigned to those nodes.
@@ -362,7 +369,7 @@ are valid for minimizing the makespan of the DAG.
     \includegraphics[width=\linewidth]{images/second_samemakespan_diff_sched.png}
     \par c)
     \caption{Example of DAG task (a) for which two schedules (b and c) leading to different
-    priority lists are shown, both schedules giving the minimum makespan.}
+    priority lists are shown, with both schedules giving the minimum makespan.}
     \label{fig:not_unique_schedules}    
 \end{figure}
 
@@ -376,8 +383,8 @@ priority of $v_8$ in the last two schedule scenarios in Figure \ref{fig:dag_sche
 and a node having a specific priority when it could have 
 other potential priority values and it wouldn't change the makespan (e.g.,
 the example in Figure \ref{fig:not_unique_schedules}).
-Thus, the model can't learn to assign different priorities
-to the nodes but rather to smooth out the priorities and give
+Thus, the model isn't able to learn to assign different priorities
+to the nodes but rather smooths out the priorities and gives
 the same one to most of the nodes of a DAG,
 hence the over-smoothing problem.
 Furthermore, the non-uniqueness in the nodes' vector representations
@@ -395,7 +402,7 @@ with the ILP priority-list, which contributes to the over-smoothing problem.
     \centering
     \includegraphics[width=0.5\linewidth]{images/dag_similarity_representation.png}
     \caption{Example of a DAG task where two different nodes have the
-    exact same vector representation.}
+    exact same vector representation, node $\tau_2$ and $\tau_3$.}
     \label{fig:dag_same_representation_vector}
 \end{figure}
 
@@ -404,7 +411,7 @@ One potential solution to explore might be to generate
 makespan and from them, retrieve a single, unique priority list
 not only containing the information about which nodes need to be
 executed first, but also having the information of which nodes
-have interchangeable execution ordering 
+have an interchangeable execution order 
 (e.g., the two nodes in the example above, Figure \ref{fig:dag_same_representation_vector}).
 \\\\
 
@@ -420,6 +427,6 @@ method has shown great performance compared to ILP\cite{Zhao2024GATDRLmodel}
 and state-of-the-Art heuristics\cite{Lee2021GlobalDagSchedDRL},
 the supervised learning model presented here 
 clearly cannot compare at all to either SOTA heuristics
-or ILP, even though it is more scalable than ILP, 
-mostly because of the supervised learning method being unsuited 
+or ILP, although it is more scalable than ILP. 
+Mostly because of the supervised learning method being unsuited 
 for DAG task fixed-priority scheduling.

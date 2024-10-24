@@ -38,6 +38,16 @@ $v_j$ must wait the end of $v_i$'s execution to start executing(i.e., $v_i$ is a
 The nodes of the graph $G$ are characterized by their own worst-case execution time $C_{v_i}$ 
 and $vol(G) = \sum_{v_i \in V} C_{v_i}$ is the worst-case execution time of the DAG task $\tau$,
 also called the total workload of the DAG task.
+A \textit{source} node is the node which only has successors 
+and no predecessors, and a \textit{sink} node is 
+the node that only has predecessors and no sucessors.
+It is assumed that all DAGs have a unique source node and a unique sink node.
+This can always be assumed as you can always add a dummy sink or source node,
+setting their wcet to 0,
+at the end or beginning of a DAG that has multiple sink or source nodes,
+linking those non-unique sink and source nodes to
+the dummy nodes added so that the dummy nodes become the unique source node and sink node
+of the DAG.
 In this paper, the words nodes, vertices and subtasks will be used
 to address the same thing, that is the vertices of the graph of a DAG task.\\
 
@@ -47,19 +57,19 @@ where the DAG task has a wcet of 24 time units.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.5\linewidth]{images/example_DAG.png}
-    \caption{a) DAG task $\tau$. The worst-case execution time (wcet) of each subtask written as an exponent
+    \caption{DAG task $\tau$. The worst-case execution time (wcet) of each subtask is written as an exponent
     and the nodes highlighted in red are the nodes in the critical path, the path of maximum length in terms of wcets.}
     \label{fig:dag_example}
     \includegraphics[width=\linewidth]{images/example_DAG_schedules.png}
-    \caption{b) Execution schedules for the DAG task above. Heavily inspired from \citet{zhao2020DAGsched}.}
+    \caption{Execution schedules for the DAG task above. Heavily inspired from \citet{zhao2020DAGsched}.}
     \label{fig:dag_schedule_example}
 \end{figure}
 
 
-This concept will be the task model used in to conduct 
-part of the systematic literature review (see Section \ref{sec:literature})
-and it also will be the task model used for designing 
-the machine learning model (see Section \ref{sec:methodology}).
+The DAG task model will be the task model used in order to conduct 
+the systematic literature review (see Section \ref{sec:literature})
+and it will also be the task model used for designing 
+the supervised machine learning model (see Section \ref{sec:methodology}).
 
 \subsection{Makespan}
 
@@ -75,15 +85,14 @@ ways of scheduling the DAG task, the bottom one yielding a makespan of 13.
 This is a key measurement when scheduling the nodes of a single DAG task,
 also called intra-task scheduling (see Section \ref{sec:literature}),
 and it will be the main efficacy criteria when comparing 
-the machine learning model with state-of-the-art heuristics and ILP
+the machine learning model with state-of-the-Art heuristics and ILP
 (see Section \ref{sec:methodology}).
 
 \subsection{Intra-task and inter-task scheduling}
 ~
 
 When considering the DAG task model,
-two concepts arise : intra-task scheduling and inter-task scheduling.
-
+two concepts arise: intra-task scheduling and inter-task scheduling.
 Intra-task scheduling of DAG tasks is when only the execution
 order of the nodes in a single DAG task is considered.
 The goal of such a problem being to minimize the makespan
@@ -100,7 +109,7 @@ The problem of intra-task scheduling of DAG tasks,
 that is, scheduling the nodes of a single DAG task so that 
 the makespan is minimized,
 is a NP-hard problem\cite{ULLMAN1975NPhard}\cite{du1989schedNPhard}
-but can also be intuitively seen as a NP-difficult problem when looking at 
+but can also be intuitively seen as a NP-hard problem when looking at 
 the schedules shown in Figure \ref{fig:dag_schedule_example}.
 Indeed, 
 when looking at a single DAG task,
@@ -126,7 +135,9 @@ in advance
 in order to find the best solution, it often means that the problem is NP-hard
 (e.g., the problem of coloring a graph\cite{book1975richardNPhardColorGraph}
 or coloring a path of a graph\cite{ERLEBACH2001ColorPathNPhard}).
-Therefore, researchers have resorted to heuristics to solve the problem(see Section \ref{sec:literature}).
+Therefore, researchers have resorted to heuristics to compute an execution order
+that minimizes the bound of the DAG, reducing its wcet 
+by providing a better worst-case makespan bound than $vol(G)$ (see Section \ref{sec:literature}).
 
 
 \subsection{Utilization factor}
@@ -148,18 +159,18 @@ maximize their usage.
 
 This concept is also used either as a measurement
 when comparing two scheduling algorithms 
-and considering their utilization bound(see Section \ref{sec:literature}),
+and considering their utilization bound,
 or used as a parameter to generate tasksets or DAG tasks with 
-a fixed utilization (see Section \ref{sec:methodology}).
+a fixed utilization (see Section \ref{sec:literature}).
 
 \subsection{Capacity augmentation bound}
 
-Another measurement used when scheduling event-chains, or DAG, tasks  
-is the capacity bounds, or capacity augmentation bound,
+Another measurement used when scheduling DAG tasks  
+is the capacity bound, or capacity augmentation bound,
 which compares resource use to a theoretically optimal scheduling algorithm.
 It can also be used as a simple schedulability test.
 It is often refer to as a $\beta$ coefficient and the lower $\beta$ is, the better the scheduling algorithm.\\
-This metric is used for DAG tasks or event-chains of tasks.
+This metric is used in the literature when scheduling DAG tasks (Section \ref{sec:literature}).
 
 %\cite{tiryaki2006sunit} is really good with MAS but really bad with something else.
 %\subsection{Optimality}
@@ -187,9 +198,9 @@ and calculating the amount of schedulable (i.e.,
 the schedule produced doesn't lead to a deadline miss) tasksets compared to 
 the total amount of taskets.
 The resulting percentage is the acceptance ratio 
-and the closer it gets to 100\% for a scheduling algorithm, the better the scheduling algorithm.
+and the closer it gets to 100\% for a given scheduling algorithm, the better the scheduling algorithm.
 
-This concept is also used as a metric, to assert the efficiency
+This concept is thus used as a metric, to assert the efficiency
 of scheduling algorithms when considering inter-task scheduling (see Section \ref{sec:literature}).
 \\
 
@@ -197,7 +208,7 @@ of scheduling algorithms when considering inter-task scheduling (see Section \re
 While the acceptance ratio, also called system schedulability, is used 
 to measure the performance of scheduling algorithms for inter-DAG task scheduling
 (i.e., scheduling multiple DAG tasks),
-the makespan and the capacity bound are only used for DAG tasks and tasksets representing chain of events.
+the makespan and the capacity bound are only used for single DAG tasks.
 
 %\subsection{RM and EDF scheduling}
 %~

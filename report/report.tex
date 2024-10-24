@@ -19,13 +19,13 @@
 \begin{document}
 
 
-\title{Scheduling time-triggered tasks in multicore real-time systems: a machine learning approach\\
+\title{Scheduling time-triggered tasks in multicore real-time systems: a supervised learning approach\\
 %{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
 %should not be used}
 %\thanks{Identify applicable funding agency here. If none, delete this.}
 }
 
-\author{\IEEEauthorblockN{Félicien Fiscus-Gay}
+\author{\IEEEauthorblockN{Félicien Fiscus-Gay (ID: 23194149)}
 \IEEEauthorblockA{\textit{Computer Science} \\
 \textit{Auckland University of Technology}\\
 Auckland, New Zealand \\
@@ -37,27 +37,27 @@ felicien.fgay@gmail.com}
 
 \begin{abstract}
 Tasks on real-time systems are becoming more and more complex and
-those system are becoming more and more multicore, complexifying
+those systems are expanding their processing resources and becoming multicore, complexifying
 the scheduling of such time-triggered tasks.
 To tackle this growth, the Directed Acyclic Graph (DAG) task model has been introduced and
 research has been done on designing heuristics
-to address the scheduling of DAGs on a multicore platform,
-but very few papers used machine learning for this problem.  
-In this paper, the real-time DAG task scheduling literature is analyzed 
+to address the scheduling of DAGs on a multicore platform.
+However, very few papers used machine learning for this problem.\\
+In this research, the real-time DAG task scheduling literature is reviewed 
 and a supervised machine learning model is designed
-using a graph convolutional network and evaluated 
+using a graph convolutional network, and evaluated 
 for scheduling a single DAG task with the goal of minimizing its makespan 
 using non-preemptive, global fixed-priority scheduling.
 The Integer Linear Programming method has been 
 used to compute the output labels for the supervised model to learn on
-and a non-preemptive global and fixed-priority scheduler 
+and a non-preemptive, global fixed-priority scheduler simulator 
 has been implemented to compute the exact makespan of a DAG task.
 The results showed that the supervised model doesn't learn
 and that the supervised learning method seems unfit 
 for this kind of problem.
-The performance problem is mainly caused by the computation of 
-the output label that could be and should be 
-investigated further in the future.
+The learning issue is mainly due to the computation of 
+the output labels, which will be
+investigated further in future works.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -86,13 +86,13 @@ supervised learning for the single DAG multicore scheduling problem.
 Hence, a supervised learning model has been designed and evaluated.
 Unfortunately, the performance results 
 showed how the supervised learning method seems unfit for this kind of 
-problem, with the main problem being the computation of the output labels,
-and reinforcement learning appears to yield much better results, comparable
+problem, with the main issue being the computation of the output labels.
+Reinforcement learning, on the other hand, appears to yield much better results, comparable
 to state-of-the-Art heuristics and the optimal Integer Linear Programming method.
 
 Future works should be done on computing unique and more informative output labels,
-to expand on the results discussion,
-and, if successful, expand the model to treat multi-DAGs scheduling as well. 
+to expand on the results' discussion,
+and, if successful, expand the model to tackle multi-DAGs scheduling as well. 
 One could also work on using reinforcement learning for 
 multi-rate DAGs, or chain of time-triggered tasks, and potentially
 extend the task model to include other types of tasks,
@@ -109,7 +109,10 @@ such as Logical Execution Time tasks.
 
 \section*{Acknowledgement}
 
-\paraheading{For referencing in LaTeX, check out: \url{https://texblog.org/2014/04/22/using-google-scholar-to-download-bibtex-citations/}}
+A special thank you to my supervisor Dr. Matthew Kuo
+who guided me throughout this dissertation,
+as well as my friend Alexi Cannesse who helped 
+me to debug some code when implementing the machine learning model.
 
 
 \bibliographystyle{IEEEtranN}
