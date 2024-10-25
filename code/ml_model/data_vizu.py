@@ -96,7 +96,7 @@ def plot_curves_from_csv(file_path, ilp_filepath, m):
     # Load the CSV file into a DataFrame
     data_model = pd.read_csv(file_path, header=0)
     data_ilp = pd.read_csv(ilp_filepath, header=0)
-    #data_ilp = data_ilp.iloc[:3, :]
+    data_ilp = data_ilp.iloc[:3, :]
     #print(data)
     # Plot the curves
     plt.figure(figsize=(10, 6))
@@ -107,7 +107,7 @@ def plot_curves_from_csv(file_path, ilp_filepath, m):
     # Add labels, title, and legend
     plt.xlabel('Number of nodes')
     plt.ylabel('Average computing time in minutes')
-    plt.title('Average (over %i samples) computing time for 10, 20, 30, 40 and 50 nodes per graph on %i cores' % (data_model['samples'][0], m))
+    plt.title('Average (over %i DAG samples) computing time for the ILP method on %i cores' % (data_model['samples'][0], m))
     plt.legend()
 
     # Display the plot
@@ -154,14 +154,17 @@ def plot_barchart_makespans(m, n):
 def plot_curves(list_loss_train, list_loss_val, list_accu_train, list_accu_val, m, n, epochs):
     plt.figure(figsize=(10, 5))
     
+    x_axis = np.arange(1, len(list_accu_train) + 1, step=1)
     # Plotting the first list with label 'train'
-    plt.plot(list_loss_train, label='train loss', marker='o', linestyle='-', color='red')
-    plt.plot(list_loss_val, label='validation loss', marker='x', linestyle='--', color='red')
+    plt.plot(x_axis, list_loss_train, label='train loss', marker='o', linestyle='-', color='red')
+    plt.plot(x_axis, list_loss_val, label='validation loss', marker='x', linestyle='--', color='red')
 
-    plt.plot(list_accu_train, label='train accuracy', marker='o', linestyle='-', color='blue')
-    plt.plot(list_accu_val, label='validation accuracy', marker='x', linestyle='--', color='blue')
+    plt.plot(x_axis, list_accu_train, label='train accuracy', marker='o', linestyle='-', color='blue')
+    plt.plot(x_axis, list_accu_val, label='validation accuracy', marker='x', linestyle='--', color='blue')
     
     # Adding titles and labels
+
+    plt.xticks(x_axis)
     plt.title('Training vs. Validation Curves on %i cores with %i nodes per graph and on %i epochs' % (m, n, epochs))
     plt.xlabel('Epoch')
     plt.ylabel('Loss/Accuracy')
@@ -254,6 +257,6 @@ def print_avg_similarity():
 if __name__ == '__main__':
     #compute_mean_time_results_ILP()
     #plot_model_compute_time()
-    #plot_lossaccu_curves()
-    plot_makespans_pretty()
+    plot_lossaccu_curves()
+    #plot_makespans_pretty()
     #print_avg_similarity()

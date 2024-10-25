@@ -14,7 +14,7 @@ the model to smooth out the priorities and assigning the same priority to all th
 To try to solve this, reducing the number of GCN layers to 1 was done,
 which unfortunately didn't fix the problem, leading to the addition
 of a regularization term to the loss function.
-The idea is to tackle the over-smoothing probblem by forcing the model
+The idea is to tackle the over-smoothing problem by forcing the model
 to differentiate between the nodes' representation.
 Hence, the regularization term is the squared inverse of the average euclidian distance 
 between each of the nodes' latent representation, i.e., 
@@ -44,11 +44,11 @@ and providing a qualitative and diverse dataset,
 this generator has great modularity and the open-source git repository\footnote{https://github.com/automaticdai/dag-gen-rnd} 
 makes it easy-to-use.
 The random DAGs are generated using the following process :
-The generator starts at a source node and expands outward, 
+the generator starts at a source node and expands outward, 
 creating nodes in successive layers. The total number of layers, 
 or maximum depth, is randomly determined to be between two values $a$ and $b$.
 For each layer, the number of nodes generated is chosen uniformly, 
-ranging from 2 up to the parallelism parameter, $p$ which in this case, 
+ranging from 2 up to the parallelism parameter $p$ which, in this case, 
 is fixed at $p=8$. Nodes that do 
 not already have connections can randomly connect to other nodes in 
 the previous layer with a probability of $p_c=0.5$. After all layers 
@@ -151,8 +151,8 @@ is polynomial.
 \subsection{Performance comparison}
 ~
 
-Two performance metrics will be used for the model.
-The makespan which will be compared to the ILP solution, the heuristic
+Two performance metrics are used for the model.
+The makespan, which is compared to the ILP solution, the heuristic
 from \citet{zhao2020DAGsched} and a random method where each priority is assigned at random,
 and the accuracy / loss of the model.
 
@@ -171,7 +171,7 @@ computed with each method on 400 DAGs from the test set.
 Therefore, the closer it is to 1, the better it performs.
 
 Not only does the model perform worse than the heuristic from \citet{zhao2020DAGsched},
-the model performs generally worse than the random method.
+the model performs globally worse than the random method.
 Also, the heuristic is very close to matching the ILP method,
 performing even greater than expected.
 
@@ -187,7 +187,7 @@ issue (see Table \ref{tab:similarity_percentages}).
 Another observation from Figures \ref{fig:avg_makespan_comparison_trained}
 and \ref{fig:avg_makespan_comparison_untrained} is that 
 the more cores there are, the smaller the makespan.
-This is expected as having more cores implies having more 
+This is expected, as having more cores implies having more 
 computing resources, and thus more parallelization is possible.
 
 \begin{figure}
@@ -328,7 +328,7 @@ have an over-smoothing problem.
 The attention-mechanism used is also similar to what is done in \citet{Zhao2024GATDRLmodel}
 which doesn't have an over-smoothing problem either.
 
-The fact that The over-smoothing is very strong (see Table \ref{tab:similarity_percentages})
+The fact that the over-smoothing is very strong (see Table \ref{tab:similarity_percentages})
 and that the model is close to what has been done in the reinforcement learning models\cite{Lee2021GlobalDagSchedDRL}\cite{Zhao2024GATDRLmodel},
 lead us to conclude that the problem might be the learning method, 
 that is the supervised learning design.
@@ -343,7 +343,7 @@ Or the problem is going to be interpreted as a classification problem.
 In our case, the numbers are discrete and the set of priorities is finite
 which is why the problem was treated as a classification problem.
 However, usually, for supervised learning, the predicted output 
-aim at matching a ground truth, known beforehand, that is unique.
+aims at matching a ground truth, known beforehand, that is unique.
 Although the ILP method permitted us to have a priority list that
 effectively yields the minimum makespan,
 that priority list is not unique.
@@ -354,7 +354,7 @@ which means that the optimal priority-list is not unique
 (in Figure \ref{fig:not_unique_schedules}, schedule a gives 
 [0, 1, 2, 3, 4, 5] but schedule b gives [0, 1, 2, 4, 3, 5]).
 But even if the schedule might be unique, when the start time
-of nodes are the same, multiple priorities
+of nodes is the same, multiple priorities
 can be assigned to those nodes.
 For instance, in schedule a) of Figure \ref{fig:not_unique_schedules},
 the  two priority-lists [0, 1, 2, 3, 4, 5] and [0, 2, 1, 3, 4, 5]
@@ -390,11 +390,11 @@ hence the over-smoothing problem.
 Furthermore, the non-uniqueness in the nodes' vector representations
 also contributes to the model struggling to learn.
 Indeed, 
-if two nodes have the same number of in and out neighbours,
+if two nodes have the same number of in and out neighbours and
 are neither a sink nor a source node, their respective
 vector representation will be very similar.
 For instance, in the DAG shown in Figure \ref{fig:dag_same_representation_vector},
-the vector representation of nodes $\tau_2$ and $\tau_3$ are the same,
+the vector representation of nodes $v_2$ and $v_3$ are the same,
 i.e., $(0.067, 1, 1, 0, 0)$, and although those nodes having different priorities
 doesn't impact the final makespan, they do have different priority values
 with the ILP priority-list, which contributes to the over-smoothing problem. 
@@ -402,12 +402,12 @@ with the ILP priority-list, which contributes to the over-smoothing problem.
     \centering
     \includegraphics[width=0.5\linewidth]{images/dag_similarity_representation.png}
     \caption{Example of a DAG task where two different nodes have the
-    exact same vector representation, node $\tau_2$ and $\tau_3$.}
+    exact same vector representation, node $v_2$ and $v_3$.}
     \label{fig:dag_same_representation_vector}
 \end{figure}
 
-One potential solution to explore might be to generate
-, for each DAG, all the different schedules that lead to the minimum
+One potential solution to explore might be to generate,
+for each DAG, all the different schedules that lead to the minimum
 makespan and from them, retrieve a single, unique priority list
 not only containing the information about which nodes need to be
 executed first, but also having the information of which nodes

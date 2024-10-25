@@ -10,7 +10,7 @@ and don't want to waste time solving it ourselves,
 such as image classification or text classification.
 In this case, there are ways to compute solutions to the problem
 using linear programming, but it is costly and doesn't scale well 
-when inreasing the number of nodes per DAG.
+when increasing the number of nodes per DAG.
 Hence, in the literature, only reinforcement learning has been
 used to tackle this problem, a machine learning method that 
 doesn't need to know the true solution but 
@@ -20,8 +20,8 @@ and can provide good interpretations when the model is not too deep.
 Also, once trained, the supervised machine learning model can be 
 fast and scalable in terms of computing time, unlike the ILP method.
 Therefore, the supervised learning model's purpose will be to
-approximate the computation of a priority-list for a single DAG task
-, that leads to the minimum makespan.
+approximate the computation of a priority-list for a single DAG task, 
+that leads to the minimum makespan.
 
 \subsection{Supervised design}
 ~
@@ -81,8 +81,8 @@ An example of such a DAG task representation is shown in Figure \ref{fig:dag_tas
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/dag_matrix_example.drawio.png}
-    \caption{Example dag task with 5 nodes, a total workload of 12
-    and the matrix representation of each node with the columns respectively respresenting the above list of features.}
+    \caption{Example DAG task with 5 nodes, a total workload of 12
+    and the matrix representation of each node with the columns respectively representing the above list of features.}
     \label{fig:dag_task_matrix_example}
 \end{figure}
 
@@ -102,11 +102,11 @@ with each one being the probability of the node being
 assigned the priority corresponding to the position of the probability in the list
 of probabilities, starting from 0.
 For instance, if $n = 3$, 
-a possible output for a node $\tau_i$ would be
-$\text{model}(\tau_i) = [0.2,0.5,0.3]$ which means that according to the model,
-the node $\tau_i$ has a probability to be assigned priority 0 of $0.2$,
+a possible output for a node $v_i$ would be
+$\text{model}(v_i) = [0.2,0.5,0.3]$ which means that according to the model,
+the node $v_i$ has a probability to be assigned priority 0 of $0.2$,
 priority 1 of $0.5$ and priority 2 of $0.3$.
-As a consequence, the priority chosen for node $\tau_i$ will be 
+As a consequence, the priority chosen for node $v_i$ will be 
 the one that has the maximum probability a-posteriori (MAP strategy),
 in the example above, it is priority 1.
 
@@ -120,12 +120,12 @@ correspond to the priorities, e.g., Figure \ref{fig:dag_output_matrix_example}.
 The model output needs to be compared to the known-to-be-true output or label,
 which means we need a way of calculating the optimal priority list.
 The idea is to use an ILP solver to compute the optimal schedule 
-of a dag task, and then use this optimal schedule to retrieve 
+of a DAG task, and then use this optimal schedule to retrieve 
 the optimal priorities for each node, according to their start time
 in the computed schedule.
 Each node will be sorted according to their start time, in increasing order,
 and the priority value will then be the position of each node in the sorted list.
-As a consequence, the nodes with the lowest start time will
+As a consequence, the node with the lowest start time will
 have the highest priority.
 
 The makespan calculation is done using a non-preemptive GFPS,
@@ -162,10 +162,16 @@ of the DAG.
 Therefore, the idea was, initially, to compare the makespan
 produced by the predicted priority-list with the makespan
 produced by the ILP schedule, using a simple difference operator.
-This difference would have been the loss function of the model.
+This difference would have been the loss function of the model : 
+$loss(p_{\text{model}}, p_{\text{ilp}}) = |GFPS(p_{\text{model}}) - GFPS(p_{\text{ilp}})|$
+with $p_{\text{model}}$ and $p_{\text{ilp}}$ being 
+the priority lists outputed by the model and the ILP solver respectively.
 Unfortunately, the non-preemptive GFPS which is used to compute the makespan,
 isn't differentiable for the priority-list given to it,
 which lead to segfaults in the training phase.
+The segfaults happen because the non-differentiability 
+of this loss function makes the PyTorch gradient calculation algorithm
+try to compute something that doesn't exist.
 Thus, instead of looking at the makespans,
 the idea is to look at the priority matrix 
 and compare the one predicted by the model to
@@ -178,7 +184,7 @@ of each node being assigned a specific priority, using the
 same process described in the previous section but in reverse, with a probability of 1 
 on the optimal priority value, and 0 otherwise. 
 For instance, if the optimal priority list for a DAG task of 3 nodes 
-is [$\tau_1$: 0, $\tau_2$: 2, $\tau_3$: 1],
+is [$v_1$: 0, $v_2$: 2, $v_3$: 1],
 then the true label is the matrix :
 $$
 \begin{pmatrix}
@@ -187,7 +193,7 @@ $$
     0 & 1 & 0
 \end{pmatrix}
 $$
-With each row representing $\tau_1$, $\tau_2$ and $\tau_3$ respectively,
+With each row representing $v_1$, $v_2$ and $v_3$ respectively,
 and the column representing the priorities 0, 1 and 2 respectively.
 
 Once we have the two matrices, 
@@ -296,18 +302,20 @@ uses the directed aspect of the DAGs.
 The Figure \ref{fig:update_aggregate_diagram} represents
 one GCN layer.
 
-To be more specific, for each GCN layer, the input vector $X_k$ 
+To be more specific, for each GCN layer, the input vector $X^{v_i}_k$ 
 goes through an aggregation phase where,
-given the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
+the inputs are the set of incoming neighbours of node $v_i$, $\mathcal{N}_{in}(v_i)$, which includes
 $v_i$, and the set of outgoing neighbours $\mathcal{N}_{out}(v_i)$, which also includes $v_i$,
-the next vector representation $X_{k+1}$ is calculated by the following equation:
+and the output is
+the next vector representation $X^{v_i}_{k+1}$, calculated by the following equation:
 
 \begin{equation}
 GCN(X) = AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i))
 \end{equation}
 
 where $AttentionModule$ is defined by the Equations \ref{eq:attention_module}--\ref{eq:elu}
-and computes the importance scores of each neighbour, in each set of neighbours:
+and computes the importance scores of each neighbour, in each set of neighbours.
+$X^{v_i}$ is the feature vector for the node $v_i$.
 
 \begin{multline}
     AttentionModule(X, \mathcal{N}_{in}(v_i), \mathcal{N}_{out}(v_i)) = \\
@@ -316,20 +324,20 @@ and computes the importance scores of each neighbour, in each set of neighbours:
 \end{multline}
 
 \begin{equation}
-Att(X, \mathcal{N}(v_i)) = W\sum_{j \in \mathcal{N}(v_i)} \alpha_{ij} X_j
+Att(X, \mathcal{N}(v_i)) = W\sum_{j \in \mathcal{N}(v_i)} \alpha_{ij} X^{v_j}
 \label{eq:attention_submodule}
 \end{equation}
 Where 
 \begin{equation}
-    \alpha_{ij} = \frac{\exp \left ({ a ^{T} W X_{i} + b ^{T} W X_{j} }\right )}
-    {{\sum _{k \in \mathcal {N}(v_{i})}} \exp \left ({ a ^{T} W X_{i} + b ^{T} W X_{k} }\right )}
+    \alpha_{ij} = \frac{\exp \left ({ a ^{T} W X^{v_i} + b ^{T} W X^{v_j} }\right )}
+    {{\sum _{k \in \mathcal {N}(v_{i})}} \exp \left ({ a ^{T} W X^{v_i} + b ^{T} W X^{v_k} }\right )}
 \end{equation}
 
 are the attention coefficients
 which evaluates how important is $v_j$ to $v_i$'s vector 
 representation, similar to what is done in \citet{Lee2021GlobalDagSchedDRL}.
 Equation \ref{eq:attention_submodule} computes the attention scores
-for each neighbours of node $v_i$, 
+for each neighbour of node $v_i$, 
 scores that are then used in Equation \ref{eq:attention_module}
 to aggregate the scores information and pass it through 
 the ELU activation function.
@@ -339,7 +347,8 @@ and $\text{ELU}$ is the exponential linear unit activation function (Equation \r
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{images/gcn_update_aggregate_diagram.png}
-    \caption{Diagram of the graph convolution network layer. $X_k$ is the transformed node vector representation
+    \caption{Diagram of the graph convolution network layer. $X^{v_i}_k$ is the transformed node vector representation,
+    for node $v_i$,
     and ELU is the exponential linear unit function (see Equation \ref{eq:elu}).}
     \label{fig:update_aggregate_diagram}
 \end{figure}
@@ -355,7 +364,7 @@ x, & \text{if } x > 0 \\
 
 
 The GCN layer can be repeated several times 
-to improve the model's capacity to better
+to improve the model's capacity to
 capture the complexity of the graph structure.
 In this case, the number of GCN layers was set to 3.
 
@@ -399,13 +408,13 @@ which is precisely the problem at stakes\footnote{See the github repository for 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{images/Tau_108.png}
-    \includegraphics[width=\linewidth, height=70px]{images/schedule_ilp_fail_correct.png}
+    \includegraphics[width=\linewidth, height=70px]{images/schedule_example_ilpfail_correct.png}
     \par Schedule a)
     \includegraphics[width=\linewidth, height=55px]{images/schedule_example_ilpfail_better.png}
     \par Schedule b)
     \caption{Example of a DAG task (top image) where the schedule that the ILP solver outputs (the schedule a))
-    produces a longer makespan (64) but smaller sum of dependencies delays (400) than 
-    the schedule b) with a makespan of 63 and a sum of dependencies delays of 427.}
+    produces a longer makespan (64) but smaller sum of dependency delays (400) than 
+    the schedule b) with a makespan of 63 and a sum of dependency delays of 427.}
     \label{fig:counter_example_minsumdep}
 \end{figure}
 
@@ -420,9 +429,9 @@ according to the node's start time.
 The sooner the start time, the higher the priority.
 
 For instance, for the non-optimal schedule shown in Figure \ref{fig:counter_example_minsumdep} (schedule a)),
-the corresponding priority-list would be 0 for node $\tau_1$, 1 for node $\tau_4$,
-etc, i.e., [$\tau_1$: 0, $\tau_2$: 3, $\tau_3$: 2, $\tau_4$: 1, $\tau_5$: 4, $\tau_6$: 6, $\tau_7$: 5, $\tau_8$: 8,
- $\tau_9$: 10, $\tau_10$: 7, $\tau_11$: 9, $\tau_12$: 11, $\tau_13$: 13, $\tau_14$: 12, $\tau_15$: 14].
+the corresponding priority-list would be 0 for node $v_1$, 1 for node $v_4$,
+etc, i.e., [$v_1$: 0, $v_2$: 3, $v_3$: 2, $v_4$: 1, $v_5$: 4, $v_6$: 6, $v_7$: 5, $v_8$: 8,
+ $v_9$: 10, $v_10$: 7, $v_11$: 9, $v_12$: 11, $v_13$: 13, $v_14$: 12, $v_15$: 14].
 This priority list is then converted to a matrix by the process described
 at the end of Section \ref{sec:output_labels}.
 
@@ -445,7 +454,8 @@ the ready priority queue (see Figure \ref{fig:algo_makespan} and \ref{fig:algo_m
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{images/makespan_computation_algorithm_global.png}
-    \caption{Top view of the makespan computation algorithm.}
+    \caption{Top view of the makespan computation algorithm.
+    The round squares are inputs and the angular squares are routines or statements.}
     \label{fig:algo_makespan}
 \end{figure}
 

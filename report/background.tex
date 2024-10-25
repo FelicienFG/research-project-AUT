@@ -109,7 +109,7 @@ The problem of intra-task scheduling of DAG tasks,
 that is, scheduling the nodes of a single DAG task so that 
 the makespan is minimized,
 is a NP-hard problem\cite{ULLMAN1975NPhard}\cite{du1989schedNPhard}
-but can also be intuitively seen as a NP-hard problem when looking at 
+and can also be intuitively seen as such when looking at 
 the schedules shown in Figure \ref{fig:dag_schedule_example}.
 Indeed, 
 when looking at a single DAG task,
@@ -117,9 +117,13 @@ a simple yet efficient way of scheduling the nodes
 is looking at a critical-path-first execution order(CPFE).
 The critical path, highlighted in red in Figure \ref{fig:dag_example},
 is the longest path of the graph in terms of wcets.
-The CPFE principle is applied in the third schedule (from top to bottom)
-in Figure \ref{fig:dag_schedule_example} and achieves a makespan of 14.
-But this is not the minimum makespan as the fourth schedule yields a makespan
+The CPFE principle is about assigning the highest execution priority
+to the nodes that are part of the critical path in the graph.
+Basically, if multiple nodes, including a node in the critical path, are ready for execution,
+the node in the critical path will be executed first.
+The CPFE principle is applied in the third and fourth schedules (from top to bottom)
+in Figure \ref{fig:dag_schedule_example} and achieves a makespan of 14 in the third schedule.
+However, this is not the minimum makespan as the fourth schedule yields a makespan
 of 13.
 
 This is due to the fact that, although executing the critical path first
@@ -130,7 +134,7 @@ The fourth schedule in Figure \ref{fig:dag_schedule_example}
 achieves a makespan of 13 by prioritizing the execution of node $v_8$
 before node $v_5$ which is crucial to enable $v_3$ to execute sooner
 than in the third schedule.
-Typically in graph theory, when the global structure needs to be known 
+Typically, in graph theory, when the global structure needs to be known 
 in advance
 in order to find the best solution, it often means that the problem is NP-hard
 (e.g., the problem of coloring a graph\cite{book1975richardNPhardColorGraph}
@@ -139,6 +143,54 @@ Therefore, researchers have resorted to heuristics to compute an execution order
 that minimizes the bound of the DAG, reducing its wcet 
 by providing a better worst-case makespan bound than $vol(G)$ (see Section \ref{sec:literature}).
 
+
+\subsection{Global and partitioned scheduling}
+~
+
+In task scheduling,
+the term \textit{global} means that 
+we allow the tasks to migrate between multiple processors or cores
+during their execution, i.e., the tasks are
+not bound to a single processor.
+On the other hand, the term \textit{partitioned}
+in scheduling means that we don't allow tasks to migrate 
+and rather fix each of them on a specific processor to execute on
+indefinitely.
+
+\subsection{Priority scheduling}
+~
+
+Multiple scheduling algorithm use either fixed-priority 
+on non-fixed priority scheduling.
+Firstly, priority scheduling is the concept 
+of assigning different execution priorities 
+to different tasks and, when choosing which tasks 
+must execute first, executing the one with the highest priority.
+Fixed-priority scheduling means that the priority values
+are assigned to each task before the scheduling starts
+and are not changed afterwards(e.g., the RM algorithm\cite{liu1973scheduling}).
+On the other hand, non-fixed or online-priority scheduling
+is when the tasks' priorities are computed during 
+the scheduling process(e.g., the EDF algorithm\cite{liu1973scheduling}).
+
+\subsection{Epochs and batch size}
+~
+
+In machine learning,
+an \textit{epoch} is a training phase iteration where 
+the model goes through the entire training dataset, 
+the model, then, went through one epoch.
+The training phase often consists of multiple epochs to 
+enhance the training performance of the model.
+A \textit{batch} is a subset, or chunk,  of the training dataset
+that is given to the model to learn on and adjust its weights.
+Hence, the \textit{batch size} is the number of data samples
+the model should look at before it learns from its mistakes
+and adjusts itself.
+When using stochastic gradient descent, for instance,
+the model first computes the average gradient of the batch
+it just processed and then uses this mean value to 
+tweak its weights.
 
 \subsection{Utilization factor}
 
@@ -159,15 +211,16 @@ maximize their usage.
 
 This concept is also used either as a measurement
 when comparing two scheduling algorithms 
-and considering their utilization bound,
+and considering their minimum-utilization bound,
 or used as a parameter to generate tasksets or DAG tasks with 
 a fixed utilization (see Section \ref{sec:literature}).
+
 
 \subsection{Capacity augmentation bound}
 
 Another measurement used when scheduling DAG tasks  
 is the capacity bound, or capacity augmentation bound,
-which compares resource use to a theoretically optimal scheduling algorithm.
+which compares the use of computing resources to a theoretically optimal scheduling algorithm.
 It can also be used as a simple schedulability test.
 It is often refer to as a $\beta$ coefficient and the lower $\beta$ is, the better the scheduling algorithm.\\
 This metric is used in the literature when scheduling DAG tasks (Section \ref{sec:literature}).

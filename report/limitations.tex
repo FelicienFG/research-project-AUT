@@ -10,7 +10,7 @@ using the generator as it has been used might not
 lead to a dataset as diverse as what is done by \citet{Zhao2024GATDRLmodel} for instance,
 and it might not be as qualitative as the authors of the generator claim it to be.
 Also, no evaluation of the model using multiple values of the parallelism
-parameter $p$ has been done, which could've been interesting 
+parameter $p$ has been done, which could have been interesting 
 to look at to see the impact of this parameter, and of how parallelizable 
 a DAG task is, on the performance.
 The amount of DAG tasks used as a test set is 400 which 
@@ -29,7 +29,7 @@ the supervised learning method might still be an option
 for this kind of problem, as the main problem isn't the supervised
 learning method per se, but rather the computation of the output labels. 
 Also, although the ILP method computes
-optimal schedules, it does take a long time to do so and is not scalable,
+optimal schedules, it does take a long time to do so and it is not scalable,
 making the model training not scalable which can
 become problematic if we want to train the model
 on DAGs with 100, 500 or 1000 nodes.

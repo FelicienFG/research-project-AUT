@@ -52,11 +52,13 @@ However, when considering multiple processors, the scheduling
 problem becomes much more complex, and different task models must 
 be considered.
 
-A prevalent task model when considering periodic tasks that can be parallelized is the 
-Directed Acyclic Graph (DAG) task model which arises when a time-triggered task
-can be parallelized into subtasks which are the nodes of the graph,
-thus reducing the worst-case execution time of the reccurent DAG task when executed on a designated set of cores.
-Those nodes have dependency constraints which are modeled by the directed edges between the nodes.
+A prevalent task model when considering parllelization
+is the Directed Acyclic Graph (DAG) task model.
+DAG tasks are time-triggered tasks
+that can be parallelized into subtasks,
+thus reducing the worst-case execution time of the recurrent DAG task, when executed on a designated set of cores.
+The subtasks correspond to the nodes of the graph and
+those nodes have dependency constraints which are modeled by the directed edges between the nodes.
 The DAG task model is used to model tasks that are parallelizable\cite{baruah2012DAGdef},
 fitting the ever-increasing multicore architectures found in today's real-time systems. 
 
@@ -64,19 +66,19 @@ Given that the problem of scheduling independent tasks or dependency-constrained
 NP-hard, it means that it is impossible to find a solution in 
 polynomial time complexity, i.e., solutions are not scalable}\cite{du1989schedNPhard}
 \cite{ULLMAN1975NPhard}, 
-people have resorted to either heuristics 
+people have resorted to either, heuristics 
 to partially solve the problem,
 or the optimal but not scalable Integer Linear Programming
 (ILP) method.
 
-Consequently, machine learning will be considered here as 
+Consequently, machine learning will be considered here, as 
 a machine learning model can 
 approximate a perfect solution while being 
 scalable in terms of computing time after the training phase\cite{Zhao2024GATDRLmodel}\cite{Lee2021GlobalDagSchedDRL}. 
 More specifically, the research questions are the following:
 
 \begin{itemize}
-    \item [RQ1] What is the current state-of-the-Art for DAG tasks scheduling ?        
+    \item [RQ1] What is the current state-of-the-Art for DAG task scheduling ?        
     \item [RQ2] What machine learning  techniques are used for DAG task scheduling ?
     \item [RQ3]  Can machine learning be a better solution to schedule DAG tasks ?
             \begin{itemize}

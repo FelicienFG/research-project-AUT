@@ -7,7 +7,7 @@
 This Systematic Literature Review (SLR) aims at tackling RQ1 and RQ2. More precisely, the following research questions will be answered:
 
 \begin{itemize}
-    \item [RQ1] What is the current state-of-the-Art for DAG tasks scheduling ?        
+    \item [RQ1] What is the current state-of-the-Art for DAG task scheduling ?        
     \item [RQ2] What machine learning  techniques are used for DAG task scheduling ?
 \end{itemize}
 It will also be shown how the literature doesn't provide 
@@ -88,7 +88,7 @@ they do not evaluate the overhead caused by the frequent task migrations
 and preemptions. This overhead can lead to deadline misses
 on systems where the migration cost is high which is why it is important,
 especially with fluid-based algorithms, to consider this overhead\cite{migrationCostFairSched}.
- Also, their algorithm only considers DAG task with implicit deadlines
+ Also, their algorithm only considers DAG tasks with implicit deadlines
 (D = T) which makes the response-time analysis simpler but to the cost
 of not covering all types of tasks that can execute on real-time systems.
 
@@ -141,7 +141,7 @@ the system schedulability of DAG tasks and reduces the resource wasting
 problem of federated scheduling. The main limitation
 of this paper is that they only consider GEDF 
 for their util-tensity bound and
-don't compare with using other algorithms such as Global RM.
+don't compare with other algorithms such as Global RM.
 Also, they only consider implicit deadline DAG tasks
 which doesn't represent tasks that need to have a deadline 
 lower than their period.
@@ -195,7 +195,7 @@ that takes this type of tasks into account
 and compare it to existing global or federated scheduling approaches
 for arbitrary deadline tasks, significantly outperforming
 most of them in terms of acceptance ratio.
-Their approach consists of using this new proposed aglgorithm 
+Their approach consists of using this new proposed algorithm 
 for heavy tasks that have a deadline bigger than their period,
 then using classic federated scheduling for the heavy tasks with a 
 constrained deadline, and finally using EDF-First-Fit (EDF-FF) for the light tasks.
@@ -229,8 +229,8 @@ Federated scheduling isn't the only method used,
 for instance, propose a decomposition-based 
 approach to schedule multiple DAG tasks as well as 
 a metric for testing the schedulability of tasks.
-Their decomposition strategy proves to be the most efficient 
-, according to the defined metric, and the scheduling algorithm
+Their decomposition strategy proves to be the most efficient,
+ according to the defined metric, and the scheduling algorithm
 derived from it shows promising results in terms of
 acceptance ratio.
 Their decomposition strategy basically works by first 
@@ -286,7 +286,7 @@ effectively outperforming \citet{He2019DagIntra}
 in terms of makespan and providing 
 a federated-based multi-DAG scheduling algorithm,
 compatible with this new priority-list scheduling algorithm.
-Their multi-DAG scheduling algorithms also outpeforms 
+Their multi-DAG scheduling algorithm also outpeforms 
 the multi-DAG algorithm used in \cite{He2019DagIntra}.
 Their method uses the vertices in the critical path 
 as producers of workload for the parallelizable vertices
@@ -313,7 +313,7 @@ propose an extension of the DAG task model to add
 execution groups that bind groups of subtasks
 to a single physical core, thus reducing 
 inter-core communication which can cause major
-communication delays depending on the topolgy of the system.
+communication delays depending on the topology of the system.
 They also introduce a scheduling algorithm 
 and compare the makespan of their approach to existing methods
 such as federated scheduling and critical path-based scheduling.
@@ -360,13 +360,13 @@ obtained by solving the equivalent ILP problem.
 Their model achieves up to 75\% of makespan 
 reduction compared to ILP, that is, the makespan 
 produced by the ILP method is, on average, 25\% smaller than the 
-makespan produced by their DRL model,
-which is a relatively good performance as 
+makespan produced by their DRL model.
+This is a relatively good performance as 
 the ILP approach gives the mathematically minimum makespan.
 The more important result, however,
 is that when you increase the subtasks in the DAG tasks,
 the ILP method explodes in terms of computing
-time when the DRL approach gives a result in a relativley short time,
+time when the DRL approach gives a result in a relatively short time,
 making it scalable, unlike the ILP approach.
 The model uses a combination of a graph neural network 
 with attention layers to better capture 
